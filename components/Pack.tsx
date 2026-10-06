@@ -44,7 +44,7 @@ function HoundShape({ h }: { h: Hound }) {
   return (
     <g transform={`translate(${h.x} ${h.y}) scale(${h.scale})`} style={{ "--d": `${h.delay}s` } as React.CSSProperties}>
       <path className="p-tail" d="M172 162 Q206 132 192 84" fill="none" stroke={h.coat} strokeWidth="13" strokeLinecap="round" />
-      <path d="M50 70 L106 62 C114 110 152 122 180 150 C196 170 196 230 196 460 L36 460 C36 300 60 200 50 70 Z" fill={h.coat} filter="url(#grain)" />
+      <path d="M50 70 L106 62 C114 110 152 122 180 150 C196 170 196 230 196 460 L36 460 C36 300 60 200 50 70 Z" fill={h.coat} />
       <path d="M108 94 C200 136 320 110 760 158" fill="none" stroke={h.collar} strokeWidth="2.6" strokeLinecap="round" />
       <circle cx="80" cy="64" r="31" fill={h.coat} />
       <rect x="47" y="88" width="66" height="13" rx="6.5" fill={h.collar} transform="rotate(-7 80 94)" />

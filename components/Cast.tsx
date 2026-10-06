@@ -2,7 +2,8 @@ import type { BreedId } from "@/lib/flow";
 
 // The landing-page cast. Each character is drawn in the style of the
 // illustration references: one flat painted shape per body, long necks,
-// a few thin ink lines, and a dry-brush grain over the top.
+// and a few thin ink lines. (The paper grain is one static overlay on the
+// whole stage, in globals.css, so it costs nothing while things move.)
 // Animated parts are marked with class names that globals.css drives:
 // head, ear, eye, pupil, tongue, tail, paw, jaw, mouth, bark.
 
@@ -18,7 +19,7 @@ const line = { fill: "none", stroke: INK, strokeWidth: 2.4, strokeLinecap: "roun
 function Shepherd() {
   return (
     <svg viewBox="0 0 300 360" className="pet-svg" aria-hidden>
-      <g className="bounce" filter="url(#grain)">
+      <g className="bounce">
         <g className="tail" style={{ transformOrigin: "92px 300px" }}>
           <path d="M100 318 C44 332 0 292 8 234 C20 250 34 254 46 246 C36 224 46 204 64 194 C70 216 86 238 104 262 Z" fill={INK} />
         </g>
@@ -66,7 +67,7 @@ function Golden() {
   const gold = "#e9a03c";
   return (
     <svg viewBox="0 0 300 360" className="pet-svg" aria-hidden>
-      <g className="bounce" filter="url(#grain)">
+      <g className="bounce">
         <g className="tail" style={{ transformOrigin: "212px 300px" }}>
           <path d="M204 314 C262 318 300 270 292 194 C284 214 274 222 262 222 C268 240 258 256 240 258 C236 270 226 276 212 274 Z" fill="#d98a2b" />
         </g>
@@ -103,7 +104,7 @@ function Indie() {
   const red = "#ee6a47";
   return (
     <svg viewBox="0 0 260 380" className="pet-svg" aria-hidden>
-      <g className="bounce" filter="url(#grain)">
+      <g className="bounce">
         <path d="M20 380 C24 290 60 230 84 160 L166 160 C176 240 210 300 214 380 Z" fill={red} />
         <path d="M98 380 v-78 M140 380 v-78" {...line} />
         <g className="head" style={{ transformOrigin: "125px 170px" }}>
@@ -135,7 +136,7 @@ function Beagle() {
   // "upwards" in this drawing and end up hanging with gravity on screen.
   return (
     <svg viewBox="0 0 240 300" className="pet-svg" aria-hidden>
-      <g className="bounce" filter="url(#grain)">
+      <g className="bounce">
         <g className="ear" style={{ transformOrigin: "52px 136px" }}>
           <ellipse cx="34" cy="56" rx="26" ry="92" transform="rotate(-8 52 136)" fill={INK} />
         </g>
@@ -161,7 +162,7 @@ function Cat() {
   const fur = "#231c1c";
   return (
     <svg viewBox="0 0 260 220" className="pet-svg" aria-hidden>
-      <g filter="url(#grain)">
+      <g>
         <g className="tail" style={{ transformOrigin: "214px 214px" }}>
           <path d="M210 216 Q264 192 244 118" fill="none" stroke={fur} strokeWidth="22" strokeLinecap="round" />
         </g>
@@ -219,22 +220,5 @@ export function Toon({ id, className = "" }: { id: BreedId; className?: string }
     <span className={`pet toon reactive ${id === "indie-cat" ? "" : "pet-dog"} ${className}`} data-pat>
       <Drawing />
     </span>
-  );
-}
-
-// The dry-brush speckle shared by every character.
-export function CastDefs() {
-  return (
-    <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden>
-      <filter id="grain" x="-20%" y="-20%" width="140%" height="140%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="noise" />
-        <feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1.5 0 0 0 -0.92" result="specks" />
-        <feComposite in="specks" in2="SourceGraphic" operator="in" result="brush" />
-        <feMerge>
-          <feMergeNode in="SourceGraphic" />
-          <feMergeNode in="brush" />
-        </feMerge>
-      </filter>
-    </svg>
   );
 }

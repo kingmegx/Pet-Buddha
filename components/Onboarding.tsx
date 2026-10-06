@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { AGE_STOPS, BREEDS, NEEDS, WEIGHT_RANGE, formatAge, type BreedId, type NeedId, type Species } from "@/lib/flow";
 import { Pet } from "./Pets";
-import { CastDefs, Toon } from "./Cast";
+import { Toon } from "./Cast";
 import { Pack, aimPack, type PackMood } from "./Pack";
 import { CatBox, type BoxBrand, type CatCoat } from "./CatBox";
 import Slider from "./Slider";
@@ -48,6 +48,8 @@ export default function Onboarding() {
   const [cheer, setCheer] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [packMood, setPackMood] = useState<PackMood>("idle");
+  const lookFrame = useRef(0);
+  const aimFrame = useRef(0);
 
   const pet = BREEDS.find((b) => b.id === breed);
   const species: Species = pet?.species ?? "dog";
@@ -133,11 +135,16 @@ export default function Onboarding() {
     <main
       className="stage"
       onPointerMove={(e) => {
-        e.currentTarget.style.setProperty("--lx", ((e.clientX / window.innerWidth) * 2 - 1).toFixed(2));
-        e.currentTarget.style.setProperty("--ly", ((e.clientY / window.innerHeight) * 2 - 1).toFixed(2));
+        // Eyes follow the hand. Updated at most once per frame.
+        const stage = e.currentTarget;
+        const { clientX, clientY } = e;
+        cancelAnimationFrame(lookFrame.current);
+        lookFrame.current = requestAnimationFrame(() => {
+          stage.style.setProperty("--lx", ((clientX / window.innerWidth) * 2 - 1).toFixed(2));
+          stage.style.setProperty("--ly", ((clientY / window.innerHeight) * 2 - 1).toFixed(2));
+        });
       }}
     >
-      <CastDefs />
       <svg className="hill" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
         <motion.path initial={false} animate={{ d: HILL[step] }} transition={wobble} />
       </svg>
@@ -228,10 +235,14 @@ export default function Onboarding() {
                 const at = e.clientX / window.innerWidth;
                 const next: PackMood = at >= 0.65 ? "wag" : at >= 0.52 ? "sniff" : "idle";
                 if (next !== packMood) setPackMood(next);
-                aimPack(e.currentTarget, next === "idle" ? null : { x: e.clientX, y: e.clientY });
+                const sides = e.currentTarget;
+                const target = next === "idle" ? null : { x: e.clientX, y: e.clientY };
+                cancelAnimationFrame(aimFrame.current);
+                aimFrame.current = requestAnimationFrame(() => aimPack(sides, target));
               }}
               onPointerLeave={(e) => {
                 setPackMood("idle");
+                cancelAnimationFrame(aimFrame.current);
                 aimPack(e.currentTarget, null);
               }}
             >
