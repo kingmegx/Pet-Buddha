@@ -1,0 +1,1028 @@
+:root {
+  /* Palette drawn from the illustration references: warm cream paper,
+     dusty teal ground, and marigold / coral / cobalt for the characters. */
+  --sky: #f5e6cf;
+  --ground: #8fc4bf;
+  --ground-deep: #5c9f9a;
+  --sun: #f5b041;
+  --coral: #ee5f3f;
+  --cobalt: #1f4fa3;
+  --ink: #211e1c;
+  --hand: #f7b2ac;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--sky);
+  color: var(--cobalt);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.has-hand,
+.has-hand * {
+  cursor: none !important;
+}
+
+/* ---------- stage ---------- */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.hill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hill path {
+  fill: var(--ground);
+}
+
+.title {
+  position: absolute;
+  top: clamp(18px, 5vh, 48px);
+  left: 0;
+  right: 0;
+  padding: 0 56px;
+  text-align: center;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.title p {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.title h1 {
+  margin: 0;
+  font-size: clamp(30px, 5.2vw, 56px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+
+.back {
+  position: absolute;
+  top: clamp(16px, 4vh, 36px);
+  left: clamp(14px, 3vw, 36px);
+  z-index: 5;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  color: var(--ink);
+  font-size: 20px;
+  transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.back:hover {
+  transform: scale(1.12) translateX(-2px);
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+/* ---------- buttons, chips ---------- */
+
+.pill {
+  padding: 15px 34px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--sky);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: transform 0.25s cubic-bezier(0.3, 1.8, 0.5, 1), opacity 0.2s;
+}
+
+.pill:hover:not(:disabled) {
+  transform: scale(1.09) rotate(-2deg);
+}
+
+.pill:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.pill:disabled {
+  opacity: 0.35;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 640px;
+}
+
+.chip {
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+  transition: transform 0.25s cubic-bezier(0.3, 1.8, 0.5, 1), background 0.15s, color 0.15s;
+}
+
+button.chip:hover {
+  transform: translateY(-3px) rotate(-1.5deg);
+}
+
+button.chip:active {
+  transform: scale(0.93);
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--sun);
+  animation: chip-pop 0.35s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+
+.chip-static {
+  border-color: transparent;
+  background: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+}
+
+@keyframes chip-pop {
+  40% {
+    transform: scale(1.14) rotate(2deg);
+  }
+}
+
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* ---------- controls block ---------- */
+
+.controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(20px, 6vh, 64px);
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.readout {
+  margin: 0;
+  font-size: clamp(22px, 3.2vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-align: center;
+}
+
+.hint {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  opacity: 0.7;
+}
+
+/* ---------- slider ---------- */
+
+.slider {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: min(460px, 100%);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.slider-end {
+  width: 52px;
+  text-align: center;
+  flex: none;
+}
+
+.slider-track {
+  position: relative;
+  flex: 1;
+  height: 44px;
+  touch-action: none;
+  border-radius: 22px;
+}
+
+.slider-track svg {
+  position: absolute;
+  inset: 7px 0;
+  width: 100%;
+  height: 30px;
+  overflow: visible;
+}
+
+.slider-track path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 7;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  transition: d 0.25s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+
+.slider-knob {
+  position: absolute;
+  top: 19px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--ink);
+  transition: transform 0.25s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+
+/* ---------- landing ---------- */
+
+.landing-copy {
+  position: absolute;
+  top: 21%;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.landing-copy > * {
+  pointer-events: auto;
+}
+
+.logo {
+  margin: 0;
+  font-size: clamp(54px, 10vw, 112px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+}
+
+.landing-copy p {
+  margin: 14px 0 26px;
+  font-size: clamp(15px, 1.6vw, 18px);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* The cast rings the title, each one leaning in from its own edge. */
+
+.cast .toon {
+  position: absolute;
+  transition: translate 0.42s cubic-bezier(0.6, -0.3, 0.7, 0.4);
+}
+
+.cast .c-gsd {
+  left: -3%;
+  bottom: -1%;
+  width: clamp(230px, 28vw, 430px);
+  animation: in-left 0.8s 0.05s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
+}
+
+.cast .c-golden {
+  right: -3%;
+  bottom: -1%;
+  width: clamp(230px, 28vw, 430px);
+  animation: in-right 0.8s 0.15s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
+}
+
+.cast .c-indie {
+  left: 5%;
+  top: -13%;
+  width: clamp(130px, 18vw, 280px);
+  transform: scaleY(-1) rotate(-30deg);
+  animation: in-top-left 0.8s 0.25s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
+}
+
+.cast .c-beagle {
+  right: 15%;
+  top: -3%;
+  width: clamp(100px, 13vw, 200px);
+  transform: rotate(180deg);
+  animation: in-top 0.8s 0.3s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
+}
+
+.cast .c-cat {
+  left: 50%;
+  bottom: -3%;
+  width: clamp(150px, 19vw, 290px);
+  margin-left: calc(clamp(150px, 19vw, 290px) / -2);
+  animation: in-bottom 0.8s 0.2s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
+}
+
+.cast.is-leaving .c-gsd {
+  translate: -140% 0;
+}
+
+.cast.is-leaving .c-golden {
+  translate: 140% 0;
+}
+
+.cast.is-leaving .c-indie {
+  translate: -90% -120%;
+}
+
+.cast.is-leaving .c-beagle {
+  translate: 0 -140%;
+}
+
+.cast.is-leaving .c-cat {
+  translate: 0 140%;
+}
+
+@keyframes in-left {
+  from {
+    translate: -130% 20%;
+  }
+}
+
+@keyframes in-right {
+  from {
+    translate: 130% 20%;
+  }
+}
+
+@keyframes in-top {
+  from {
+    translate: 0 -140%;
+  }
+}
+
+@keyframes in-top-left {
+  from {
+    translate: -90% -120%;
+  }
+}
+
+@keyframes in-bottom {
+  from {
+    translate: 0 130%;
+  }
+}
+
+/* ---------- dog or cat ---------- */
+
+.sides {
+  position: absolute;
+  inset: 20% 0 0;
+  display: flex;
+}
+
+.side {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  transition: background 0.25s;
+}
+
+.side-dog .crowd {
+  inset: 0 0 21% 3%;
+}
+
+.side-cat .crowd {
+  inset: 0 2% 19% 2%;
+}
+
+.pack {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pack :is(.p-tail, .p-head, .p-ear, .p-nose, .p-eye) {
+  transform-box: fill-box;
+}
+
+.p-tail {
+  transform-origin: 0% 100%;
+  animation: sway 3.2s var(--d) ease-in-out infinite;
+}
+
+.p-head {
+  transform-origin: 100% 100%;
+  transform: rotate(var(--aim, 0deg));
+  transition: transform 0.18s ease-out;
+}
+
+.p-eye {
+  transform-origin: 50% 50%;
+  animation: blink 4.2s var(--d) infinite;
+}
+
+.p-nose {
+  transform-origin: 50% 50%;
+}
+
+.pack[data-mood="sniff"] .p-nose {
+  animation: nose-twitch 0.07s ease-in-out infinite alternate;
+}
+
+.pack[data-mood="wag"] .p-tail {
+  animation: wag 0.2s var(--d) ease-in-out infinite alternate;
+}
+
+.pack[data-mood="wag"] .p-ear {
+  transform-origin: 50% 20%;
+  animation: flap 0.3s var(--d) ease-in-out infinite alternate;
+}
+
+@keyframes nose-twitch {
+  from {
+    transform: translate(-0.7px, 0.5px) scale(1.06, 0.96);
+  }
+  to {
+    transform: translate(0.7px, -0.5px) scale(0.96, 1.08);
+  }
+}
+
+.crowd {
+  position: absolute;
+  inset: 2% 6% 22%;
+}
+
+.spot {
+  position: absolute;
+  display: block;
+}
+
+.side-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(16px, 5vh, 48px);
+  font-size: clamp(34px, 6vw, 72px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  transition: transform 0.3s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+
+.side:hover .side-label {
+  transform: scale(1.14) rotate(-3deg);
+}
+
+/* ---------- cats in boxes ---------- */
+
+.catbox {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* ---------- breed pick ---------- */
+
+.breeds {
+  position: absolute;
+  inset: 24% 0 0;
+  padding: 0 clamp(12px, 3vw, 48px) 5vh;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  align-content: center;
+  gap: 2vh clamp(8px, 2vw, 28px);
+}
+
+.breed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: clamp(130px, 17vw, 230px);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* ---------- hero pet ---------- */
+
+.hero {
+  position: absolute;
+  left: 50%;
+  z-index: 1;
+  width: clamp(190px, 30vw, 360px);
+  margin-left: calc(clamp(190px, 30vw, 360px) / -2);
+  translate: 0 -50%;
+}
+
+.hero-size {
+  transform-origin: 50% 90%;
+  transition: transform 0.35s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+
+.hero .pet-cat {
+  width: 62%;
+  margin: 0 auto;
+}
+
+/* ---------- pets ---------- */
+
+.pet {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.pet-svg {
+  display: block;
+  height: auto;
+  overflow: visible;
+}
+
+.pet-cat .pet-svg {
+  width: 100%;
+}
+
+.pet .shadow {
+  fill: var(--ground-deep);
+}
+
+.pet .tongue {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.pet .tail {
+  animation: sway 3.2s ease-in-out infinite;
+}
+
+.pet .head {
+  animation: nod 4.5s ease-in-out infinite;
+}
+
+.pet .eye {
+  animation: blink 4.2s infinite;
+}
+
+.pet .cat-rig {
+  transition: transform 0.4s cubic-bezier(0.3, 1.7, 0.5, 1);
+}
+
+.spot:nth-child(2n) .pet * {
+  animation-delay: -1.3s;
+}
+
+.spot:nth-child(3n) .pet * {
+  animation-delay: -2.4s;
+}
+
+.toon .pet-svg {
+  width: 100%;
+}
+
+.pet .tongue.pant {
+  opacity: 1;
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: pant 0.26s ease-in-out infinite alternate;
+}
+
+/* Eyes follow the pointer: the stage sets --lx / --ly between -1 and 1. */
+.pupil {
+  translate: calc(var(--lx, 0) * 3px) calc(var(--ly, 0) * 3px);
+  transition: translate 0.15s ease-out;
+}
+
+.c-indie .pupil {
+  translate: calc(var(--lx, 0) * 3px) calc(var(--ly, 0) * -3px);
+}
+
+/* The white dog barks while hovered: the head kicks up, the jaw drops
+   and action lines flash by the nose. */
+.bark,
+.mouth {
+  opacity: 0;
+}
+
+.cast .c-gsd:hover .bark,
+.cast .c-gsd:hover .mouth {
+  animation: bark-flash 0.46s steps(1) infinite;
+}
+
+.cast .c-gsd:hover .jaw {
+  animation: bark-jaw 0.46s steps(1) infinite;
+}
+
+.cast .c-gsd:hover .head {
+  animation: bark-head 0.46s ease-out infinite;
+}
+
+@keyframes bark-flash {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes bark-jaw {
+  0% {
+    transform: rotate(17deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes bark-head {
+  0% {
+    transform: rotate(-9deg) translateY(-4px);
+  }
+  50%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+}
+
+/* Indie and Beagle: sway where they hang. */
+.c-indie .pet-svg {
+  transform-origin: 50% 100%;
+  animation: hang 2.8s ease-in-out infinite alternate;
+}
+
+.c-beagle .ear {
+  animation: dangle 1.5s ease-in-out infinite alternate;
+}
+
+.c-beagle .ear + .ear {
+  animation-delay: -0.5s;
+}
+
+/* The two corner dogs sway their heads and ears, eyes closed. */
+.c-gsd .head {
+  animation: lean 1.6s -0.6s ease-in-out infinite alternate-reverse;
+}
+
+.c-gsd .ear {
+  animation: flap 1.6s ease-in-out infinite alternate;
+}
+
+.c-gsd .tail,
+.c-golden .tail {
+  transform-box: view-box;
+  animation: wag 0.5s ease-in-out infinite alternate;
+}
+
+.c-golden .head {
+  animation: lean 1.3s ease-in-out infinite alternate;
+}
+
+.c-golden .ear {
+  animation: flap 1.3s ease-in-out infinite alternate;
+}
+
+/* Cat: waves a paw, flicks its tail. */
+.paw {
+  animation: wave 2.8s ease-in-out infinite;
+}
+
+.pet .tail {
+  transform-box: view-box;
+}
+
+.c-cat .tail {
+  animation: flick 2.2s ease-in-out infinite;
+}
+
+.reactive:hover .paw {
+  animation: wave 0.5s ease-in-out infinite;
+}
+
+/* A pet reacts when it is hovered, when its ".reactive" parent is hovered,
+   or when the page marks it ".is-happy". */
+
+:is(.is-happy, .reactive:hover) .tail {
+  animation: wag 0.24s ease-in-out infinite alternate;
+}
+
+:is(.is-happy, .reactive:hover) .tongue {
+  opacity: 1;
+}
+
+:is(.is-happy, .reactive:hover) .bounce {
+  animation: hop 0.5s cubic-bezier(0.3, 0, 0.4, 1) infinite alternate;
+}
+
+:is(.is-happy, .reactive:hover) .pet-dog .ear,
+.pet-dog:is(.is-happy, .reactive:hover) .ear {
+  animation: flap 0.25s ease-in-out infinite alternate;
+}
+
+:is(.is-happy, .reactive:hover) .head {
+  animation: tilt 0.6s ease-in-out infinite alternate;
+}
+
+/* Cats in boxes duck down and peek instead. */
+
+.reactive:hover .cat-rig.in-box {
+  transform: translateY(28px);
+}
+
+.reactive:hover .cat-rig.in-box .bounce,
+.reactive:hover .cat-rig.in-box .head {
+  animation: none;
+}
+
+.reactive:hover .cat-rig.in-box .ear {
+  animation: twitch 0.5s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.spot:nth-child(2) .cat-rig {
+  transition-delay: 0.06s;
+}
+
+.spot:nth-child(3) .cat-rig {
+  transition-delay: 0.12s;
+}
+
+.spot:nth-child(4) .cat-rig {
+  transition-delay: 0.18s;
+}
+
+.spot:nth-child(5) .cat-rig {
+  transition-delay: 0.24s;
+}
+
+@keyframes hang {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes dangle {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes lean {
+  from {
+    transform: rotate(0deg) scale(1, 1);
+  }
+  to {
+    transform: rotate(5deg) scale(1.02, 0.96);
+  }
+}
+
+@keyframes wave {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0deg);
+  }
+  70%,
+  90% {
+    transform: rotate(13deg);
+  }
+  80% {
+    transform: rotate(-4deg);
+  }
+}
+
+@keyframes flick {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0deg);
+  }
+  80% {
+    transform: rotate(14deg);
+  }
+  90% {
+    transform: rotate(-6deg);
+  }
+}
+
+@keyframes pant {
+  to {
+    transform: scaleY(1.24);
+  }
+}
+
+@keyframes sway {
+  50% {
+    transform: rotate(9deg);
+  }
+}
+
+@keyframes wag {
+  from {
+    transform: rotate(-20deg);
+  }
+  to {
+    transform: rotate(24deg);
+  }
+}
+
+@keyframes nod {
+  50% {
+    transform: rotate(-2.5deg);
+  }
+}
+
+@keyframes tilt {
+  from {
+    transform: rotate(-7deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+  97% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes hop {
+  to {
+    transform: translateY(-9px);
+  }
+}
+
+@keyframes flap {
+  to {
+    transform: rotate(-16deg);
+  }
+}
+
+@keyframes twitch {
+  to {
+    transform: rotate(9deg);
+  }
+}
+
+/* ---------- hand cursor ---------- */
+
+.hand {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  margin: -8px 0 0 -29px;
+  pointer-events: none;
+}
+
+.hand svg {
+  display: block;
+  overflow: visible;
+}
+
+.hand-pat {
+  animation: pat 0.32s ease-in-out infinite alternate;
+  transform-box: view-box;
+  transform-origin: 50px 100px;
+}
+
+@keyframes pat {
+  from {
+    transform: rotate(-34deg);
+  }
+  to {
+    transform: rotate(-20deg);
+  }
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 640px) {
+  .landing-copy {
+    top: 26%;
+  }
+
+  .cast .c-gsd {
+    left: -15%;
+    bottom: -1%;
+    width: 52vw;
+  }
+
+  .cast .c-golden {
+    right: -15%;
+    bottom: -1%;
+    width: 52vw;
+  }
+
+  .cast .c-indie {
+    left: -6%;
+    top: -9%;
+    width: 38vw;
+  }
+
+  .cast .c-beagle {
+    right: 6%;
+    top: -5%;
+    width: 27vw;
+  }
+
+  .cast .c-cat {
+    width: 34vw;
+    margin-left: -17vw;
+    z-index: 1;
+  }
+
+  .sides {
+    flex-direction: column;
+    inset: 16% 0 0;
+  }
+
+  .side-dog .crowd {
+    inset: 0 30% 0 0;
+  }
+
+  .crowd {
+    inset: 2% 34% 4% 4%;
+  }
+
+  .side-label {
+    left: auto;
+    right: 6%;
+    bottom: 38%;
+  }
+
+  .breeds {
+    inset: 17% 0 0;
+    align-content: flex-end;
+  }
+
+  .breed {
+    width: 30%;
+    font-size: 13px;
+  }
+
+  .chip {
+    padding: 10px 16px;
+    font-size: 15px;
+  }
+
+  .slider-end {
+    width: 44px;
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catbox *,
+  .pack *,
+  .pet *,
+  .hand-pat,
+  .chip {
+    animation: none !important;
+  }
+}

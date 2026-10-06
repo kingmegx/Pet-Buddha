@@ -1,0 +1,16 @@
+node_modules
+.next
+.vercel
+.DS_Store
+next-env.d.ts
+
+# env files
+.env*
+
+# build output
+out
+build
+*.tsbuildinfo
+
+# reference material (third-party, kept local)
+inspo
