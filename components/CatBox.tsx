@@ -1,13 +1,14 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 
 // The cat side of the "Who's your buddy?" screen: a cardboard box with a
-// letterbox slot cut in the front and a cat hiding inside. On a loop the cat
-// looks around, blinks, curls both arms out of the slot, swipes with one of
-// them, pulls them back in and ducks out of sight. Hovering a box makes the
-// cat reach out and bat at the hand.
+// letterbox slot cut in the front and a cat hiding inside. The cat sits
+// still until its box is hovered; then it perks its ears, widens its pupils
+// and reaches out to bat at the hand.
+// Its ears poke up over the rim of the box and duck with the face, so it
+// reads as a cat even when only the eyes show in the slot.
 //
 // Each arm is one thick line that bends between a few poses, so it unfurls
 // and swings like a real limb instead of popping in and out.
@@ -17,10 +18,10 @@ const INK = "#211e1c";
 export type CatCoat = "black" | "orange" | "spotted";
 export type BoxBrand = "furex" | "pawmazon" | "plain";
 
-const COATS: Record<CatCoat, { fur: string; leftArm: string; patch?: string; mouth: string }> = {
-  black: { fur: "#231c1c", leftArm: "#231c1c", mouth: "#8f8782" },
-  orange: { fur: "#f0883a", leftArm: "#f0883a", mouth: INK },
-  spotted: { fur: "#ffffff", leftArm: "#9a5b34", patch: "#9a5b34", mouth: INK },
+const COATS: Record<CatCoat, { fur: string; leftArm: string; patch?: string; mouth: string; earL: string; earR: string; inner: string; whisker: string }> = {
+  black: { fur: "#231c1c", leftArm: "#231c1c", mouth: "#8f8782", earL: "#231c1c", earR: "#231c1c", inner: "#6b3838", whisker: "#fffaf2" },
+  orange: { fur: "#f0883a", leftArm: "#f0883a", mouth: INK, earL: "#f0883a", earR: "#f0883a", inner: "#f7b48a", whisker: "#fffaf2" },
+  spotted: { fur: "#ffffff", leftArm: "#ffffff", patch: "#9a5b34", mouth: INK, earL: "#ffffff", earR: "#9a5b34", inner: "#f6b9c4", whisker: "rgba(33,30,28,0.55)" },
 };
 
 function Label({ brand }: { brand: BoxBrand }) {
@@ -55,28 +56,20 @@ function Label({ brand }: { brand: BoxBrand }) {
 type Pose = { d: string; x: number; y: number; rotate: number; scale: number; opacity: number };
 
 // Left arm (the one that swipes) and right arm, as seen on screen. x / y /
-// rotate place the paw on the end of the arm for that pose.
-// "tuck" is hidden inside the box; "curl" is the same spot but visible, so
-// an arm is fully solid for the whole time it is moving.
-const LEFT: Record<"tuck" | "curl" | "hang" | "reach" | "swipe", Pose> = {
-  tuck: { d: "M60 152 C60 152 60 152 60 152", x: 60, y: 152, rotate: 0, scale: 0.3, opacity: 0 },
-  curl: { d: "M60 152 C60 152 60 152 60 152", x: 60, y: 152, rotate: 0, scale: 0.3, opacity: 1 },
-  hang: { d: "M62 152 C28 148 24 184 30 212", x: 31, y: 216, rotate: 6, scale: 1, opacity: 1 },
-  reach: { d: "M62 152 C36 150 14 136 -4 112", x: -6, y: 109, rotate: 143, scale: 1, opacity: 1 },
-  swipe: { d: "M62 152 C36 153 10 151 -12 140", x: -15, y: 138, rotate: 118, scale: 1, opacity: 1 },
+// rotate place the paw on the end of the arm for that pose. The shoulders sit
+// out past the eyes so an arm never covers one.
+// "tuck" is hidden inside the box.
+const LEFT: Record<"tuck" | "hang" | "reach" | "swipe", Pose> = {
+  tuck: { d: "M54 152 C54 152 54 152 54 152", x: 54, y: 152, rotate: 0, scale: 0.3, opacity: 0 },
+  hang: { d: "M54 152 C26 148 24 184 30 212", x: 31, y: 216, rotate: 6, scale: 1, opacity: 1 },
+  reach: { d: "M54 152 C32 150 14 136 -4 112", x: -6, y: 109, rotate: 143, scale: 1, opacity: 1 },
+  swipe: { d: "M54 152 C32 153 10 151 -12 140", x: -15, y: 138, rotate: 118, scale: 1, opacity: 1 },
 };
 
-const RIGHT: Record<"tuck" | "curl" | "hang", Pose> = {
-  tuck: { d: "M146 152 C146 152 146 152 146 152", x: 146, y: 152, rotate: 0, scale: 0.3, opacity: 0 },
-  curl: { d: "M146 152 C146 152 146 152 146 152", x: 146, y: 152, rotate: 0, scale: 0.3, opacity: 1 },
-  hang: { d: "M144 152 C178 148 182 184 174 212", x: 173, y: 216, rotate: -8, scale: 1, opacity: 1 },
+const RIGHT: Record<"tuck" | "hang", Pose> = {
+  tuck: { d: "M152 152 C152 152 152 152 152 152", x: 152, y: 152, rotate: 0, scale: 0.3, opacity: 0 },
+  hang: { d: "M152 152 C180 148 182 184 174 212", x: 173, y: 216, rotate: -8, scale: 1, opacity: 1 },
 };
-
-const LOOP = 9; // seconds for one full idle cycle
-const LEFT_STEPS = ["tuck", "tuck", "curl", "hang", "hang", "reach", "swipe", "reach", "swipe", "hang", "curl", "tuck", "tuck"] as const;
-const LEFT_TIMES = [0, 0.455, 0.46, 0.55, 0.6, 0.66, 0.7, 0.74, 0.78, 0.85, 0.905, 0.91, 1];
-const RIGHT_STEPS = ["tuck", "tuck", "curl", "hang", "hang", "curl", "tuck", "tuck"] as const;
-const RIGHT_TIMES = [0, 0.435, 0.44, 0.53, 0.82, 0.885, 0.89, 1];
 
 type Mode = "idle" | "reach" | "bat" | "settle";
 
@@ -93,38 +86,22 @@ function still(pose: Pose) {
   return { arm: { d, opacity }, paw: { ...paw, opacity } };
 }
 
-export function CatBox({ coat, brand, delay = 0 }: { coat: CatCoat; brand: BoxBrand; delay?: number }) {
+export function CatBox({ coat, brand }: { coat: CatCoat; brand: BoxBrand }) {
   const c = COATS[coat];
   const clip = `slot-${coat}-${brand}`;
   const beans = "#ff4f9a";
   const [mode, setMode] = useState<Mode>("idle");
-  const firstRun = useRef(true);
 
   const a = useMemo(() => {
-    const wait = firstRun.current ? delay : 0;
-    const loop = (times: number[]) => ({ duration: LOOP, times, repeat: Infinity, ease: "easeInOut" as const, delay: wait });
     const quick = { duration: mode === "settle" ? 0.34 : 0.24, ease: "easeOut" as const };
     const swing = { duration: 0.27, repeat: Infinity, repeatType: "mirror" as const, ease: "easeInOut" as const };
 
-    if (mode === "idle") {
-      return {
-        left: column(LEFT_STEPS, LEFT),
-        leftT: loop(LEFT_TIMES),
-        right: column(RIGHT_STEPS, RIGHT),
-        rightT: loop(RIGHT_TIMES),
-        face: { y: [0, 0, 60, 60, 0] },
-        faceT: loop([0, 0.92, 0.95, 0.975, 1]),
-        look: { x: [0, -6, -6, 6, 6, 0, 0] },
-        lookT: loop([0, 0.07, 0.15, 0.23, 0.31, 0.37, 1]),
-        blink: { scaleY: [1, 1, 0.08, 1, 1] },
-        blinkT: loop([0, 0.395, 0.415, 0.435, 1]),
-      };
-    }
     const batting = mode === "bat";
+    const resting = mode === "idle" || mode === "settle";
     return {
       left: batting ? column(["reach", "swipe"] as const, LEFT) : still(mode === "reach" ? LEFT.reach : LEFT.tuck),
       leftT: batting ? swing : quick,
-      right: still(mode === "settle" ? RIGHT.tuck : RIGHT.hang),
+      right: still(resting ? RIGHT.tuck : RIGHT.hang),
       rightT: quick,
       face: { y: 0 },
       faceT: quick,
@@ -133,7 +110,7 @@ export function CatBox({ coat, brand, delay = 0 }: { coat: CatCoat; brand: BoxBr
       blink: { scaleY: 1 },
       blinkT: quick,
     };
-  }, [mode, delay]);
+  }, [mode]);
 
   return (
     <svg
@@ -141,16 +118,25 @@ export function CatBox({ coat, brand, delay = 0 }: { coat: CatCoat; brand: BoxBr
       viewBox="0 0 300 250"
       data-pat
       aria-hidden
-      onPointerEnter={() => {
-        firstRun.current = false;
-        setMode("reach");
-      }}
+      onPointerEnter={() => setMode("reach")}
       onPointerLeave={() => setMode("settle")}
     >
       <polygon points="40,216 178,236 294,198 252,186" fill="rgba(33,30,28,0.2)" />
       <polygon points="108,62 252,74 232,36 100,28" fill="#f1d9c6" />
       <polygon points="28,84 108,62 252,74 178,96" fill="#2b211c" />
       <polygon points="28,84 108,62 172,67 96,90" fill="#e7c8b0" />
+      {/* Ears over the rim, above the face in the slot. Their bases hide
+          behind the front of the box, so they duck out of sight with it. */}
+      <motion.g initial={false} animate={a.face} transition={a.faceT}>
+        <g className="cb-ear">
+          <polygon points="72,100 80,44 108,92" fill={c.earL} stroke={c.earL} strokeWidth="2.4" strokeLinejoin="round" />
+          <polygon points="81,90 85,58 99,86" fill={c.inner} />
+        </g>
+        <g className="cb-ear cb-ear-r">
+          <polygon points="104,94 128,46 140,100" fill={c.earR} stroke={c.earR} strokeWidth="2.4" strokeLinejoin="round" />
+          <polygon points="113,88 126,60 132,90" fill={c.inner} />
+        </g>
+      </motion.g>
       <polygon points="28,84 178,96 178,222 28,202" fill="#d8ab8d" />
       <polygon points="178,96 252,74 252,194 178,222" fill="#c3987c" />
       <polygon points="88,89 114,91 114,112 88,110" fill="#edd3c1" />
@@ -177,6 +163,7 @@ export function CatBox({ coat, brand, delay = 0 }: { coat: CatCoat; brand: BoxBr
           </motion.g>
           <path d="M98.5 160 h9 l-4.5 5 Z" fill={beans} />
           <path d="M95.5 169 q4 5 7.5 0 q3.5 5 7.5 0" fill="none" stroke={c.mouth} strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M90 162 l-26 -5 M90 168 l-26 3 M116 162 l26 -5 M116 168 l26 3" stroke={c.whisker} strokeWidth="1.4" strokeLinecap="round" />
         </motion.g>
       </g>
 

@@ -29,10 +29,10 @@ const HILL: Record<Step, string> = {
 const wobble = { type: "spring", stiffness: 90, damping: 9, mass: 1 } as const;
 const pop = { type: "spring", stiffness: 260, damping: 18 } as const;
 
-const CAT_BOXES: { coat: CatCoat; brand: BoxBrand; delay: number; style: React.CSSProperties }[] = [
-  { coat: "black", brand: "furex", delay: 0, style: { left: "8%", top: "8%", width: "38%" } },
-  { coat: "orange", brand: "pawmazon", delay: 2.6, style: { left: "54%", top: "18%", width: "38%" } },
-  { coat: "spotted", brand: "plain", delay: 5.4, style: { left: "27%", top: "52%", width: "40%" } },
+const CAT_BOXES: { coat: CatCoat; brand: BoxBrand; style: React.CSSProperties }[] = [
+  { coat: "black", brand: "furex", style: { left: "8%", top: "8%", width: "38%" } },
+  { coat: "orange", brand: "pawmazon", style: { left: "54%", top: "18%", width: "38%" } },
+  { coat: "spotted", brand: "plain", style: { left: "27%", top: "52%", width: "40%" } },
 ];
 
 export default function Onboarding() {
@@ -115,16 +115,30 @@ export default function Onboarding() {
 
   const titles: Record<Step, [string, string]> = {
     landing: ["", ""],
-    species: ["Step 1", "Who's your buddy?"],
-    breed: ["Step 2", "Pick your dog"],
-    age: [species === "cat" ? "Step 2" : "Step 3", "Tell us more"],
-    weight: [species === "cat" ? "Step 2" : "Step 3", "Tell us more"],
-    sex: [species === "cat" ? "Step 2" : "Step 3", "Tell us more"],
-    needs: [species === "cat" ? "Step 3" : "Step 4", "What do you need help with?"],
-    follow: [species === "cat" ? "Step 4" : "Step 5", current?.label ?? ""],
+    species: ["", "Who's your buddy?"],
+    breed: ["", "Pick your dog"],
+    age: ["", "Tell us more"],
+    weight: ["", "Tell us more"],
+    sex: ["", "Tell us more"],
+    needs: ["", "What do you need help with?"],
+    follow: ["", current?.label ?? ""],
     done: ["All set", pet ? `Curating for your ${pet.name}` : ""],
   };
   const [eyebrow, title] = titles[step];
+
+  // The progress bar has one segment per step (cats skip the breed step).
+  // "Tell us more" spans three screens and the follow-ups one per need, so
+  // those segments fill in parts.
+  const segments = species === "cat" ? ["species", "about", "needs", "follow"] : ["species", "breed", "about", "needs", "follow"];
+  const segment = ["age", "weight", "sex"].includes(step) ? "about" : step;
+  const at = segments.indexOf(segment);
+  const part =
+    step === "age" || step === "weight" || step === "sex"
+      ? (["age", "weight", "sex"].indexOf(step) + 1) / 3
+      : step === "follow"
+        ? (followIndex + 1) / Math.max(1, chosen.length)
+        : 1;
+  const fill = (i: number) => (step === "done" || i < at ? 1 : i === at ? part : 0);
 
   const heroOn = !!pet && ["age", "weight", "sex", "needs", "follow", "done"].includes(step);
   const heroSmall = step === "needs" || step === "follow" || step === "done";
@@ -155,6 +169,30 @@ export default function Onboarding() {
         </button>
       )}
 
+      <AnimatePresence>
+        {step !== "landing" && (
+          <motion.div
+            className="progress"
+            role="progressbar"
+            aria-label="Progress"
+            aria-valuemin={0}
+            aria-valuemax={segments.length}
+            aria-valuenow={step === "done" ? segments.length : at + 1}
+            aria-valuetext={step === "done" ? "Done" : `Step ${at + 1} of ${segments.length}`}
+            initial={{ opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={pop}
+          >
+            {segments.map((name, i) => (
+              <span key={name} className="progress-seg">
+                <motion.span className="progress-fill" initial={false} animate={{ scaleX: fill(i) }} transition={pop} />
+              </span>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence mode="wait">
         {title && (
           <motion.header
@@ -165,7 +203,7 @@ export default function Onboarding() {
             exit={{ y: -60, opacity: 0, transition: { duration: 0.15 } }}
             transition={pop}
           >
-            <p>{eyebrow}</p>
+            {eyebrow && <p>{eyebrow}</p>}
             <h1>{title}</h1>
           </motion.header>
         )}
@@ -230,10 +268,10 @@ export default function Onboarding() {
             <div
               className="sides"
               onPointerMove={(e) => {
-                // The dogs notice the hand as it crosses the middle: from 52% of
-                // the way over they point their noses at it, and wag once it is on top of them.
+                // The dogs notice the hand as it nears their side: they point
+                // their noses at it and sniff. That is their only reaction.
                 const at = e.clientX / window.innerWidth;
-                const next: PackMood = at >= 0.65 ? "wag" : at >= 0.52 ? "sniff" : "idle";
+                const next: PackMood = at >= 0.45 ? "sniff" : "idle";
                 if (next !== packMood) setPackMood(next);
                 const sides = e.currentTarget;
                 const target = next === "idle" ? null : { x: e.clientX, y: e.clientY };
@@ -250,13 +288,13 @@ export default function Onboarding() {
                 <span className="crowd">
                   {CAT_BOXES.map((b) => (
                     <span key={b.coat} className="spot" style={b.style}>
-                      <CatBox coat={b.coat} brand={b.brand} delay={b.delay} />
+                      <CatBox coat={b.coat} brand={b.brand} />
                     </span>
                   ))}
                 </span>
                 <span className="side-label">Cat</span>
               </button>
-              <button className="side side-dog" onClick={() => go("breed")} data-pat>
+              <button className="side side-dog" onClick={() => go("breed")}>
                 <span className="crowd">
                   <Pack mood={packMood} />
                 </span>

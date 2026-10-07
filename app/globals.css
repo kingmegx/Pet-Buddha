@@ -72,9 +72,37 @@ button {
   fill: var(--ground);
 }
 
+/* Step progress: one segment per step, level with the back button. */
+.progress {
+  position: absolute;
+  top: calc(clamp(16px, 4vh, 36px) + 18px);
+  left: 50%;
+  z-index: 4;
+  width: clamp(150px, 26vw, 300px);
+  margin-left: calc(clamp(150px, 26vw, 300px) / -2);
+  display: flex;
+  gap: 6px;
+}
+
+.progress-seg {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(33, 30, 28, 0.12);
+}
+
+.progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--cobalt);
+  transform-origin: 0 50%;
+}
+
 .title {
   position: absolute;
-  top: clamp(18px, 5vh, 48px);
+  top: calc(clamp(16px, 4vh, 36px) + 42px);
   left: 0;
   right: 0;
   padding: 0 56px;
@@ -283,9 +311,12 @@ button.chip:active {
 
 /* ---------- landing ---------- */
 
+/* Sits just below the beagle's hanging ears, which grow with the
+   viewport width: ear tips land at ~1.41x the beagle's width, less its
+   -3% top offset. */
 .landing-copy {
   position: absolute;
-  top: 21%;
+  top: max(24%, calc(1.41 * clamp(100px, 13vw, 200px) - 3% + 28px));
   left: 0;
   right: 0;
   z-index: 2;
@@ -465,25 +496,39 @@ button.chip:active {
   transform-origin: 50% 50%;
 }
 
+/* Sniffing: two quick sniffs and a pause, with the head nudging in on
+   each one. The ears stay put on the head. */
 .pack[data-mood="sniff"] .p-nose {
-  animation: nose-twitch 0.07s ease-in-out infinite alternate;
+  animation: sniff 1.1s var(--d) ease-in-out infinite;
 }
 
-.pack[data-mood="wag"] .p-tail {
-  animation: wag 0.2s var(--d) ease-in-out infinite alternate;
+.pack[data-mood="sniff"] .p-head {
+  animation: sniff-lean 1.1s var(--d) ease-in-out infinite;
 }
 
-.pack[data-mood="wag"] .p-ear {
-  transform-origin: 50% 20%;
-  animation: flap 0.3s var(--d) ease-in-out infinite alternate;
-}
-
-@keyframes nose-twitch {
-  from {
-    transform: translate(-0.7px, 0.5px) scale(1.06, 0.96);
+@keyframes sniff {
+  0%,
+  16%,
+  32%,
+  100% {
+    transform: scale(1);
   }
-  to {
-    transform: translate(0.7px, -0.5px) scale(0.96, 1.08);
+  8%,
+  24% {
+    transform: scale(1.18, 0.9);
+  }
+}
+
+@keyframes sniff-lean {
+  0%,
+  16%,
+  32%,
+  100% {
+    translate: 0 0;
+  }
+  8%,
+  24% {
+    translate: -2px 0.5px;
   }
 }
 
@@ -520,6 +565,31 @@ button.chip:active {
   width: 100%;
   height: auto;
   overflow: visible;
+}
+
+/* Hovered, the cat perks its ears and its pupils go wide. */
+.catbox .cb-ear {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.catbox:hover .cb-ear {
+  transform: translateY(-5px) rotate(-6deg);
+}
+
+.catbox:hover .cb-ear-r {
+  transform: translateY(-5px) rotate(6deg);
+}
+
+.catbox .pupil {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transition: transform 0.2s ease-out, translate 0.15s ease-out;
+}
+
+.catbox:hover .pupil {
+  transform: scale(1.45, 1.15);
 }
 
 /* ---------- breed pick ---------- */
@@ -641,116 +711,88 @@ button.chip:active {
   translate: calc(var(--lx, 0) * 3px) calc(var(--ly, 0) * -3px);
 }
 
-/* The white dog barks while hovered: the head kicks up, the jaw drops
-   and action lines flash by the nose. */
-.bark,
+/* The white dog's open mouth stays hidden. */
 .mouth {
   opacity: 0;
 }
 
-.cast .c-gsd:hover .bark,
-.cast .c-gsd:hover .mouth {
-  animation: bark-flash 0.46s steps(1) infinite;
-}
-
-.cast .c-gsd:hover .jaw {
-  animation: bark-jaw 0.46s steps(1) infinite;
-}
-
-.cast .c-gsd:hover .head {
-  animation: bark-head 0.46s ease-out infinite;
-}
-
-@keyframes bark-flash {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-@keyframes bark-jaw {
-  0% {
-    transform: rotate(17deg);
-  }
-  50% {
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes bark-head {
-  0% {
-    transform: rotate(-9deg) translateY(-4px);
-  }
-  50%,
-  100% {
-    transform: rotate(0deg) translateY(0);
-  }
-}
-
-/* Indie and Beagle: sway where they hang. */
+/* Landing cast at rest: slow breathing, a small head bob and ears that
+   drift. Tails stay still and the cat's paw stays down until hovered. */
 .c-indie .pet-svg {
   transform-origin: 50% 100%;
-  animation: hang 2.8s ease-in-out infinite alternate;
+  animation: hang 4.2s ease-in-out infinite alternate;
 }
 
 .c-beagle .ear {
-  animation: dangle 1.5s ease-in-out infinite alternate;
+  animation: dangle 2.6s ease-in-out infinite alternate;
 }
 
 .c-beagle .ear + .ear {
-  animation-delay: -0.5s;
+  animation-delay: -0.9s;
 }
 
-/* The two corner dogs sway their heads and ears, eyes closed. */
 .c-gsd .head {
-  animation: lean 1.6s -0.6s ease-in-out infinite alternate-reverse;
+  animation: lean-soft 2.8s -1s ease-in-out infinite alternate-reverse;
 }
 
 .c-gsd .ear {
-  animation: flap 1.6s ease-in-out infinite alternate;
-}
-
-.c-gsd .tail,
-.c-golden .tail {
-  transform-box: view-box;
-  animation: wag 0.5s ease-in-out infinite alternate;
+  animation: flap-soft 2.8s ease-in-out infinite alternate;
 }
 
 .c-golden .head {
-  animation: lean 1.3s ease-in-out infinite alternate;
+  animation: lean-soft 2.4s ease-in-out infinite alternate;
 }
 
 .c-golden .ear {
-  animation: flap 1.3s ease-in-out infinite alternate;
-}
-
-/* Cat: waves a paw, flicks its tail. */
-.paw {
-  animation: wave 2.8s ease-in-out infinite;
+  animation: flap-soft 2.4s ease-in-out infinite alternate;
 }
 
 .pet .tail {
   transform-box: view-box;
 }
 
-.c-cat .tail {
-  animation: flick 2.2s ease-in-out infinite;
+.cast .tail,
+.cast .paw {
+  animation: none;
 }
 
-.reactive:hover .paw {
-  animation: wave 0.5s ease-in-out infinite;
+/* Hovered, a landing pet wags and the cat waves: gently. */
+.cast .toon:hover .tail {
+  animation: wag-soft 0.42s ease-in-out infinite alternate;
+}
+
+.cast .pet-dog:hover .tongue {
+  opacity: 1;
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: pant-soft 0.5s ease-in-out infinite alternate;
+}
+
+.cast .c-cat:hover .paw {
+  animation: wave-soft 0.7s ease-in-out infinite alternate;
+}
+
+.cast .toon:hover .bounce {
+  animation: hop-soft 0.8s cubic-bezier(0.3, 0, 0.4, 1) infinite alternate;
+}
+
+.cast .toon.pet-dog:hover .ear {
+  animation: flap-soft 0.6s ease-in-out infinite alternate;
+}
+
+.cast .toon:hover .head {
+  animation: tilt-soft 1.2s ease-in-out infinite alternate;
 }
 
 /* A pet reacts when it is hovered, when its ".reactive" parent is hovered,
-   or when the page marks it ".is-happy". */
+   or when the page marks it ".is-happy". The tongue only comes out while
+   the pet is being petted (hovered), not when an answer is picked. */
 
 :is(.is-happy, .reactive:hover) .tail {
   animation: wag 0.24s ease-in-out infinite alternate;
 }
 
-:is(.is-happy, .reactive:hover) .tongue {
+.reactive:hover .tongue {
   opacity: 1;
 }
 
@@ -824,6 +866,60 @@ button.chip:active {
   }
   to {
     transform: rotate(5deg) scale(1.02, 0.96);
+  }
+}
+
+@keyframes lean-soft {
+  from {
+    transform: rotate(0deg) scale(1, 1);
+  }
+  to {
+    transform: rotate(2.5deg) scale(1.01, 0.98);
+  }
+}
+
+@keyframes flap-soft {
+  to {
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes wag-soft {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes pant-soft {
+  to {
+    transform: scaleY(1.12);
+  }
+}
+
+@keyframes wave-soft {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes hop-soft {
+  to {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes tilt-soft {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(2.5deg);
   }
 }
 

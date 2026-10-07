@@ -13,6 +13,7 @@ export default function HandCursor() {
   const sy = useSpring(y, { stiffness: 700, damping: 45, mass: 0.35 });
   const [enabled, setEnabled] = useState(false);
   const [pat, setPat] = useState(false);
+  const [patting, setPatting] = useState(false);
   const [down, setDown] = useState(false);
   const [seen, setSeen] = useState(false);
 
@@ -20,11 +21,16 @@ export default function HandCursor() {
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     setEnabled(true);
     document.documentElement.classList.add("has-hand");
+    let still = 0;
     const move = (e: PointerEvent) => {
       x.set(e.clientX);
       y.set(e.clientY);
       setSeen(true);
-      setPat(!!(e.target as Element | null)?.closest?.("[data-pat]"));
+      const overPet = !!(e.target as Element | null)?.closest?.("[data-pat]");
+      setPat(overPet);
+      setPatting(overPet);
+      clearTimeout(still);
+      if (overPet) still = window.setTimeout(() => setPatting(false), 180);
     };
     const press = () => setDown(true);
     const release = () => setDown(false);
@@ -32,6 +38,7 @@ export default function HandCursor() {
     window.addEventListener("pointerdown", press);
     window.addEventListener("pointerup", release);
     return () => {
+      clearTimeout(still);
       document.documentElement.classList.remove("has-hand");
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerdown", press);
@@ -51,7 +58,7 @@ export default function HandCursor() {
         transition={{ type: "spring", stiffness: 500, damping: 18 }}
         style={{ transformOrigin: "29px 8px" }}
       >
-        <g transform="rotate(-28 29 8)" className={pat ? "hand-pat" : undefined}>
+        <g transform="rotate(-28 29 8)" className={patting ? "hand-pat" : undefined}>
           <rect x="26" y="108" width="52" height="1400" rx="22" fill="#f7b2ac" />
           <ellipse cx="12" cy="92" rx="10" ry="22" transform="rotate(-22 12 92)" fill="#f7b2ac" />
           <rect x="12" y="60" width="76" height="68" rx="28" fill="#f7b2ac" />

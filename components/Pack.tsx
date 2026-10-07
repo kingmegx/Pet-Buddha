@@ -2,8 +2,7 @@
 // overlapping, all on leashes and all looking across at the cats.
 // data-mood on the <svg> drives the animation in globals.css:
 //   idle  – tails sway, eyes blink
-//   sniff – noses quiver
-//   wag   – every tail wags
+//   sniff – heads lean in and noses sniff in short bursts
 // While the hand is near, aimPack() turns each head to point at it.
 
 const INK = "#211e1c";
@@ -14,7 +13,7 @@ const CLAY = "#b5532f";
 const PEACH = "#f7c9ac";
 const CREAM = "#f8efe2";
 
-export type PackMood = "idle" | "sniff" | "wag";
+export type PackMood = "idle" | "sniff";
 
 type Hound = {
   x: number;
