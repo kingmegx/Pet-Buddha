@@ -5,11 +5,12 @@ import type { BreedId } from "@/lib/flow";
 // and a few thin ink lines. (The paper grain is one static overlay on the
 // whole stage, in globals.css, so it costs nothing while things move.)
 // Animated parts are marked with class names that globals.css drives:
-// head, ear, eye, pupil, tongue, tail, paw, jaw, mouth, bark.
+// head, ear, eye, pupil, tongue, tail, paw, jaw, mouth.
 
 const INK = "#211e1c";
 const CORAL = "#ee5f3f";
 const CREAM = "#f8efe2";
+const TONGUE = "#f0899a";
 const line = { fill: "none", stroke: INK, strokeWidth: 2.4, strokeLinecap: "round" as const };
 
 // The two big dogs sit in the bottom corners, chunky and content, turned
@@ -38,6 +39,7 @@ function Shepherd() {
           <circle cx="170" cy="44" r="13" fill="#fff" />
           <ellipse cx="166" cy="98" rx="62" ry="56" fill="#fff" />
           <g transform="rotate(10 166 110)">
+            <rect className="tongue" x="194" y="120" width="24" height="32" rx="11" fill={TONGUE} />
             <g className="jaw" style={{ transformOrigin: "176px 122px" }}>
               <rect x="172" y="112" width="66" height="24" rx="12" fill="#fff" />
               <rect className="mouth" x="184" y="112" width="46" height="13" rx="6" fill="#8c3a3a" />
@@ -57,7 +59,6 @@ function Shepherd() {
             <path d="M134 56 C94 64 84 142 104 190 C128 200 148 162 144 110 Z" fill={INK} />
           </g>
         </g>
-        <path className="bark" d="M278 96 l20 -11 M286 130 h22 M278 164 l20 11" {...line} strokeWidth="4.5" />
       </g>
     </svg>
   );
@@ -116,6 +117,7 @@ function Indie() {
             <polygon points="80,110 48,100 78,130" fill="#f4a58c" />
           </g>
           <ellipse cx="128" cy="124" rx="52" ry="45" fill={red} />
+          <rect className="tongue" x="160" y="126" width="22" height="40" rx="10" fill={TONGUE} transform="rotate(-28 136 113)" />
           <rect x="130" y="92" width="108" height="42" rx="21" fill={red} transform="rotate(-28 136 113)" />
           <ellipse cx="226" cy="64" rx="10" ry="8" fill={INK} transform="rotate(-28 226 64)" />
           <path d="M160 132 q22 2 40 -20" {...line} />
@@ -150,6 +152,7 @@ function Beagle() {
           <ellipse cx="150" cy="122" rx="4.5" ry="7" fill={INK} />
         </g>
         <path d="M100 150 h40 q8 0 4 10 l-16 22 q-8 6 -16 0 l-16 -22 q-4 -10 4 -10 Z" fill={INK} />
+        <rect className="tongue" x="109" y="196" width="22" height="30" rx="10" fill={CORAL} />
         <path d="M70 184 q50 40 100 0 M120 188 v14" {...line} />
         <circle cx="96" cy="196" r="1.6" fill={INK} />
         <circle cx="144" cy="196" r="1.6" fill={INK} />
