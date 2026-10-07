@@ -57,7 +57,7 @@ export default function Slider({ value, onChange, left, right, label, valueText,
         <svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden>
           <path d={`M2 12 Q${x} ${12 + sag * 2} 98 12`} />
         </svg>
-        <span className="slider-knob" style={{ left: `${x}%`, transform: `translate(-50%, calc(-50% + ${sag}px)) scale(${dragging ? 1.15 : 1})` }} />
+        <span className={`slider-knob ${dragging ? "" : "is-gliding"}`} style={{ left: `${x}%`, transform: `translate(-50%, calc(-50% + ${sag}px)) scale(${dragging ? 1.15 : 1})` }} />
       </div>
       <span className="slider-end">{right}</span>
     </div>

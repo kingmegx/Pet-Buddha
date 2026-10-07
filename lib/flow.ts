@@ -29,10 +29,25 @@ export const WEIGHT_RANGE: Record<Species, [number, number]> = {
 export const AGE_STOPS = [2, 3, 4, 5, 6, 8, 10, 12, 18, 24, 36, 48, 60, 72, 84, 96, 120, 144, 180];
 
 export function formatAge(months: number) {
-  if (months < 12) return `${months} months`;
-  if (months === 12) return "1 year";
-  if (months === 18) return "1.5 years";
-  return `${months / 12} years`;
+  if (months < 1) return "under 1 month";
+  const years = Math.floor(months / 12);
+  const rest = months % 12;
+  const y = years === 1 ? "1 year" : `${years} years`;
+  const m = rest === 1 ? "1 month" : `${rest} months`;
+  if (years === 0) return m;
+  return rest === 0 ? y : `${y} ${m}`;
+}
+
+// Whole months between a date of birth ("YYYY-MM-DD") and today.
+// Returns null for an empty, invalid or future date.
+export function monthsSince(dob: string, today = new Date()) {
+  const [y, m, d] = dob.split("-").map(Number);
+  if (!y || !m || !d) return null;
+  const born = new Date(y, m - 1, d);
+  if (Number.isNaN(born.getTime()) || born > today) return null;
+  let months = (today.getFullYear() - y) * 12 + (today.getMonth() - (m - 1));
+  if (today.getDate() < d) months -= 1;
+  return Math.max(0, months);
 }
 
 export type NeedId = "food" | "biting" | "potty" | "leash" | "energy" | "products";
@@ -40,7 +55,8 @@ export type NeedId = "food" | "biting" | "potty" | "leash" | "energy" | "product
 export type Need = {
   id: NeedId;
   label: string;
-  followUp: { question: (pet: string) => string; options: string[] };
+  // Not every need has a follow-up; some need no extra detail.
+  followUp?: { question: (pet: string) => string; options: string[] };
 };
 
 export const NEEDS: Need[] = [
@@ -55,10 +71,6 @@ export const NEEDS: Need[] = [
   {
     id: "biting",
     label: "Biting & chewing",
-    followUp: {
-      question: () => "What gets chewed the most?",
-      options: ["Hands & feet", "Furniture", "Shoes & clothes", "Everything"],
-    },
   },
   {
     id: "potty",

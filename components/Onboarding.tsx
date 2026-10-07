@@ -2,15 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { AGE_STOPS, BREEDS, NEEDS, WEIGHT_RANGE, formatAge, type BreedId, type NeedId, type Species } from "@/lib/flow";
+import { AGE_STOPS, BREEDS, NEEDS, WEIGHT_RANGE, formatAge, monthsSince, type BreedId, type NeedId, type Species } from "@/lib/flow";
 import { Pet } from "./Pets";
+import { BreedArt } from "./Breeds";
 import { Toon } from "./Cast";
 import { Pack, aimPack, type PackMood } from "./Pack";
 import { CatBox, type BoxBrand, type CatCoat } from "./CatBox";
+import { Walkers } from "./Walkers";
 import Slider from "./Slider";
 import HandCursor from "./HandCursor";
 
-type Step = "landing" | "species" | "breed" | "age" | "weight" | "sex" | "needs" | "follow" | "done";
+type Step = "landing" | "species" | "breed" | "age" | "weight" | "sex" | "needs" | "follow" | "curating" | "done";
 
 // The hill is one path that re-shapes itself on every step. All shapes use
 // the same commands so they can morph into each other.
@@ -23,11 +25,26 @@ const HILL: Record<Step, string> = {
   sex: "M0,46 C36,36 62,46 100,36 L100,100 L0,100 Z",
   needs: "M0,26 C30,36 66,20 100,30 L100,100 L0,100 Z",
   follow: "M0,30 C32,20 64,36 100,24 L100,100 L0,100 Z",
+  curating: "M0,60 C30,60 66,60 100,60 L100,100 L0,100 Z",
   done: "M0,-6 C30,-6 66,-6 100,-6 L100,100 L0,100 Z",
 };
 
 const wobble = { type: "spring", stiffness: 90, damping: 9, mass: 1 } as const;
 const pop = { type: "spring", stiffness: 260, damping: 18 } as const;
+
+// Order sets who springs in first on the pick-your-dog screen.
+const BREED_SPOTS = ["beagle", "gsd", "golden", "indie", "shihtzu"] as const;
+
+// Where the age slider's knob sits for a given age in months: between the
+// two nearest stops, so an exact birthday lands in the right place.
+function sliderPosition(months: number) {
+  const last = AGE_STOPS.length - 1;
+  if (months <= AGE_STOPS[0]) return 0;
+  if (months >= AGE_STOPS[last]) return 1;
+  const i = AGE_STOPS.findIndex((stop) => stop > months);
+  const between = (months - AGE_STOPS[i - 1]) / (AGE_STOPS[i] - AGE_STOPS[i - 1]);
+  return (i - 1 + between) / last;
+}
 
 const CAT_BOXES: { coat: CatCoat; brand: BoxBrand; delay: number; style: React.CSSProperties }[] = [
   { coat: "black", brand: "furex", delay: 0, style: { left: "8%", top: "8%", width: "38%" } },
@@ -40,6 +57,9 @@ export default function Onboarding() {
   const [trail, setTrail] = useState<Step[]>([]);
   const [breed, setBreed] = useState<BreedId | null>(null);
   const [age, setAge] = useState(0.2);
+  // Age comes from the slider, or from an exact date of birth, which also
+  // moves the slider. Dragging the slider afterwards clears the date.
+  const [dob, setDob] = useState("");
   const [weight, setWeight] = useState(0.4);
   const [sex, setSex] = useState<"boy" | "girl" | null>(null);
   const [needs, setNeeds] = useState<NeedId[]>([]);
@@ -53,11 +73,15 @@ export default function Onboarding() {
 
   const pet = BREEDS.find((b) => b.id === breed);
   const species: Species = pet?.species ?? "dog";
-  const months = AGE_STOPS[Math.round(age * (AGE_STOPS.length - 1))];
+  const sliderMonths = AGE_STOPS[Math.round(age * (AGE_STOPS.length - 1))];
+  const dobMonths = monthsSince(dob);
+  const months = dobMonths ?? sliderMonths;
   const [minKg, maxKg] = WEIGHT_RANGE[species];
   const kg = Math.round((minKg + weight * (maxKg - minKg)) * 2) / 2;
   const chosen = NEEDS.filter((n) => needs.includes(n.id));
-  const current = chosen[followIndex];
+  // Only the needs that have a follow-up question get one.
+  const asks = chosen.filter((n) => n.followUp);
+  const current = asks[followIndex];
 
   const go = (next: Step) => {
     setTrail((t) => [...t, step]);
@@ -89,8 +113,8 @@ export default function Onboarding() {
     setAnswers({ ...answers, [current.id]: option });
     celebrate();
     window.setTimeout(() => {
-      if (followIndex < chosen.length - 1) setFollowIndex(followIndex + 1);
-      else go("done");
+      if (followIndex < asks.length - 1) setFollowIndex(followIndex + 1);
+      else go("curating");
     }, 350);
   };
 
@@ -99,19 +123,27 @@ export default function Onboarding() {
     setTrail([]);
     setBreed(null);
     setSex(null);
+    setDob("");
     setNeeds([]);
     setAnswers({});
     setFollowIndex(0);
   };
 
+  // The curating screen is a short pause before the results.
+  useEffect(() => {
+    if (step !== "curating") return;
+    const timer = window.setTimeout(() => setStep("done"), 4600);
+    return () => window.clearTimeout(timer);
+  }, [step]);
+
   // Recommendations will read this later.
   useEffect(() => {
     if (step !== "done" || !pet) return;
-    const profile = { breed: pet.id, species, ageMonths: months, weightKg: kg, sex, needs, answers };
+    const profile = { breed: pet.id, species, ageMonths: months, dateOfBirth: dobMonths !== null ? dob : null, weightKg: kg, sex, needs, answers };
     try {
       localStorage.setItem("petbuddha.profile", JSON.stringify(profile));
     } catch {}
-  }, [step, pet, species, months, kg, sex, needs, answers]);
+  }, [step, pet, species, months, dobMonths, dob, kg, sex, needs, answers]);
 
   const titles: Record<Step, [string, string]> = {
     landing: ["", ""],
@@ -122,7 +154,8 @@ export default function Onboarding() {
     sex: [species === "cat" ? "Step 2" : "Step 3", "Tell us more"],
     needs: [species === "cat" ? "Step 3" : "Step 4", "What do you need help with?"],
     follow: [species === "cat" ? "Step 4" : "Step 5", current?.label ?? ""],
-    done: ["All set", pet ? `Curating for your ${pet.name}` : ""],
+    curating: ["Hang tight", pet ? `Curating for your ${pet.name}` : "Curating"],
+    done: ["All set", pet ? `Picks for your ${pet.name}` : ""],
   };
   const [eyebrow, title] = titles[step];
 
@@ -149,7 +182,7 @@ export default function Onboarding() {
         <motion.path initial={false} animate={{ d: HILL[step] }} transition={wobble} />
       </svg>
 
-      {trail.length > 0 && step !== "done" && (
+      {trail.length > 0 && step !== "done" && step !== "curating" && (
         <button className="back" onClick={back} aria-label="Back">
           ←
         </button>
@@ -182,7 +215,7 @@ export default function Onboarding() {
             transition={pop}
           >
             <div className="hero-size" style={{ transform: `scale(${growth * girth}, ${growth})` }}>
-              <Pet id={pet.id} happy={cheer} className="reactive" />
+              {pet.id === "indie-cat" ? <Pet id={pet.id} happy={cheer} className="reactive" /> : <BreedArt id={pet.id} happy={cheer} className="reactive" />}
             </div>
           </motion.div>
         )}
@@ -266,20 +299,19 @@ export default function Onboarding() {
           )}
 
           {step === "breed" && (
-            <div className="breeds">
-              {BREEDS.filter((b) => b.species === "dog").map((b, i) => (
+            <div className="breed-scene">
+              {BREED_SPOTS.map((id, i) => (
                 <motion.button
-                  key={b.id}
-                  className="breed reactive"
-                  onClick={() => pick(b.id)}
-                  initial={{ y: 120, opacity: 0 }}
+                  key={id}
+                  className={`breed-spot at-${id} reactive`}
+                  onClick={() => pick(id)}
+                  initial={{ y: 90, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ ...pop, delay: 0.08 * i }}
-                  whileHover={{ y: -10 }}
-                  whileTap={{ scale: 0.92 }}
+                  transition={{ ...pop, delay: 0.09 * i }}
+                  whileTap={{ scale: 0.94 }}
                 >
-                  <Pet id={b.id} />
-                  <span>{b.name}</span>
+                  <BreedArt id={id} couch />
+                  <span className="breed-name">{BREEDS.find((b) => b.id === id)!.name}</span>
                 </motion.button>
               ))}
             </div>
@@ -288,7 +320,31 @@ export default function Onboarding() {
           {step === "age" && (
             <div className="controls">
               <p className="readout">{formatAge(months)} old</p>
-              <Slider value={age} onChange={setAge} left="Baby" right="Senior" label="Age" valueText={formatAge(months)} steps={AGE_STOPS.length - 1} />
+              <Slider
+                value={age}
+                onChange={(v) => {
+                  setAge(v);
+                  if (dob) setDob("");
+                }}
+                left="Baby"
+                right="Senior"
+                label="Age"
+                valueText={formatAge(months)}
+                steps={AGE_STOPS.length - 1}
+              />
+              <label className="dob">
+                <span>or enter the date of birth</span>
+                <input
+                  type="date"
+                  value={dob}
+                  max={new Date().toLocaleDateString("en-CA")}
+                  onChange={(e) => {
+                    setDob(e.target.value);
+                    const m = monthsSince(e.target.value);
+                    if (m !== null) setAge(sliderPosition(m));
+                  }}
+                />
+              </label>
               <button className="pill" onClick={() => go("weight")}>
                 Next
               </button>
@@ -337,7 +393,7 @@ export default function Onboarding() {
                     className="chip"
                     aria-pressed={needs.includes(n.id)}
                     onClick={() => {
-                      setNeeds(needs.includes(n.id) ? needs.filter((x) => x !== n.id) : [...needs, n.id]);
+                      setNeeds((now) => (now.includes(n.id) ? now.filter((x) => x !== n.id) : [...now, n.id]));
                       celebrate();
                     }}
                   >
@@ -350,7 +406,7 @@ export default function Onboarding() {
                 disabled={needs.length === 0}
                 onClick={() => {
                   setFollowIndex(0);
-                  go("follow");
+                  go(asks.length > 0 ? "follow" : "curating");
                 }}
               >
                 Next
@@ -360,18 +416,38 @@ export default function Onboarding() {
 
           {step === "follow" && current && (
             <div className="controls">
-              <p className="readout">{current.followUp.question(species)}</p>
+              <p className="readout">{current.followUp!.question(species)}</p>
               <div className="chips">
-                {current.followUp.options.map((o) => (
+                {current.followUp!.options.map((o) => (
                   <button key={o} className="chip" aria-pressed={answers[current.id] === o} onClick={() => answer(o)}>
                     {o}
                   </button>
                 ))}
               </div>
               <p className="hint">
-                {followIndex + 1} of {chosen.length}
+                {followIndex + 1} of {asks.length}
               </p>
             </div>
+          )}
+
+          {step === "curating" && (
+            <>
+              <Walkers />
+              <p className="curating-note">
+                <span className="paw-trail" aria-hidden>
+                  {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                    <svg key={i} viewBox="0 0 24 24" style={{ "--i": i } as React.CSSProperties}>
+                      <ellipse cx="12" cy="15.5" rx="5.5" ry="4.5" />
+                      <circle cx="5.5" cy="9.5" r="2.4" />
+                      <circle cx="10" cy="6" r="2.4" />
+                      <circle cx="15" cy="6.5" r="2.4" />
+                      <circle cx="19" cy="10.5" r="2.4" />
+                    </svg>
+                  ))}
+                </span>
+                Fetching the best picks<span className="dots" aria-hidden />
+              </p>
+            </>
           )}
 
           {step === "done" && pet && (
@@ -382,7 +458,7 @@ export default function Onboarding() {
               <div className="chips">
                 {chosen.map((n) => (
                   <span key={n.id} className="chip chip-static">
-                    {n.label}: {answers[n.id]}
+                    {answers[n.id] ? `${n.label}: ${answers[n.id]}` : n.label}
                   </span>
                 ))}
               </div>
