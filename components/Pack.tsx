@@ -50,7 +50,8 @@ function HoundShape({ h }: { h: Hound }) {
       <circle cx="80" cy="64" r="31" fill={h.coat} />
       <rect x="47" y="88" width="66" height="13" rx="6.5" fill={h.collar} transform="rotate(-7 80 94)" />
       <g className="p-head">
-        {h.ear === "pointy" && <polygon className="p-ear" points="84,32 97,-10 110,36" fill={h.earColor} stroke={h.earColor} strokeWidth="4" strokeLinejoin="round" />}
+        {/* Both base corners sit inside the head circle (drawn next, on top), so no part of the base can show past it. */}
+        {h.ear === "pointy" && <polygon className="p-ear p-ear-up" points="83,46 96,-10 107,48" fill={h.earColor} stroke={h.earColor} strokeWidth="4" strokeLinejoin="round" />}
         <ellipse cx="78" cy="52" rx="35" ry="29" fill={h.coat} />
         <path d="M72 27 L-6 45 C-13 49 -11 59 -3 61 L76 78 Z" fill={h.coat} />
         <ellipse className="p-nose" cx="-5" cy="52" rx="6.5" ry="5.5" fill={mark} />

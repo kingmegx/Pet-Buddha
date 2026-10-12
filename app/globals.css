@@ -1046,6 +1046,22 @@ button.chip:active {
   animation: flap 0.3s var(--d) ease-in-out infinite alternate;
 }
 
+/* Upright ears turn about their base, hidden inside the head, and only a little:
+   a twitch, not a flap. */
+.pack[data-mood="wag"] .p-ear-up {
+  transform-origin: 50% 100%;
+  animation: ear-twitch 0.34s var(--d) ease-in-out infinite alternate;
+}
+
+@keyframes ear-twitch {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+
 @keyframes nose-twitch {
   from {
     transform: translate(-0.7px, 0.5px) scale(1.06, 0.96);
