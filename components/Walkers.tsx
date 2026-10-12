@@ -2,9 +2,9 @@
 // over a black zebra crossing that fans out in perspective. Hovering it makes
 // the hand cursor say "The Beagles" (see data-say and HandCursor).
 //
-// The beagles are in the same picture-book style as the pick-your-dog
-// screen: flat shapes, a small dot eye, an
-// oversized nose, a long dark ear and a coral collar. No outlines.
+// The beagles match the beagle head used everywhere else on the site: flat
+// tan and cream, one big brown ear, a dot eye and a large nose. No
+// outlines, no shading, no extra marks.
 //
 // They really travel from left to right and loop round, each holding its
 // head and tail differently. Every leg has a thigh and a shin, so paws lift
@@ -13,16 +13,16 @@
 const INK = "#211e1c";
 const TAN = "#cf7d4a";
 const TAN_DEEP = "#a8552c";
-const EAR = "#a8552c";
+const EAR = "#b96a3c";
 const WHITE = "#f7f1e3";
 const FAR_WHITE = "#e6dcc6";
-const CORAL = "#ee5f3f";
+const RED = "#d8392b";
 
 const BODY = "M58 92 C56 76 66 66 86 64 C112 61 150 60 176 64 C194 67 204 80 204 96 C204 110 196 122 182 126 C168 129 150 122 132 120 C112 118 92 122 78 118 C64 114 58 104 58 92 Z";
 // From the head down to well inside the shoulders. It is drawn behind the
 // body, so however the head tilts, its base never shows.
 const NECK = "M176 104 C172 74 190 48 212 40 L232 70 C230 94 216 112 198 118 Z";
-const EAR_SHAPE = "M216 22 C196 26 186 56 192 86 C194 98 210 98 214 86 C222 66 226 42 222 26 Z";
+const EAR_SHAPE = "M218 20 C194 22 180 56 186 90 C190 106 212 106 218 90 C228 68 230 42 226 24 Z";
 
 // A flat shape. No shading or texture.
 function P({ d, fill }: { d: string; fill: string }) {
@@ -30,7 +30,7 @@ function P({ d, fill }: { d: string; fill: string }) {
 }
 
 function Leg({ x, y, beat, hind, far }: { x: number; y: number; beat: 1 | 2; hind?: boolean; far?: boolean }) {
-  const upper = hind ? (far ? TAN_DEEP : TAN) : far ? FAR_WHITE : WHITE;
+  const upper = far ? TAN_DEEP : TAN;
   const lower = far ? FAR_WHITE : WHITE;
   return (
     <g transform={`translate(${x} ${y})`}>
@@ -71,12 +71,10 @@ function Beagle() {
           <path d="M176 104 C172 74 190 48 212 40 C208 62 198 86 186 106 Z" fill={TAN} />
         </g>
 
-        <P d={BODY} fill={WHITE} />
+        {/* A tan back and a cream belly, so the dog stands out on the white card. */}
+        <P d={BODY} fill={TAN} />
         <g clipPath="url(#beagle-body)">
-          <path d="M40 60 H96 C92 78 94 100 104 124 H40 Z" fill={TAN} />
-          <path d="M176 56 H220 V130 H190 C180 110 174 84 176 56 Z" fill={TAN} />
-          <P d="M84 56 H182 C180 76 176 90 168 98 C146 104 118 104 98 98 C88 88 84 74 84 56 Z" fill={INK} />
-          <path d="M112 118 C140 118 160 130 184 124 C196 120 202 112 204 104 C186 116 150 114 124 110 Z" fill={FAR_WHITE} />
+          <path d="M96 132 C104 106 150 104 176 110 C192 114 204 104 210 92 V134 Z" fill={WHITE} />
         </g>
 
         <Leg x={78} y={104} beat={1} hind />
@@ -84,18 +82,12 @@ function Beagle() {
 
         {/* head, collar and ear in front */}
         <g className="w-head" style={{ transformOrigin: "192px 88px" }}>
-          <path d="M188 70 C196 80 208 86 220 88" fill="none" stroke={CORAL} strokeWidth="8" strokeLinecap="round" />
-          <path d="M203 90 c-4 -2 -6 3 -3 5 c-3 2 -1 7 3 5 h9 c4 2 6 -3 3 -5 c3 -2 1 -7 -3 -5 Z" fill="#cfc8bd" />
+          <path d="M188 70 C196 80 208 86 220 88" fill="none" stroke={RED} strokeWidth="8" strokeLinecap="round" />
           <P d="M204 46 C204 26 220 14 238 16 C252 18 260 30 260 42 C260 56 248 66 234 66 C218 66 204 60 204 46 Z" fill={TAN} />
           <path d="M242 17 C247 24 247 30 244 37 L234 36 C237 29 237 23 238 16 Z" fill={WHITE} />
           <P d="M232 36 C248 30 274 36 278 50 C280 62 268 72 252 72 C238 72 226 64 226 52 C226 44 228 39 232 36 Z" fill={WHITE} />
-          <path d="M236 62 Q256 76 274 60" fill="none" stroke={INK} strokeWidth="2.4" strokeLinecap="round" />
-          <circle cx="246" cy="58" r="1.1" fill={INK} />
-          <circle cx="252" cy="61" r="1.1" fill={INK} />
-          <ellipse cx="275" cy="47" rx="9" ry="8" fill={INK} />
-          <path d="M270 44 q4 -4 9 -1" fill="none" stroke="#fff" strokeOpacity="0.3" strokeWidth="2" strokeLinecap="round" />
-          <circle cx="238" cy="34" r="3.8" fill={INK} />
-          <path d="M226 16 q-3 -8 -8 -10 M233 14 q0 -9 4 -13 M240 15 q4 -6 10 -7" fill="none" stroke={TAN_DEEP} strokeWidth="1.6" strokeLinecap="round" />
+          <ellipse cx="274" cy="48" rx="11" ry="9.5" fill={INK} />
+          <circle cx="240" cy="35" r="4.2" fill={INK} />
           <g className="w-ear" style={{ transformOrigin: "216px 28px" }}>
             <P d={EAR_SHAPE} fill={EAR} />
           </g>

@@ -15,7 +15,7 @@ export type Breed = {
 
 // The five tiles on the breed screen, in the order they spring in.
 export const POPULAR: Breed[] = [
-  { name: "Beagle", face: "beagle", kg: [9, 13] },
+  { name: "Beagle", face: "beagle", kg: [15, 16] },
   { name: "German Shepherd", face: "gsd", kg: [25, 40] },
   { name: "Golden Retriever", face: "golden", kg: [25, 34] },
   { name: "Indie", face: "indie", kg: [15, 25] },
