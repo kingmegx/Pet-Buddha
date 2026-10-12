@@ -42,70 +42,96 @@ function Ears({ children, pivot }: { children: React.ReactNode; pivot: [number, 
   );
 }
 
-function Features({ eyeX = 28, eyeY = 102, eye = 5.5, noseY = 132, line = COAT.ink }: { eyeX?: number; eyeY?: number; eye?: number; noseY?: number; line?: string }) {
+function Features({
+  eyeX = 28,
+  eyeY = 102,
+  eye = 5.5,
+  eyeRy,
+  noseY = 132,
+  noseW = 12.5,
+  noseH = 9,
+  mouth = true,
+  line = COAT.ink,
+}: {
+  eyeX?: number;
+  eyeY?: number;
+  eye?: number;
+  // Set for flatter, sleepier eyes; round when left out.
+  eyeRy?: number;
+  noseY?: number;
+  noseW?: number;
+  noseH?: number;
+  // The little "w" under the nose. Some faces are just eyes and a nose.
+  mouth?: boolean;
+  line?: string;
+}) {
+  const under = noseY + noseH;
   return (
     <>
       <g className="f-eyes">
-        <circle className="f-eye" cx={100 - eyeX} cy={eyeY} r={eye} fill={COAT.ink} />
-        <circle className="f-eye" cx={100 + eyeX} cy={eyeY} r={eye} fill={COAT.ink} />
+        <ellipse className="f-eye" cx={100 - eyeX} cy={eyeY} rx={eye} ry={eyeRy ?? eye} fill={COAT.ink} />
+        <ellipse className="f-eye" cx={100 + eyeX} cy={eyeY} rx={eye} ry={eyeRy ?? eye} fill={COAT.ink} />
       </g>
-      <g className="f-tongue" style={{ transformOrigin: `100px ${noseY + 15}px` }}>
-        <path d={`M91 ${noseY + 14} h18 v11 a9 9 0 0 1 -18 0 Z`} fill={COAT.pink} />
+      <g className="f-tongue" style={{ transformOrigin: `100px ${under + 4}px` }}>
+        <path d={`M91 ${under + 3} h18 v11 a9 9 0 0 1 -18 0 Z`} fill={COAT.pink} />
       </g>
-      <path d={`M87 ${noseY + 13} q6.5 7 13 0 q6.5 7 13 0`} fill="none" stroke={line} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-      <ellipse cx="100" cy={noseY} rx="12.5" ry="9" fill={COAT.ink} />
+      {mouth && <path d={`M87 ${under + 4} q6.5 7 13 0 q6.5 7 13 0`} fill="none" stroke={line} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />}
+      <path d={`M${100 - noseW} ${noseY - noseH * 0.2} C${100 - noseW} ${noseY - noseH * 1.1} ${100 + noseW} ${noseY - noseH * 1.1} ${100 + noseW} ${noseY - noseH * 0.2} C${100 + noseW} ${noseY + noseH * 0.6} ${100 + noseW * 0.35} ${under} 100 ${under} C${100 - noseW * 0.35} ${under} ${100 - noseW} ${noseY + noseH * 0.6} ${100 - noseW} ${noseY - noseH * 0.2} Z`} fill={COAT.ink} />
     </>
   );
 }
 
 // Each breed has its own outline, so they read as different dogs even in silhouette.
 
-// Narrow oval face, long ears that hang below the chin, a white blaze.
+// The three below share one build: a rounded head, a muzzle that hangs a
+// little below it, leaf-shaped ears, dot eyes and a soft triangular nose.
+const DOME = "M100 34 C140 34 158 60 158 98 C158 122 154 140 146 150 C140 156 132 158 124 158 L76 158 C68 158 60 156 54 150 C46 140 42 122 42 98 C42 60 60 34 100 34 Z";
+
+// Big ears that splay out from the sides, a thin blaze widening into a broad cream muzzle.
 function Beagle() {
   return (
     <>
-      <Ears pivot={[58, 58]}>
-        <path d="M54 56 C22 58 6 112 16 160 C22 190 56 190 62 160 C68 124 66 86 64 58 Z" fill={COAT.brown} />
+      <Ears pivot={[58, 64]}>
+        <path d="M54 60 C24 64 4 104 12 150 C16 178 44 182 57 158 C68 136 68 96 66 64 Z" fill="#b96a3c" />
       </Ears>
-      <path d="M100 30 C134 30 152 58 152 100 C152 146 132 178 100 178 C68 178 48 146 48 100 C48 58 66 30 100 30 Z" fill={COAT.tan} />
-      <path d="M92 30 C92 62 80 90 74 120 C68 154 82 178 100 178 C118 178 132 154 126 120 C120 90 108 62 108 30 Z" fill={COAT.cream} />
-      <Features eyeX={26} eyeY={100} noseY={136} />
+      <path d={DOME} fill={COAT.tan} />
+      <path d="M92 34 C92 66 88 84 76 100 C60 120 58 152 70 170 C80 184 120 184 130 170 C142 152 140 120 124 100 C112 84 108 66 108 34 Z" fill={COAT.cream} />
+      <Features eyeX={29} eyeY={100} noseY={144} noseW={17} noseH={13} mouth={false} />
     </>
   );
 }
 
-// Wide head with fluffy cheeks and feathered ears.
+// A tall, soft-cornered face in pale gold, with darker feathered ears that
+// hang from the top corners down to the jaw. Just eyes and a wide nose.
 function Golden() {
   return (
     <>
-      <Ears pivot={[56, 62]}>
-        <path d="M50 62 C24 66 12 106 18 146 C21 158 28 150 33 161 C39 172 47 160 54 169 C64 164 66 142 66 120 C66 96 64 78 62 62 Z" fill={COAT.honey} />
+      <Ears pivot={[64, 46]}>
+        <path
+          d="M70 40 C50 32 30 42 23 62 C17 80 19 100 21 114 C21 122 27 120 27 129 C27 139 35 135 35 145 C37 155 45 150 47 158 C54 160 57 150 57 140 L57 80 C57 62 61 50 70 40 Z"
+          fill="#d6953f"
+        />
       </Ears>
-      <path
-        d="M100 32 C140 32 166 58 166 98 C166 112 162 122 168 134 C160 136 158 146 160 156 C150 154 144 162 142 170 C132 164 118 178 100 178 C82 178 68 164 58 170 C56 162 50 154 40 156 C42 146 40 136 32 134 C38 122 34 112 34 98 C34 58 60 32 100 32 Z"
-        fill={COAT.gold}
-      />
-      <ellipse cx="100" cy="142" rx="32" ry="26" fill="#f2cd8e" />
-      <Features eyeX={29} eyeY={100} noseY={134} />
+      <path d="M70 40 C80 34 120 34 130 40 C142 46 146 60 146 80 L144 130 C142 160 124 178 100 178 C76 178 58 160 56 130 L54 80 C54 60 58 46 70 40 Z" fill="#f2c56e" />
+      <Features eyeX={18} eyeY={98} eye={6} noseY={146} noseW={16} noseH={10} mouth={false} />
     </>
   );
 }
 
-// A wedge: tall pointed ears, cheek points, a dark cap and a dark muzzle.
+// Tall rounded ears with pink insides, a dark mask with tan around the eyes, a grey muzzle.
 function Shepherd() {
   return (
     <>
-      <Ears pivot={[66, 62]}>
-        <path d="M46 78 L40 2 C62 14 86 36 94 58 Z" fill={COAT.charcoal} />
-        <path d="M54 64 L50 22 C62 32 76 46 82 56 Z" fill={COAT.pink} />
+      <Ears pivot={[68, 64]}>
+        <path d="M48 80 C38 46 42 14 58 6 C76 22 88 46 92 64 Z" fill={COAT.charcoal} />
+        <path d="M56 68 C50 46 52 28 60 22 C70 34 78 48 82 62 Z" fill="#d9a0aa" />
       </Ears>
-      <path
-        d="M100 36 C128 36 150 50 158 76 C164 96 160 112 166 124 C152 126 146 138 136 152 C126 168 114 180 100 180 C86 180 74 168 64 152 C54 138 48 126 34 124 C40 112 36 96 42 76 C50 50 72 36 100 36 Z"
-        fill={COAT.tan}
-      />
-      <path d="M56 54 C76 38 124 38 144 54 C134 70 118 76 108 78 L100 92 L92 78 C82 76 66 70 56 54 Z" fill={COAT.charcoal} />
-      <path d="M100 106 C120 106 132 124 130 146 C128 166 114 180 100 180 C86 180 72 166 70 146 C68 124 80 106 100 106 Z" fill={COAT.cocoa} />
-      <Features eyeX={29} eyeY={98} noseY={138} />
+      <path d={DOME} fill={COAT.tan} />
+      <path d="M100 40 C130 40 148 58 148 88 C148 114 128 130 100 130 C72 130 52 114 52 88 C52 58 70 40 100 40 Z" fill={COAT.charcoal} />
+      <ellipse cx="74" cy="94" rx="13" ry="11" fill={COAT.tan} />
+      <ellipse cx="126" cy="94" rx="13" ry="11" fill={COAT.tan} />
+      <path d="M100 106 C122 106 132 124 130 148 C128 170 114 182 100 182 C86 182 72 170 70 148 C68 124 78 106 100 106 Z" fill="#8f8a92" />
+      <Features eyeX={26} eyeY={94} noseY={140} noseW={14} noseH={10} />
     </>
   );
 }
