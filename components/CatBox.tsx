@@ -4,7 +4,10 @@ import { useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
 
 // The cat side of the "Who's your buddy?" screen: a cardboard box with a
-// letterbox slot cut in the front and a cat hiding inside. On a loop the cat
+// letterbox slot cut in the front and a cat hiding inside. The eyes are
+// bigger than the slot, so its edges crop them: the cat reads as sitting
+// behind the cardboard, not painted on it. The white-and-brown cat is the
+// exception: it has climbed up and peeks over the top of its box instead. On a loop the cat
 // looks around, blinks, curls both arms out of the slot, swipes with one of
 // them, pulls them back in and ducks out of sight. Hovering a box makes the
 // cat reach out and bat at the hand.
@@ -59,17 +62,17 @@ type Pose = { d: string; x: number; y: number; rotate: number; scale: number; op
 // "tuck" is hidden inside the box; "curl" is the same spot but visible, so
 // an arm is fully solid for the whole time it is moving.
 const LEFT: Record<"tuck" | "curl" | "hang" | "reach" | "swipe", Pose> = {
-  tuck: { d: "M60 152 C60 152 60 152 60 152", x: 60, y: 152, rotate: 0, scale: 0.3, opacity: 0 },
-  curl: { d: "M60 152 C60 152 60 152 60 152", x: 60, y: 152, rotate: 0, scale: 0.3, opacity: 1 },
-  hang: { d: "M62 152 C28 148 24 184 30 212", x: 31, y: 216, rotate: 6, scale: 1, opacity: 1 },
-  reach: { d: "M62 152 C36 150 14 136 -4 112", x: -6, y: 109, rotate: 143, scale: 1, opacity: 1 },
-  swipe: { d: "M62 152 C36 153 10 151 -12 140", x: -15, y: 138, rotate: 118, scale: 1, opacity: 1 },
+  tuck: { d: "M50 152 C50 152 50 152 50 152", x: 50, y: 152, rotate: 0, scale: 0.3, opacity: 0 },
+  curl: { d: "M50 152 C50 152 50 152 50 152", x: 50, y: 152, rotate: 0, scale: 0.3, opacity: 1 },
+  hang: { d: "M50 152 C22 148 18 184 24 212", x: 25, y: 216, rotate: 6, scale: 1, opacity: 1 },
+  reach: { d: "M50 152 C28 150 10 136 -8 112", x: -10, y: 109, rotate: 143, scale: 1, opacity: 1 },
+  swipe: { d: "M50 152 C28 153 6 151 -16 140", x: -19, y: 138, rotate: 118, scale: 1, opacity: 1 },
 };
 
 const RIGHT: Record<"tuck" | "curl" | "hang", Pose> = {
-  tuck: { d: "M146 152 C146 152 146 152 146 152", x: 146, y: 152, rotate: 0, scale: 0.3, opacity: 0 },
-  curl: { d: "M146 152 C146 152 146 152 146 152", x: 146, y: 152, rotate: 0, scale: 0.3, opacity: 1 },
-  hang: { d: "M144 152 C178 148 182 184 174 212", x: 173, y: 216, rotate: -8, scale: 1, opacity: 1 },
+  tuck: { d: "M156 152 C156 152 156 152 156 152", x: 156, y: 152, rotate: 0, scale: 0.3, opacity: 0 },
+  curl: { d: "M156 152 C156 152 156 152 156 152", x: 156, y: 152, rotate: 0, scale: 0.3, opacity: 1 },
+  hang: { d: "M156 152 C182 148 184 184 176 212", x: 175, y: 216, rotate: -8, scale: 1, opacity: 1 },
 };
 
 const LOOP = 9; // seconds for one full idle cycle
@@ -97,6 +100,8 @@ export function CatBox({ coat, brand, delay = 0 }: { coat: CatCoat; brand: BoxBr
   const c = COATS[coat];
   const clip = `slot-${coat}-${brand}`;
   const beans = "#ff4f9a";
+  // The white-and-brown cat looks out over the top instead of through a slot.
+  const peek = coat === "spotted";
   const [mode, setMode] = useState<Mode>("idle");
   const firstRun = useRef(true);
 
@@ -126,14 +131,14 @@ export function CatBox({ coat, brand, delay = 0 }: { coat: CatCoat; brand: BoxBr
       leftT: batting ? swing : quick,
       right: still(mode === "settle" ? RIGHT.tuck : RIGHT.hang),
       rightT: quick,
-      face: { y: 0 },
+      face: { y: peek && mode !== "settle" ? -12 : 0 },
       faceT: quick,
       look: { x: 0 },
       lookT: quick,
       blink: { scaleY: 1 },
       blinkT: quick,
     };
-  }, [mode, delay]);
+  }, [mode, delay, peek]);
 
   return (
     <svg
@@ -151,35 +156,68 @@ export function CatBox({ coat, brand, delay = 0 }: { coat: CatCoat; brand: BoxBr
       <polygon points="108,62 252,74 232,36 100,28" fill="#f1d9c6" />
       <polygon points="28,84 108,62 252,74 178,96" fill="#2b211c" />
       <polygon points="28,84 108,62 172,67 96,90" fill="#e7c8b0" />
+      {peek && (
+        // Sits in the opening: drawn after the inside of the box and before its
+        // front wall, which hides everything below the rim. Only the top of a
+        // wide head shows, with the eyes just clear of the cardboard.
+        <motion.g initial={false} animate={a.face} transition={a.faceT} onAnimationComplete={() => setMode((m) => (m === "reach" ? "bat" : m === "settle" ? "idle" : m))}>
+          <clipPath id={clip}>
+            <ellipse cx="112" cy="84" rx="56" ry="38" />
+          </clipPath>
+          {/* the tail curls up out of the far end of the box, well clear of the head */}
+          <path d="M214 86 C234 68 240 40 224 30 C214 25 207 36 215 43" fill="none" stroke={c.patch} strokeWidth="11" strokeLinecap="round" />
+          <path d="M62 70 L66 34 L92 52 Z" fill="#fff" />
+          <path d="M132 52 L158 34 L162 70 Z" fill={c.patch} />
+          <ellipse cx="112" cy="84" rx="56" ry="38" fill="#fff" />
+          <circle cx="140" cy="68" r="30" fill={c.patch} clipPath={`url(#${clip})`} />
+          <motion.g initial={false} animate={a.blink} transition={a.blinkT}>
+            <circle cx="92" cy="74" r="13" fill="#f2b632" />
+            <circle cx="132" cy="74" r="13" fill="#f2b632" />
+            <motion.g initial={false} animate={a.look} transition={a.lookT}>
+              <circle className="pupil" cx="92" cy="74" r="8" fill={INK} />
+              <circle className="pupil" cx="132" cy="74" r="8" fill={INK} />
+              <circle cx="95" cy="70" r="2.6" fill="#fff" />
+              <circle cx="135" cy="70" r="2.6" fill="#fff" />
+            </motion.g>
+          </motion.g>
+          <path d="M58 78 h-20 M60 85 l-19 5 M166 78 h20 M164 85 l19 5" fill="none" stroke={INK} strokeWidth="1.6" strokeLinecap="round" />
+        </motion.g>
+      )}
       <polygon points="28,84 178,96 178,222 28,202" fill="#d8ab8d" />
       <polygon points="178,96 252,74 252,194 178,222" fill="#c3987c" />
       <polygon points="88,89 114,91 114,112 88,110" fill="#edd3c1" />
       <polygon points="92,190 116,193 116,216 92,212" fill="#edd3c1" />
       <Label brand={brand} />
 
-      {/* The slot shows the eyes in the middle with a shoulder at each end,
-          so the arms come out beside the face. */}
-      <clipPath id={clip}>
-        <rect x="36" y="122" width="134" height="58" rx="29" />
-      </clipPath>
-      <rect x="36" y="122" width="134" height="58" rx="29" fill="#1a1412" />
-      <g clipPath={`url(#${clip})`}>
-        <motion.g initial={false} animate={a.face} transition={a.faceT}>
-          <rect x="30" y="118" width="146" height="66" fill={c.fur} />
-          {c.patch && <circle cx="124" cy="142" r="23" fill={c.patch} />}
-          <motion.g initial={false} animate={a.blink} transition={a.blinkT}>
-            <circle cx="86" cy="144" r="14" fill="#fff" stroke={coat === "spotted" ? INK : "none"} strokeWidth="1.6" />
-            <circle cx="120" cy="144" r="14" fill="#fff" />
-            <motion.g initial={false} animate={a.look} transition={a.lookT}>
-              <ellipse className="pupil" cx="86" cy="144" rx="4.5" ry="7.5" fill={INK} />
-              <ellipse className="pupil" cx="120" cy="144" rx="4.5" ry="7.5" fill={INK} />
+      {peek ? null : (
+        <>
+          {/* A long low slot. The arms come out at its two ends; the eyes sit
+              together in the middle, between them, and are taller than the
+              slot, so the cardboard cuts them off top and bottom. */}
+          <clipPath id={clip}>
+            <rect x="30" y="130" width="146" height="44" rx="22" />
+          </clipPath>
+          <rect x="30" y="130" width="146" height="44" rx="22" fill="#1a1412" />
+          <g clipPath={`url(#${clip})`}>
+            <motion.g initial={false} animate={a.face} transition={a.faceT}>
+              <rect x="24" y="118" width="158" height="66" fill={c.fur} />
+              <motion.g initial={false} animate={a.blink} transition={a.blinkT}>
+                <ellipse cx="82" cy="152" rx="14" ry="27" fill="#fff" />
+                <ellipse cx="124" cy="152" rx="14" ry="27" fill="#fff" />
+                <motion.g initial={false} animate={a.look} transition={a.lookT}>
+                  <ellipse className="pupil" cx="83" cy="152" rx="5" ry="11" fill={INK} />
+                  <ellipse className="pupil" cx="123" cy="152" rx="5" ry="11" fill={INK} />
+                </motion.g>
+              </motion.g>
+              <path d="M98.5 147 h9 l-4.5 5 Z" fill={beans} />
+              <path d="M96 157 q3.5 4 7 0 q3.5 4 7 0" fill="none" stroke={c.mouth} strokeWidth="1.8" strokeLinecap="round" />
             </motion.g>
-          </motion.g>
-          <path d="M98.5 160 h9 l-4.5 5 Z" fill={beans} />
-          <path d="M95.5 169 q4 5 7.5 0 q3.5 5 7.5 0" fill="none" stroke={c.mouth} strokeWidth="1.8" strokeLinecap="round" />
-        </motion.g>
-      </g>
+          </g>
+        </>
+      )}
 
+      {!peek && (
+        <>
       {/* Right arm: shows the back of the paw, three toes with claws. */}
       <motion.path initial={false} animate={a.right.arm} transition={a.rightT} fill="none" stroke={c.fur} strokeWidth="25" strokeLinecap="round" />
       <motion.g initial={false} animate={a.right.paw} transition={a.rightT}>
@@ -213,6 +251,8 @@ export function CatBox({ coat, brand, delay = 0 }: { coat: CatCoat; brand: BoxBr
         <circle cx="0" cy="11.5" r="3.9" fill={beans} />
         <circle cx="10" cy="8" r="3.6" fill={beans} />
       </motion.g>
+        </>
+      )}
     </svg>
   );
 }
