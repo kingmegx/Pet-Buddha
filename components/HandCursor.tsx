@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring } from "motion/react";
 
-// The illustrated hand that replaces the mouse pointer. It points by default
+// The illustrated hand that replaces the mouse pointer: a hand and a short
+// wrist, nothing more. It points by default
 // and opens into a patting palm over anything marked data-pat (the pets).
 // Touch devices keep their normal behaviour.
 export default function HandCursor() {
@@ -15,6 +16,10 @@ export default function HandCursor() {
   const [pat, setPat] = useState(false);
   const [down, setDown] = useState(false);
   const [seen, setSeen] = useState(false);
+  const [say, setSay] = useState("");
+  // Keep the last words on the bubble while it shrinks away.
+  const lastSaid = useRef("");
+  if (say) lastSaid.current = say;
 
   useEffect(() => {
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
@@ -24,7 +29,9 @@ export default function HandCursor() {
       x.set(e.clientX);
       y.set(e.clientY);
       setSeen(true);
-      setPat(!!(e.target as Element | null)?.closest?.("[data-pat]"));
+      const target = e.target as Element | null;
+      setPat(!!target?.closest?.("[data-pat]"));
+      setSay(target?.closest?.("[data-say]")?.getAttribute("data-say") ?? "");
     };
     const press = () => setDown(true);
     const release = () => setDown(false);
@@ -43,6 +50,9 @@ export default function HandCursor() {
 
   return (
     <motion.div className="hand" style={{ x: sx, y: sy, opacity: seen ? 1 : 0 }} aria-hidden>
+      <motion.span className="hand-say" initial={false} animate={{ scale: say ? 1 : 0, opacity: say ? 1 : 0, rotate: say ? -4 : -14 }} transition={{ type: "spring", stiffness: 420, damping: 22 }}>
+        {lastSaid.current}
+      </motion.span>
       <motion.svg
         width="110"
         height="140"
@@ -52,7 +62,8 @@ export default function HandCursor() {
         style={{ transformOrigin: "29px 8px" }}
       >
         <g transform="rotate(-28 29 8)" className={pat ? "hand-pat" : undefined}>
-          <rect x="26" y="108" width="52" height="1400" rx="22" fill="#f7b2ac" />
+          {/* a short wrist, so it is just a hand and not an arm reaching in from the edge */}
+          <rect x="27" y="104" width="50" height="46" rx="21" fill="#f7b2ac" />
           <ellipse cx="12" cy="92" rx="10" ry="22" transform="rotate(-22 12 92)" fill="#f7b2ac" />
           <rect x="12" y="60" width="76" height="68" rx="28" fill="#f7b2ac" />
           <rect x="18" y="4" width="22" height="80" rx="11" fill="#f7b2ac" />

@@ -1,39 +1,40 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { AGE_STOPS, BREEDS, NEEDS, WEIGHT_RANGE, formatAge, monthsSince, type BreedId, type NeedId, type Species } from "@/lib/flow";
-import { Pet } from "./Pets";
-import { BreedArt } from "./Breeds";
-import { Toon } from "./Cast";
+import { AGE_STOPS, MIXED, POPULAR, WEIGHT_RANGE, ageBand, formatAge, monthsSince, searchBreeds, type Breed } from "@/lib/flow";
+import { PROBLEMS, commonProblems, type ProblemId, type Sex } from "@/lib/content";
+import { Face } from "./Faces";
+import { CatBust, ProfileBust } from "./Busts";
+import { NicheArt } from "./NicheArt";
+import { FunFact } from "./FunFact";
+import { NameTag } from "./NameTag";
 import { Pack, aimPack, type PackMood } from "./Pack";
 import { CatBox, type BoxBrand, type CatCoat } from "./CatBox";
 import { Walkers } from "./Walkers";
+import { Results } from "./Results";
 import Slider from "./Slider";
 import HandCursor from "./HandCursor";
 
-type Step = "landing" | "species" | "breed" | "age" | "weight" | "sex" | "needs" | "follow" | "curating" | "done";
+type Step = "landing" | "species" | "name" | "breed" | "weight" | "age" | "sex" | "needs" | "curating" | "done";
 
 // The hill is one path that re-shapes itself on every step. All shapes use
 // the same commands so they can morph into each other.
 const HILL: Record<Step, string> = {
-  landing: "M0,101 C28,101 58,101 100,101 L100,102 L0,102 Z",
+  landing: "M0,112 C28,112 58,112 100,112 L100,114 L0,114 Z",
   species: "M0,40 C30,30 62,48 100,36 L100,100 L0,100 Z",
+  name: "M0,58 C30,48 66,64 100,52 L100,100 L0,100 Z",
   breed: "M0,38 C30,52 66,28 100,42 L100,100 L0,100 Z",
   age: "M0,44 C34,34 60,52 100,32 L100,100 L0,100 Z",
   weight: "M0,34 C30,50 64,34 100,46 L100,100 L0,100 Z",
   sex: "M0,46 C36,36 62,46 100,36 L100,100 L0,100 Z",
   needs: "M0,26 C30,36 66,20 100,30 L100,100 L0,100 Z",
-  follow: "M0,30 C32,20 64,36 100,24 L100,100 L0,100 Z",
   curating: "M0,60 C30,60 66,60 100,60 L100,100 L0,100 Z",
   done: "M0,-6 C30,-6 66,-6 100,-6 L100,100 L0,100 Z",
 };
 
 const wobble = { type: "spring", stiffness: 90, damping: 9, mass: 1 } as const;
 const pop = { type: "spring", stiffness: 260, damping: 18 } as const;
-
-// Order sets who springs in first on the pick-your-dog screen.
-const BREED_SPOTS = ["beagle", "gsd", "golden", "indie", "shihtzu"] as const;
 
 // Where the age slider's knob sits for a given age in months: between the
 // two nearest stops, so an exact birthday lands in the right place.
@@ -52,36 +53,59 @@ const CAT_BOXES: { coat: CatCoat; brand: BoxBrand; delay: number; style: React.C
   { coat: "spotted", brand: "plain", delay: 5.4, style: { left: "27%", top: "52%", width: "40%" } },
 ];
 
+// A heading whose words rise into place one after another.
+function Rise({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(" ").map((word, i) => (
+        <Fragment key={i}>
+          <span className="rise">
+            <span style={{ "--i": i } as React.CSSProperties}>{word}</span>
+          </span>{" "}
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
 export default function Onboarding() {
   const [step, setStep] = useState<Step>("landing");
   const [trail, setTrail] = useState<Step[]>([]);
-  const [breed, setBreed] = useState<BreedId | null>(null);
+  const [name, setName] = useState("");
+  const [breed, setBreed] = useState<Breed | null>(null);
+  const [typed, setTyped] = useState("");
   const [age, setAge] = useState(0.2);
   // Age comes from the slider, or from an exact date of birth, which also
   // moves the slider. Dragging the slider afterwards clears the date.
   const [dob, setDob] = useState("");
-  const [weight, setWeight] = useState(0.4);
-  const [sex, setSex] = useState<"boy" | "girl" | null>(null);
-  const [needs, setNeeds] = useState<NeedId[]>([]);
-  const [followIndex, setFollowIndex] = useState(0);
-  const [answers, setAnswers] = useState<Partial<Record<NeedId, string>>>({});
+  const [weight, setWeight] = useState(0.3);
+  // False when the owner tapped "Not sure": the weight is then the breed's typical one.
+  const [weightSure, setWeightSure] = useState(true);
+  const [sex, setSex] = useState<Sex | null>(null);
+  const [needs, setNeeds] = useState<ProblemId[]>([]);
+  // Once the owner has ticked or unticked anything, their list is left alone.
+  const [needsTouched, setNeedsTouched] = useState(false);
   const [cheer, setCheer] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [packMood, setPackMood] = useState<PackMood>("idle");
   const lookFrame = useRef(0);
   const aimFrame = useRef(0);
 
-  const pet = BREEDS.find((b) => b.id === breed);
-  const species: Species = pet?.species ?? "dog";
+  const pet = breed;
+  const who = name.trim() || "your dog";
   const sliderMonths = AGE_STOPS[Math.round(age * (AGE_STOPS.length - 1))];
   const dobMonths = monthsSince(dob);
   const months = dobMonths ?? sliderMonths;
-  const [minKg, maxKg] = WEIGHT_RANGE[species];
+  const [minKg, maxKg] = WEIGHT_RANGE;
   const kg = Math.round((minKg + weight * (maxKg - minKg)) * 2) / 2;
-  const chosen = NEEDS.filter((n) => needs.includes(n.id));
-  // Only the needs that have a follow-up question get one.
-  const asks = chosen.filter((n) => n.followUp);
-  const current = asks[followIndex];
+  const matches = searchBreeds(typed);
+
+  // The name is remembered on this device only.
+  useEffect(() => {
+    try {
+      setName(localStorage.getItem("petbuddha.name") ?? "");
+    } catch {}
+  }, []);
 
   const go = (next: Step) => {
     setTrail((t) => [...t, step]);
@@ -89,33 +113,31 @@ export default function Onboarding() {
   };
 
   const back = () => {
-    if (step === "follow" && followIndex > 0) return setFollowIndex(followIndex - 1);
     const prev = trail[trail.length - 1];
     if (!prev) return;
     setTrail(trail.slice(0, -1));
     setStep(prev);
   };
 
-  const pick = (id: BreedId) => {
-    const b = BREEDS.find((x) => x.id === id)!;
-    const [lo, hi] = WEIGHT_RANGE[b.species];
-    setBreed(id);
-    setWeight((b.typicalKg - lo) / (hi - lo));
-    go("age");
+  const pick = (b: Breed) => {
+    setBreed(b);
+    setTyped("");
+    // Start the weight in the middle of what is typical for the breed.
+    setWeight(((b.kg[0] + b.kg[1]) / 2 - minKg) / (maxKg - minKg));
+    setWeightSure(true);
+    go("weight");
+  };
+
+  const saveName = () => {
+    try {
+      localStorage.setItem("petbuddha.name", name.trim());
+    } catch {}
+    go("breed");
   };
 
   const celebrate = () => {
     setCheer(true);
     window.setTimeout(() => setCheer(false), 900);
-  };
-
-  const answer = (option: string) => {
-    setAnswers({ ...answers, [current.id]: option });
-    celebrate();
-    window.setTimeout(() => {
-      if (followIndex < asks.length - 1) setFollowIndex(followIndex + 1);
-      else go("curating");
-    }, 350);
   };
 
   const restart = () => {
@@ -125,8 +147,7 @@ export default function Onboarding() {
     setSex(null);
     setDob("");
     setNeeds([]);
-    setAnswers({});
-    setFollowIndex(0);
+    setNeedsTouched(false);
   };
 
   // The curating screen is a short pause before the results.
@@ -136,33 +157,48 @@ export default function Onboarding() {
     return () => window.clearTimeout(timer);
   }, [step]);
 
-  // Recommendations will read this later.
+  // Later flows will read this instead of asking again.
   useEffect(() => {
     if (step !== "done" || !pet) return;
-    const profile = { breed: pet.id, species, ageMonths: months, dateOfBirth: dobMonths !== null ? dob : null, weightKg: kg, sex, needs, answers };
+    const profile = { name: name.trim() || null, breed: pet.name, ageMonths: months, dateOfBirth: dobMonths !== null ? dob : null, weightKg: kg, weightSure, sex, needs };
     try {
       localStorage.setItem("petbuddha.profile", JSON.stringify(profile));
     } catch {}
-  }, [step, pet, species, months, dobMonths, dob, kg, sex, needs, answers]);
+  }, [step, pet, name, months, dobMonths, dob, kg, weightSure, sex, needs]);
 
-  const titles: Record<Step, [string, string]> = {
-    landing: ["", ""],
-    species: ["Step 1", "Who's your buddy?"],
-    breed: ["Step 2", "Pick your dog"],
-    age: [species === "cat" ? "Step 2" : "Step 3", "Tell us more"],
-    weight: [species === "cat" ? "Step 2" : "Step 3", "Tell us more"],
-    sex: [species === "cat" ? "Step 2" : "Step 3", "Tell us more"],
-    needs: [species === "cat" ? "Step 3" : "Step 4", "What do you need help with?"],
-    follow: [species === "cat" ? "Step 4" : "Step 5", current?.label ?? ""],
-    curating: ["Hang tight", pet ? `Curating for your ${pet.name}` : "Curating"],
-    done: ["All set", pet ? `Picks for your ${pet.name}` : ""],
+  // Eyebrow, title and the line under the title, per step.
+  const titles: Record<Step, [string, string, string]> = {
+    landing: ["", "", ""],
+    species: ["Step 1", "Who's your buddy?", ""],
+    name: ["Step 2", "What's their name?", "Only if you want to. It stays on this device."],
+    breed: ["Step 3", "Which one looks like yours?", "Type the breed, or tap a face."],
+    weight: ["Step 4", `How much does ${who} weigh?`, "Weight is how we size a toy safely."],
+    age: ["Step 5", `How old is ${who}?`, "Age decides what is safe, and what they need."],
+    sex: ["Step 6", "Good boy or good girl?", "A few behaviours differ between the two."],
+    needs: ["Step 7", "What do you need help with?", `We ticked what is common at ${formatAge(months)}. Untick anything that isn't true for ${who}.`],
+    curating: ["One moment", `Putting it together for ${who}`, ""],
+    done: ["", "", ""],
   };
-  const [eyebrow, title] = titles[step];
+  const [eyebrow, title, sub] = titles[step];
 
-  const heroOn = !!pet && ["age", "weight", "sex", "needs", "follow", "done"].includes(step);
-  const heroSmall = step === "needs" || step === "follow" || step === "done";
-  const growth = 0.62 + 0.38 * Math.min(1, months / 18);
-  const girth = 0.9 + 0.28 * weight;
+  // How far through the flow we are, for the bar along the top.
+  const ORDER: Step[] = ["landing", "species", "name", "breed", "weight", "age", "sex", "needs", "curating", "done"];
+  const progress = ORDER.indexOf(step) / (ORDER.length - 1);
+
+  // Where the picked pet sits. It moves up and shrinks on steps with taller
+  // controls, so there is always clear space between it and the question.
+  const HERO: Partial<Record<Step, { top: string; scale: number }>> = {
+    weight: { top: "40%", scale: 1 },
+    age: { top: "36%", scale: 0.92 },
+    sex: { top: "44%", scale: 1.08 },
+    needs: { top: "30%", scale: 0.7 },
+  };
+  const hero = HERO[step];
+
+  const heroOn = !!pet && !!hero;
+  // The head grows with age and fills out a little with weight.
+  const growth = 0.66 + 0.34 * Math.min(1, months / 18);
+  const girth = 0.94 + 0.2 * weight;
 
   return (
     <main
@@ -178,9 +214,15 @@ export default function Onboarding() {
         });
       }}
     >
+      {/* Two hills: the far one is paler and settles more slowly, for depth. */}
       <svg className="hill" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
+        <motion.path className="hill-far" initial={false} animate={{ d: HILL[step] }} transition={{ type: "spring", stiffness: 46, damping: 9, mass: 1.2 }} />
         <motion.path initial={false} animate={{ d: HILL[step] }} transition={wobble} />
       </svg>
+
+      <div className="progress" aria-hidden>
+        <motion.span initial={false} animate={{ scaleX: progress }} transition={{ type: "spring", stiffness: 120, damping: 20 }} />
+      </div>
 
       {trail.length > 0 && step !== "done" && step !== "curating" && (
         <button className="back" onClick={back} aria-label="Back">
@@ -191,15 +233,18 @@ export default function Onboarding() {
       <AnimatePresence mode="wait">
         {title && (
           <motion.header
-            key={title}
+            key={`${title}|${sub}`}
             className="title"
-            initial={{ y: -90, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -60, opacity: 0, transition: { duration: 0.15 } }}
-            transition={pop}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ y: -24, opacity: 0, transition: { duration: 0.16 } }}
+            transition={{ duration: 0.2 }}
           >
-            <p>{eyebrow}</p>
-            <h1>{title}</h1>
+            <p className="eyebrow">{eyebrow}</p>
+            <h1>
+              <Rise text={title} />
+            </h1>
+            {sub && <p className="sub">{sub}</p>}
           </motion.header>
         )}
       </AnimatePresence>
@@ -207,15 +252,15 @@ export default function Onboarding() {
       <AnimatePresence>
         {heroOn && pet && (
           <motion.div
-            key={pet.id}
+            key={pet.name}
             className="hero"
             initial={{ scale: 0, top: "50%" }}
-            animate={{ scale: heroSmall ? 0.82 : 1, top: heroSmall ? "38%" : "47%" }}
+            animate={{ scale: hero!.scale, top: hero!.top }}
             exit={{ scale: 0 }}
             transition={pop}
           >
             <div className="hero-size" style={{ transform: `scale(${growth * girth}, ${growth})` }}>
-              {pet.id === "indie-cat" ? <Pet id={pet.id} happy={cheer} className="reactive" /> : <BreedArt id={pet.id} happy={cheer} className="reactive" />}
+              <Face id={pet.face} happy={cheer} className="reactive" />
             </div>
           </motion.div>
         )}
@@ -223,38 +268,57 @@ export default function Onboarding() {
 
       <AnimatePresence mode="wait">
         <motion.section
-          key={step === "follow" ? `follow-${followIndex}` : step}
+          key={step}
           className={`screen screen-${step}`}
-          initial={{ opacity: 0, y: 40, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -30, scale: 1.04, transition: { duration: 0.18 } }}
-          transition={pop}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, y: -18, transition: { duration: 0.16 } }}
+          transition={{ duration: 0.2 }}
         >
           {step === "landing" && (
             <>
-              <div className="landing-copy">
-                <h1 className="logo">Pet Buddha</h1>
-                <p>Calm, simple help for your pet — picked for them.</p>
-                <button
-                  className="pill"
-                  onClick={() => {
-                    // Let the cast leap off their edges before the hill rises.
-                    setLeaving(true);
-                    window.setTimeout(() => {
-                      go("species");
-                      setLeaving(false);
-                    }, 380);
-                  }}
-                >
-                  Get started
-                </button>
-              </div>
-              <div className={`cast ${leaving ? "is-leaving" : ""}`}>
-                <Toon id="indie" className="c-indie" />
-                <Toon id="beagle" className="c-beagle" />
-                <Toon id="gsd" className="c-gsd" />
-                <Toon id="golden" className="c-golden" />
-                <Toon id="indie-cat" className="c-cat" />
+              {/* A white card on a pale blue page. One dog stands on the card with a
+                  band of colour behind it; another hangs in over the top corner. */}
+              <div className="landing-bg" />
+              <div className={`card-page ${leaving ? "is-leaving" : ""}`}>
+                <i className="band" />
+                <div className="paper">
+                  {/* Either side of the name, eyes closed, bowing towards it. */}
+                  <div className="niche n-left reactive" data-pat>
+                    <NicheArt src="/art/pray-dog.png">
+                      <ProfileBust />
+                    </NicheArt>
+                  </div>
+                  <div className="niche n-right reactive" data-pat>
+                    <NicheArt src="/art/pray-cat.png">
+                      <CatBust />
+                    </NicheArt>
+                  </div>
+                  <div className="landing-copy">
+                    {/* The meditating dog floats at the top, above the name. */}
+                    <span className="floater" aria-hidden>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/art/buddha.png" alt="" draggable={false} />
+                      <i />
+                    </span>
+                    <h1 className="logo">Pet Buddha</h1>
+                    <p className="lede">Personalised guidance to help you choose what’s best for your pet.</p>
+                    <button
+                      className="pill"
+                      onClick={() => {
+                        // Let the dogs leave before the hill rises.
+                        setLeaving(true);
+                        window.setTimeout(() => {
+                          go("species");
+                          setLeaving(false);
+                        }, 380);
+                      }}
+                    >
+                      Get started
+                    </button>
+                  </div>
+                  <FunFact />
+                </div>
               </div>
             </>
           )}
@@ -279,7 +343,7 @@ export default function Onboarding() {
                 aimPack(e.currentTarget, null);
               }}
             >
-              <button className="side side-cat" onClick={() => pick("indie-cat")}>
+              <button className="side side-cat" aria-disabled data-say="Cats are coming soon">
                 <span className="crowd">
                   {CAT_BOXES.map((b) => (
                     <span key={b.coat} className="spot" style={b.style}>
@@ -287,9 +351,11 @@ export default function Onboarding() {
                     </span>
                   ))}
                 </span>
-                <span className="side-label">Cat</span>
+                <span className="side-label">
+                  Cat <small>soon</small>
+                </span>
               </button>
-              <button className="side side-dog" onClick={() => go("breed")} data-pat>
+              <button className="side side-dog" onClick={() => go("name")} data-pat>
                 <span className="crowd">
                   <Pack mood={packMood} />
                 </span>
@@ -298,22 +364,115 @@ export default function Onboarding() {
             </div>
           )}
 
+          {step === "name" && <NameTag name={name} />}
+
+          {step === "name" && (
+            <form
+              className="controls"
+              onSubmit={(e) => {
+                e.preventDefault();
+                saveName();
+              }}
+            >
+              <label className="field">
+                <span className="sr">Your dog's name</span>
+                <input type="text" value={name} maxLength={24} autoComplete="off" placeholder="Type a name" onChange={(e) => setName(e.target.value)} />
+              </label>
+              <button className="pill" type="submit">
+                {name.trim() ? "Next" : "Skip"} <span className="arrow" aria-hidden />
+              </button>
+            </form>
+          )}
+
           {step === "breed" && (
-            <div className="breed-scene">
-              {BREED_SPOTS.map((id, i) => (
-                <motion.button
-                  key={id}
-                  className={`breed-spot at-${id} reactive`}
-                  onClick={() => pick(id)}
-                  initial={{ y: 90, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ ...pop, delay: 0.09 * i }}
-                  whileTap={{ scale: 0.94 }}
+            <div className="breed-pick">
+              <div className="search">
+                <label className="field">
+                  <span className="sr">Search for a breed</span>
+                  <input type="text" value={typed} autoComplete="off" placeholder="Search, like Labrador or Pug" onChange={(e) => setTyped(e.target.value)} />
+                </label>
+                {typed.trim() && (
+                  <ul className="matches">
+                    {matches.map((b) => (
+                      <li key={b.name}>
+                        <button onClick={() => pick(b)}>{b.name}</button>
+                      </li>
+                    ))}
+                    <li>
+                      <button onClick={() => pick(MIXED)}>{matches.length ? MIXED.name : `Can't find it? Choose "${MIXED.name}"`}</button>
+                    </li>
+                  </ul>
+                )}
+              </div>
+              <div className="tiles">
+                {[...POPULAR, MIXED].map((b, i) => (
+                  <motion.button
+                    key={b.name}
+                    className="tile reactive"
+                    onClick={() => pick(b)}
+                    initial={{ y: 70, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ ...pop, delay: 0.07 * i }}
+                    whileTap={{ scale: 0.94 }}
+                  >
+                    <Face id={b.face} />
+                    <span className="breed-name">{b.name}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === "weight" && pet && (
+            <div className="controls">
+              <p className="readout">
+                <input
+                  className="kg"
+                  type="number"
+                  inputMode="decimal"
+                  min={minKg}
+                  max={maxKg}
+                  step={0.5}
+                  value={kg}
+                  aria-label="Weight in kilograms"
+                  onChange={(e) => {
+                    const v = Number(e.target.value);
+                    if (v >= minKg && v <= maxKg) setWeight((v - minKg) / (maxKg - minKg));
+                    setWeightSure(true);
+                  }}
+                />{" "}
+                kg
+              </p>
+              <Slider
+                value={weight}
+                onChange={(v) => {
+                  setWeight(v);
+                  setWeightSure(true);
+                }}
+                left="Light"
+                right="Heavy"
+                label="Weight"
+                valueText={`${kg} kilograms`}
+                steps={69}
+              />
+              <p className="hint">
+                {pet === MIXED ? "Drag, or type the number." : `Grown ${pet.name}s are usually ${pet.kg[0]}-${pet.kg[1]} kg. Drag, or type the number.`}
+              </p>
+              <div className="row">
+                <button
+                  className="pill pill-quiet"
+                  onClick={() => {
+                    setWeight(((pet.kg[0] + pet.kg[1]) / 2 - minKg) / (maxKg - minKg));
+                    setWeightSure(false);
+                    go("age");
+                  }}
                 >
-                  <BreedArt id={id} couch />
-                  <span className="breed-name">{BREEDS.find((b) => b.id === id)!.name}</span>
-                </motion.button>
-              ))}
+                  Not sure
+                </button>
+                <button className="pill" onClick={() => go("age")}>
+                  Next <span className="arrow" aria-hidden />
+                </button>
+              </div>
             </div>
           )}
 
@@ -345,38 +504,29 @@ export default function Onboarding() {
                   }}
                 />
               </label>
-              <button className="pill" onClick={() => go("weight")}>
-                Next
-              </button>
-            </div>
-          )}
-
-          {step === "weight" && (
-            <div className="controls">
-              <p className="readout">{kg} kg</p>
-              <Slider value={weight} onChange={setWeight} left="Light" right="Heavy" label="Weight" valueText={`${kg} kilograms`} steps={40} />
               <button className="pill" onClick={() => go("sex")}>
-                Next
+                Next <span className="arrow" aria-hidden />
               </button>
             </div>
           )}
 
           {step === "sex" && (
             <div className="controls">
-              <p className="readout">Boy or girl?</p>
               <div className="chips">
                 {(["boy", "girl"] as const).map((s) => (
                   <button
                     key={s}
-                    className="chip"
+                    className="chip chip-big"
                     aria-pressed={sex === s}
                     onClick={() => {
                       setSex(s);
                       celebrate();
+                      // Tick what is common at this age, unless the owner already chose.
+                      if (!needsTouched) setNeeds(commonProblems(ageBand(months)));
                       window.setTimeout(() => go("needs"), 350);
                     }}
                   >
-                    {s === "boy" ? "Boy" : "Girl"}
+                    {s === "boy" ? "Good boy" : "Good girl"}
                   </button>
                 ))}
               </div>
@@ -385,88 +535,31 @@ export default function Onboarding() {
 
           {step === "needs" && (
             <div className="controls">
-              <p className="hint">Pick as many as you like</p>
               <div className="chips">
-                {NEEDS.map((n) => (
+                {PROBLEMS.map((p) => (
                   <button
-                    key={n.id}
+                    key={p.id}
                     className="chip"
-                    aria-pressed={needs.includes(n.id)}
+                    aria-pressed={needs.includes(p.id)}
                     onClick={() => {
-                      setNeeds((now) => (now.includes(n.id) ? now.filter((x) => x !== n.id) : [...now, n.id]));
+                      setNeedsTouched(true);
+                      setNeeds((now) => (now.includes(p.id) ? now.filter((x) => x !== p.id) : [...now, p.id]));
                       celebrate();
                     }}
                   >
-                    {n.label}
+                    {p.label}
                   </button>
                 ))}
               </div>
-              <button
-                className="pill"
-                disabled={needs.length === 0}
-                onClick={() => {
-                  setFollowIndex(0);
-                  go(asks.length > 0 ? "follow" : "curating");
-                }}
-              >
-                Next
+              <button className="pill" disabled={needs.length === 0} onClick={() => go("curating")}>
+                Show me <span className="arrow" aria-hidden />
               </button>
             </div>
           )}
 
-          {step === "follow" && current && (
-            <div className="controls">
-              <p className="readout">{current.followUp!.question(species)}</p>
-              <div className="chips">
-                {current.followUp!.options.map((o) => (
-                  <button key={o} className="chip" aria-pressed={answers[current.id] === o} onClick={() => answer(o)}>
-                    {o}
-                  </button>
-                ))}
-              </div>
-              <p className="hint">
-                {followIndex + 1} of {asks.length}
-              </p>
-            </div>
-          )}
+          {step === "curating" && <Walkers />}
 
-          {step === "curating" && (
-            <>
-              <Walkers />
-              <p className="curating-note">
-                <span className="paw-trail" aria-hidden>
-                  {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                    <svg key={i} viewBox="0 0 24 24" style={{ "--i": i } as React.CSSProperties}>
-                      <ellipse cx="12" cy="15.5" rx="5.5" ry="4.5" />
-                      <circle cx="5.5" cy="9.5" r="2.4" />
-                      <circle cx="10" cy="6" r="2.4" />
-                      <circle cx="15" cy="6.5" r="2.4" />
-                      <circle cx="19" cy="10.5" r="2.4" />
-                    </svg>
-                  ))}
-                </span>
-                Fetching the best picks<span className="dots" aria-hidden />
-              </p>
-            </>
-          )}
-
-          {step === "done" && pet && (
-            <div className="controls">
-              <p className="readout">
-                {formatAge(months)} old · {kg} kg · {sex}
-              </p>
-              <div className="chips">
-                {chosen.map((n) => (
-                  <span key={n.id} className="chip chip-static">
-                    {answers[n.id] ? `${n.label}: ${answers[n.id]}` : n.label}
-                  </span>
-                ))}
-              </div>
-              <button className="pill" onClick={restart}>
-                Start over
-              </button>
-            </div>
-          )}
+          {step === "done" && pet && <Results pet={pet} name={name.trim()} months={months} kg={kg} weightSure={weightSure} sex={sex} needs={needs} onRestart={restart} />}
         </motion.section>
       </AnimatePresence>
 

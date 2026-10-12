@@ -28,18 +28,19 @@ type Hound = {
 };
 
 // Back row first, so the smaller dogs at the front overlap the big ones.
+// Coats come from the same flat palette as the dog heads (Faces.tsx).
 const HOUNDS: Hound[] = [
-  { x: 170, y: 26, scale: 1.5, coat: CORAL, ear: "pointy", earColor: CORAL, collar: COBALT, delay: 0 },
-  { x: 356, y: 64, scale: 1.45, coat: COBALT, ear: "fluffy", earColor: "#ffffff", collar: CORAL, delay: -0.3 },
-  { x: 70, y: 150, scale: 1.02, coat: PEACH, ear: "pointy", earColor: "#f4a58c", collar: INK, delay: -0.7 },
-  { x: 318, y: 212, scale: 1.32, coat: CLAY, ear: "floppy", earColor: INK, collar: SUN, delay: -0.15 },
-  { x: 34, y: 286, scale: 1.02, coat: "#ffffff", ear: "floppy", earColor: INK, collar: CORAL, delay: -0.5 },
-  { x: 196, y: 306, scale: 0.98, coat: SUN, ear: "pointy", earColor: "#dd9226", collar: COBALT, delay: -0.85 },
-  { x: 408, y: 340, scale: 0.9, coat: INK, ear: "fluffy", earColor: CREAM, collar: SUN, delay: -0.4 },
+  { x: 170, y: 26, scale: 1.5, coat: "#cf7d4a", ear: "pointy", earColor: "#3a3640", collar: COBALT, delay: 0 },
+  { x: 356, y: 64, scale: 1.45, coat: "#3a3640", ear: "fluffy", earColor: "#5a4640", collar: CORAL, delay: -0.3 },
+  { x: 70, y: 150, scale: 1.02, coat: "#d9a06a", ear: "pointy", earColor: "#a8552c", collar: INK, delay: -0.7 },
+  { x: 318, y: 212, scale: 1.32, coat: "#a8552c", ear: "floppy", earColor: "#7c3d1f", collar: SUN, delay: -0.15 },
+  { x: 34, y: 286, scale: 1.02, coat: "#f7f1e3", ear: "floppy", earColor: "#a8552c", collar: CORAL, delay: -0.5 },
+  { x: 196, y: 306, scale: 0.98, coat: "#e3a44a", ear: "pointy", earColor: "#cf8a30", collar: COBALT, delay: -0.85 },
+  { x: 408, y: 340, scale: 0.9, coat: "#efe3cd", ear: "fluffy", earColor: "#a8552c", collar: SUN, delay: -0.4 },
 ];
 
 function HoundShape({ h }: { h: Hound }) {
-  const mark = h.coat === INK ? CREAM : INK;
+  const mark = h.coat === "#3a3640" ? CREAM : INK;
   const ink = { fill: "none", stroke: mark, strokeWidth: 2.2, strokeLinecap: "round" as const };
   return (
     <g transform={`translate(${h.x} ${h.y}) scale(${h.scale})`} style={{ "--d": `${h.delay}s` } as React.CSSProperties}>

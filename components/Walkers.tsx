@@ -1,11 +1,9 @@
-import { Chalk } from "./Breeds";
-
-// The "curating" loading scene: a white poster, "THE BEAGLES" in heavy black
-// lettering, and a line of beagles walking over a black zebra crossing that
-// fans out in perspective.
+// The "curating" loading scene: a white card with a line of beagles walking
+// over a black zebra crossing that fans out in perspective. Hovering it makes
+// the hand cursor say "The Beagles" (see data-say and HandCursor).
 //
 // The beagles are in the same picture-book style as the pick-your-dog
-// screen: flat painted shapes with a chalk speckle, a small dot eye, an
+// screen: flat shapes, a small dot eye, an
 // oversized nose, a long dark ear and a coral collar. No outlines.
 //
 // They really travel from left to right and loop round, each holding its
@@ -13,11 +11,11 @@ import { Chalk } from "./Breeds";
 // and fold on the way forward. The motion is in globals.css under ".poster".
 
 const INK = "#211e1c";
-const TAN = "#c9773c";
-const TAN_DEEP = "#a85c26";
-const EAR = "#4a2a1c";
-const WHITE = "#ffffff";
-const FAR_WHITE = "#e6dfd5";
+const TAN = "#cf7d4a";
+const TAN_DEEP = "#a8552c";
+const EAR = "#a8552c";
+const WHITE = "#f7f1e3";
+const FAR_WHITE = "#e6dcc6";
 const CORAL = "#ee5f3f";
 
 const BODY = "M58 92 C56 76 66 66 86 64 C112 61 150 60 176 64 C194 67 204 80 204 96 C204 110 196 122 182 126 C168 129 150 122 132 120 C112 118 92 122 78 118 C64 114 58 104 58 92 Z";
@@ -26,14 +24,9 @@ const BODY = "M58 92 C56 76 66 66 86 64 C112 61 150 60 176 64 C194 67 204 80 204
 const NECK = "M176 104 C172 74 190 48 212 40 L232 70 C230 94 216 112 198 118 Z";
 const EAR_SHAPE = "M216 22 C196 26 186 56 192 86 C194 98 210 98 214 86 C222 66 226 42 222 26 Z";
 
-// A painted shape: flat colour, then the chalk speckle over it.
+// A flat shape. No shading or texture.
 function P({ d, fill }: { d: string; fill: string }) {
-  return (
-    <>
-      <path d={d} fill={fill} />
-      <path d={d} fill="url(#chalk)" />
-    </>
-  );
+  return <path d={d} fill={fill} />;
 }
 
 function Leg({ x, y, beat, hind, far }: { x: number; y: number; beat: 1 | 2; hind?: boolean; far?: boolean }) {
@@ -57,13 +50,12 @@ function Leg({ x, y, beat, hind, far }: { x: number; y: number; beat: 1 | 2; hin
 function Beagle() {
   return (
     <svg viewBox="0 0 296 190" className="walker" aria-hidden>
-      <Chalk />
       <defs>
         <clipPath id="beagle-body">
           <path d={BODY} />
         </clipPath>
       </defs>
-      <ellipse className="w-shadow" cx="134" cy="180" rx="90" ry="5" />
+      <ellipse cx="134" cy="181" rx="90" ry="6" fill="rgba(33,30,28,0.12)" />
       <g className="w-body">
         <g className="w-tail" style={{ transformOrigin: "64px 84px" }}>
           <path d="M60 92 C44 74 38 46 46 18 C49 9 58 12 57 21 C54 44 60 64 78 80 Z" fill={TAN} />
@@ -123,13 +115,7 @@ const PACK = [
 
 export function Walkers() {
   return (
-    <div className="poster">
-      <div className="poster-title" aria-label="The Beagles">
-        <span>THE</span>
-        <strong>
-          <b>B</b>EAGLES
-        </strong>
-      </div>
+    <div className="poster" data-say="The Beagles">
       <svg className="zebra" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden>
         <polygon points="21,0 28,0 12,30 -2,30" />
         <polygon points="34,0 41,0 34,30 20,30" />

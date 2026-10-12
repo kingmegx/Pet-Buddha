@@ -2,6 +2,8 @@
   /* Palette drawn from the illustration references: warm cream paper,
      dusty teal ground, and marigold / coral / cobalt for the characters. */
   --sky: #f5e6cf;
+  /* The page behind everything. Cards and pills keep the cream above. */
+  --bg: #fbfaf6;
   --ground: #8fc4bf;
   --ground-deep: #5c9f9a;
   --sun: #f5b041;
@@ -9,6 +11,11 @@
   --cobalt: #1f4fa3;
   --ink: #211e1c;
   --hand: #f7b2ac;
+
+  /* One shared feel for every small movement: a spring that overshoots a
+     touch and settles, and a soft ease for things that just glide. */
+  --spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1.004 83.8%, 1);
+  --glide: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * {
@@ -20,7 +27,7 @@ body {
   margin: 0;
   height: 100%;
   overflow: hidden;
-  background: var(--sky);
+  background: var(--bg);
   color: var(--cobalt);
   -webkit-font-smoothing: antialiased;
 }
@@ -49,18 +56,6 @@ button {
   -webkit-user-select: none;
 }
 
-/* Paper grain: one small noise tile, drawn once and repeated over the
-   whole stage. It never repaints, however much moves underneath it. */
-.stage::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 40;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1.5 0 0 0 -0.92'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 240px 240px;
-}
-
 .hill {
   position: absolute;
   inset: 0;
@@ -72,22 +67,51 @@ button {
   fill: var(--ground);
 }
 
+.hill .hill-far {
+  fill: #b5dad5;
+  transform: translateY(-4.5%);
+}
+
+/* A thin bar along the top that fills as the steps go by. */
+.progress {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  z-index: 6;
+  background: rgba(33, 30, 28, 0.08);
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: var(--cobalt);
+  border-radius: 0 5px 5px 0;
+  transform-origin: 0 50%;
+}
+
 .title {
   position: absolute;
-  top: clamp(18px, 5vh, 48px);
+  top: clamp(20px, 5vh, 48px);
   left: 0;
   right: 0;
-  padding: 0 56px;
+  padding: 0 60px;
   text-align: center;
   z-index: 3;
   pointer-events: none;
 }
 
-.title p {
-  margin: 0 0 2px;
-  font-size: 14px;
-  font-weight: 500;
+.title .eyebrow {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(33, 30, 28, 0.08);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--ink);
+  animation: fade-up 0.5s var(--glide) both;
 }
 
 .title h1 {
@@ -95,7 +119,42 @@ button {
   font-size: clamp(30px, 5.2vw, 56px);
   font-weight: 800;
   letter-spacing: -0.03em;
-  line-height: 1.02;
+  line-height: 1.04;
+}
+
+/* Each word sits in its own window and rises into it. */
+.rise {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.rise > span {
+  display: inline-block;
+  animation: word-rise 0.7s calc(var(--i) * 55ms + 60ms) var(--glide) both;
+}
+
+.title .sub {
+  margin: 10px 0 0;
+  font-size: clamp(15px, 1.7vw, 19px);
+  font-weight: 500;
+  color: var(--ink);
+  animation: fade-up 0.6s 0.28s var(--glide) both;
+}
+
+@keyframes word-rise {
+  from {
+    transform: translateY(110%) rotate(4deg);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }
 
 .back {
@@ -109,11 +168,17 @@ button {
   background: rgba(255, 255, 255, 0.45);
   color: var(--ink);
   font-size: 20px;
-  transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1);
+  box-shadow: 0 3px 0 rgba(33, 30, 28, 0.1);
+  transition: transform 0.5s var(--spring), background 0.2s;
 }
 
 .back:hover {
-  transform: scale(1.12) translateX(-2px);
+  background: #fff;
+  transform: scale(1.1) translateX(-3px);
+}
+
+.back:active {
+  transform: scale(0.92);
 }
 
 .screen {
@@ -124,8 +189,13 @@ button {
 
 /* ---------- buttons, chips ---------- */
 
+/* Buttons are little physical keys: they sit on a hard shadow, lift on
+   hover and press down into it. */
 .pill {
-  padding: 15px 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 30px;
   border-radius: 999px;
   background: var(--ink);
   color: var(--sky);
@@ -133,19 +203,49 @@ button {
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  transition: transform 0.25s cubic-bezier(0.3, 1.8, 0.5, 1), opacity 0.2s;
+  box-shadow: 0 10px 22px -10px rgba(33, 30, 28, 0.55);
+  transition: transform 0.55s var(--spring), box-shadow 0.2s var(--glide), opacity 0.2s, background 0.2s;
 }
 
 .pill:hover:not(:disabled) {
-  transform: scale(1.09) rotate(-2deg);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 28px -12px rgba(33, 30, 28, 0.55);
 }
 
 .pill:active:not(:disabled) {
-  transform: scale(0.94);
+  transform: translateY(4px);
+  box-shadow: 0 3px 8px -4px rgba(33, 30, 28, 0.55);
+  transition-duration: 0.08s;
 }
 
 .pill:disabled {
   opacity: 0.35;
+}
+
+/* The arrow on "Next": a line and a head that slide forward on hover. */
+.arrow {
+  position: relative;
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: width 0.45s var(--spring);
+}
+
+.arrow::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.pill:hover:not(:disabled) .arrow {
+  width: 24px;
 }
 
 .chips {
@@ -153,47 +253,79 @@ button {
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
-  max-width: 640px;
+  max-width: 700px;
 }
 
 .chip {
+  display: inline-flex;
+  align-items: center;
   padding: 12px 20px;
   border-radius: 999px;
   border: 2px solid var(--ink);
+  background: rgba(248, 239, 226, 0.55);
   color: var(--ink);
   font-size: 16px;
   font-weight: 600;
-  transition: transform 0.25s cubic-bezier(0.3, 1.8, 0.5, 1), background 0.15s, color 0.15s;
+  box-shadow: 0 4px 0 rgba(33, 30, 28, 0.14);
+  transition: transform 0.55s var(--spring), box-shadow 0.2s var(--glide), background 0.18s, color 0.18s;
+}
+
+.chip-big {
+  padding: 15px 28px;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 button.chip:hover {
-  transform: translateY(-3px) rotate(-1.5deg);
+  transform: translateY(-3px);
+  box-shadow: 0 7px 0 rgba(33, 30, 28, 0.14);
+  background: #fff;
 }
 
 button.chip:active {
-  transform: scale(0.93);
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(33, 30, 28, 0.14);
+  transition-duration: 0.08s;
+}
+
+/* A tick grows in at the front of a chosen chip. */
+.chip::before {
+  content: "";
+  width: 0;
+  height: 9px;
+  margin-right: 0;
+  border-left: 2.5px solid transparent;
+  border-bottom: 2.5px solid transparent;
+  opacity: 0;
+  transform: rotate(-45deg) translate(2px, -2px);
+  transition: width 0.4s var(--spring), margin-right 0.4s var(--spring), opacity 0.15s;
 }
 
 .chip[aria-pressed="true"] {
   background: var(--ink);
   color: var(--sun);
-  animation: chip-pop 0.35s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+
+.chip[aria-pressed="true"]:hover {
+  background: var(--ink);
+}
+
+.chip[aria-pressed="true"]::before {
+  width: 15px;
+  margin-right: 10px;
+  opacity: 1;
+  border-color: var(--sun);
 }
 
 .chip-static {
   border-color: transparent;
   background: rgba(255, 255, 255, 0.5);
+  box-shadow: none;
   font-size: 14px;
 }
 
-@keyframes chip-pop {
-  40% {
-    transform: scale(1.14) rotate(2deg);
-  }
-}
-
 :focus-visible {
-  outline: 3px solid var(--ink);
+  outline: 3px solid var(--cobalt);
   outline-offset: 3px;
 }
 
@@ -211,6 +343,74 @@ button.chip:active {
   gap: 18px;
 }
 
+/* Everything in the controls arrives in turn, from the top down, and
+   chips pop in one after another. */
+.controls > * {
+  animation: settle 0.7s var(--spring) both;
+}
+
+.controls > :nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.controls > :nth-child(2) {
+  animation-delay: 0.17s;
+}
+
+.controls > :nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.controls > :nth-child(4) {
+  animation-delay: 0.31s;
+}
+
+.chips > * {
+  animation: chip-in 0.6s var(--spring) both;
+}
+
+.chips > :nth-child(1) {
+  animation-delay: 0.14s;
+}
+
+.chips > :nth-child(2) {
+  animation-delay: 0.19s;
+}
+
+.chips > :nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.chips > :nth-child(4) {
+  animation-delay: 0.29s;
+}
+
+.chips > :nth-child(5) {
+  animation-delay: 0.34s;
+}
+
+.chips > :nth-child(6) {
+  animation-delay: 0.39s;
+}
+
+.chips > :nth-child(n + 7) {
+  animation-delay: 0.44s;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+}
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.8);
+  }
+}
+
 .readout {
   margin: 0;
   font-size: clamp(22px, 3.2vw, 32px);
@@ -218,6 +418,7 @@ button.chip:active {
   letter-spacing: -0.02em;
   color: var(--ink);
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .hint {
@@ -226,6 +427,63 @@ button.chip:active {
   font-weight: 500;
   color: var(--ink);
   opacity: 0.7;
+}
+
+.controls .hint {
+  max-width: 34ch;
+  text-align: center;
+  opacity: 0.85;
+}
+
+/* The weight can be typed straight into the readout. */
+.kg {
+  width: 3.4ch;
+  padding: 0;
+  border: 0;
+  border-bottom: 3px solid var(--ink);
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  appearance: textfield;
+  -moz-appearance: textfield;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.kg::-webkit-outer-spin-button,
+.kg::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+.pill-quiet {
+  background: var(--sky);
+  color: var(--ink);
+  box-shadow: 0 6px 0 rgba(33, 30, 28, 0.14);
+}
+
+.side-label small {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--sky);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.side-cat[aria-disabled] {
+  cursor: default;
 }
 
 /* ---------- date of birth ---------- */
@@ -315,9 +573,41 @@ button.chip:active {
 
 /* ---------- landing ---------- */
 
+/* A white card floating on a pale blue page. The headline is centred on
+   the card; one dog stands on it, another hangs in over the top corner. */
+.landing-bg {
+  position: absolute;
+  inset: 0;
+  background: #e6f0f8;
+}
+
+.card-page {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  --k: min(1vh, 0.7vw);
+  --gap: clamp(14px, 4.5vw, 64px);
+  --pad: clamp(14px, 5.5vh, 56px);
+}
+
+.paper {
+  position: absolute;
+  inset: var(--pad) var(--gap);
+  border-radius: clamp(22px, 3vw, 36px);
+  background: #fdfdfb;
+  box-shadow: 0 30px 60px -30px rgba(31, 79, 163, 0.35);
+  animation: settle 0.8s var(--spring) both;
+  transition: translate 0.4s cubic-bezier(0.6, -0.3, 0.7, 0.4), opacity 0.3s;
+}
+
+.card-page.is-leaving .paper {
+  translate: 0 -8vh;
+  opacity: 0;
+}
+
 .landing-copy {
   position: absolute;
-  top: 21%;
+  top: 6%;
   left: 0;
   right: 0;
   z-index: 2;
@@ -326,120 +616,366 @@ button.chip:active {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  pointer-events: none;
 }
 
 .landing-copy > * {
-  pointer-events: auto;
+  animation: settle 0.8s var(--spring) both;
+}
+
+.landing-copy > :nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.landing-copy > :nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.label {
+  margin: 0 0 clamp(8px, 2vh, 18px);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d9482a;
 }
 
 .logo {
+  position: relative;
   margin: 0;
-  font-size: clamp(54px, 10vw, 112px);
-  font-weight: 800;
-  letter-spacing: -0.045em;
-  line-height: 0.95;
+  font-family: var(--font-hand), sans-serif;
+  font-size: clamp(52px, 9vw, 148px);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.84;
+  color: var(--ink);
+  /* This font has one weight, so a thin outline in the same colour thickens it. */
+  -webkit-text-stroke: 0.022em var(--ink);
+  paint-order: stroke fill;
 }
 
-.landing-copy p {
-  margin: 14px 0 26px;
-  font-size: clamp(15px, 1.6vw, 18px);
+.lede {
+  margin: clamp(6px, 1.2vh, 12px) 0 clamp(18px, 3.5vh, 30px);
+  max-width: min(28ch, 33vw);
+  font-size: clamp(16px, 1.5vw, 20px);
   font-weight: 500;
+  line-height: 1.4;
   color: var(--ink);
 }
 
-/* The cast rings the title, each one leaning in from its own edge. */
-
-.cast .toon {
+.fact {
   position: absolute;
-  transition: translate 0.42s cubic-bezier(0.6, -0.3, 0.7, 0.4);
-}
-
-.cast .c-gsd {
-  left: -3%;
-  bottom: -1%;
-  width: clamp(230px, 28vw, 430px);
-  animation: in-left 0.8s 0.05s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
-}
-
-.cast .c-golden {
-  right: -3%;
-  bottom: -1%;
-  width: clamp(230px, 28vw, 430px);
-  animation: in-right 0.8s 0.15s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
-}
-
-.cast .c-indie {
-  left: 5%;
-  top: -13%;
-  width: clamp(130px, 18vw, 280px);
-  transform: scaleY(-1) rotate(-30deg);
-  animation: in-top-left 0.8s 0.25s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
-}
-
-.cast .c-beagle {
-  right: 15%;
-  top: -3%;
-  width: clamp(100px, 13vw, 200px);
-  transform: rotate(180deg);
-  animation: in-top 0.8s 0.3s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
-}
-
-.cast .c-cat {
   left: 50%;
-  bottom: -3%;
-  width: clamp(150px, 19vw, 290px);
-  margin-left: calc(clamp(150px, 19vw, 290px) / -2);
-  animation: in-bottom 0.8s 0.2s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
+  bottom: clamp(14px, 4vh, 36px);
+  width: min(340px, 40vw);
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  color: var(--ink);
+  animation: settle 0.8s 0.3s var(--spring) both;
 }
 
-.cast.is-leaving .c-gsd {
-  translate: -140% 0;
+.fact strong {
+  font-family: var(--font-hand), sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d9482a;
 }
 
-.cast.is-leaving .c-golden {
-  translate: 140% 0;
+/* Two lines are always reserved, so the page does not jump when the fact changes. */
+.fact p {
+  margin: 0;
+  min-height: 2.5em;
+  font-family: var(--font-hand), sans-serif;
+  font-size: 20px;
+  line-height: 1.25;
 }
 
-.cast.is-leaving .c-indie {
-  translate: -90% -120%;
+.fact p span {
+  display: block;
 }
 
-.cast.is-leaving .c-beagle {
-  translate: 0 -140%;
+/* The meditating dog hovers above the name, with a shadow that shrinks as it rises. */
+.floater {
+  position: relative;
+  display: block;
+  height: calc(12.75 * var(--k));
+  margin-bottom: calc(2.8 * var(--k));
 }
 
-.cast.is-leaving .c-cat {
-  translate: 0 140%;
+.floater img {
+  display: block;
+  height: 100%;
+  width: auto;
+  animation: hover 3.6s ease-in-out infinite alternate;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-@keyframes in-left {
+.floater i {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: calc(-2.4 * var(--k));
+  height: calc(1.3 * var(--k));
+  border-radius: 50%;
+  background: rgba(33, 30, 28, 0.14);
+  animation: hover-shadow 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes hover {
   from {
-    translate: -130% 20%;
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-10%);
   }
 }
 
-@keyframes in-right {
+@keyframes hover-shadow {
   from {
-    translate: 130% 20%;
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  to {
+    transform: scaleX(0.72);
+    opacity: 0.55;
   }
 }
 
-@keyframes in-top {
-  from {
-    translate: 0 -140%;
+.lean {
+  position: absolute;
+  z-index: 2;
+  height: calc(var(--h) * var(--k));
+  rotate: var(--tilt);
+  animation: lean-in 0.9s var(--wait) var(--spring) backwards;
+  transition: translate 0.4s cubic-bezier(0.6, -0.3, 0.7, 0.4);
+}
+
+.bust-svg {
+  position: relative;
+  display: block;
+  height: 100%;
+  width: auto;
+  overflow: visible;
+}
+
+/* rises from the bottom edge of the card, on the left */
+.e-front { --h: 40; --tilt: 0deg; --from: 0 70vh; --wait: 0.15s; left: calc(var(--gap) + 5 * var(--k)); bottom: var(--pad); }
+/* leans in over the card's right edge, head on one side */
+.e-peek { --h: 40; --tilt: -22deg; --from: 40vw 0; --wait: 0.35s; right: calc(var(--gap) - 12 * var(--k)); top: calc(52 * var(--k)); }
+
+/* Two arched niches flank the name, like alcoves either side of a shrine.
+   The animal in each has its eyes closed and bows towards the name. */
+.niche {
+  position: absolute;
+  top: 33%;
+  width: calc(31 * var(--k));
+  height: calc(44 * var(--k));
+  border-radius: 999px 999px 20px 20px;
+  background: #68918a;
+  overflow: hidden;
+  animation: settle 0.9s 0.2s var(--spring) both;
+}
+
+.n-left {
+  left: 4%;
+}
+
+.n-right {
+  right: 4%;
+  animation-delay: 0.3s;
+}
+
+.niche .bust-svg {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  height: 80%;
+  margin-left: calc(-15.3 * var(--k));
+  transform-origin: 45% 100%;
+  animation: bow 5s 1.2s ease-in-out infinite;
+}
+
+/* A picture in place of the drawing: full width of the niche, standing on its floor. */
+.bust-img {
+  position: absolute;
+  left: 4%;
+  /* a little below the floor, so the cut edge never shows when it bows */
+  bottom: -4%;
+  width: 86%;
+  height: auto;
+  /* centred, so mirroring the right-hand picture does not slide it sideways */
+  transform-origin: 50% 100%;
+  animation: bow-img 5s 1.2s ease-in-out infinite;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* The right-hand one is turned to face left. */
+.n-right .bust-svg,
+.n-right .bust-img {
+  scale: -1 1;
+  animation-delay: 1.5s;
+}
+
+/* Mirrored, its nose is on the left, so the spare room goes on that side:
+   the same clearance the dog has on its nose side. */
+.n-right .bust-img {
+  left: 10%;
+}
+
+@keyframes bow-img {
+  0%,
+  55%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  70%,
+  82% {
+    transform: rotate(3.5deg) translateY(3%);
   }
 }
 
-@keyframes in-top-left {
-  from {
-    translate: -90% -120%;
+@keyframes bow {
+  0%,
+  55%,
+  100% {
+    transform: rotate(0deg);
+  }
+  70%,
+  82% {
+    transform: rotate(6deg);
   }
 }
 
-@keyframes in-bottom {
+/* The golden's tongue is always out, and pants faster under the hand. */
+.pant {
+  animation: f-pant 0.5s ease-in-out infinite alternate;
+}
+
+.e-peek:hover .pant {
+  animation-duration: 0.22s;
+}
+
+.card-page.is-leaving .lean {
+  translate: var(--from);
+}
+
+.sit {
+  display: block;
+  height: 100%;
+  animation: bob 4.6s var(--wait) ease-in-out infinite alternate;
+}
+
+.sit-svg {
+  display: block;
+  height: 100%;
+  width: auto;
+  overflow: visible;
+}
+
+/* Bright coats: every natural coat colour is swapped for a bright one. */
+.tint-blue [fill="#cf7d4a"] { fill: #1f6fe5; }
+.tint-blue [fill="#a8552c"] { fill: #15233f; }
+.tint-blue [stroke="#a8552c"] { stroke: #15233f; }
+.tint-coral [fill="#d9a06a"] { fill: #ff6a45; }
+.tint-coral [fill="#a8552c"] { fill: #15233f; }
+.tint-coral [stroke="#a8552c"] { stroke: #15233f; }
+
+.s-tail {
+  transform-origin: 144px 286px;
+  animation: s-tail 2.8s ease-in-out infinite alternate;
+}
+
+.sit:hover .s-tail {
+  animation: s-wag 0.28s ease-in-out infinite alternate;
+}
+
+@keyframes lean-in {
   from {
-    translate: 0 130%;
+    translate: var(--from);
+  }
+}
+
+@keyframes bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes s-tail {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes s-wag {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(12deg);
+  }
+}
+
+/* ---------- name tag ---------- */
+
+.nametag {
+  position: absolute;
+  left: 50%;
+  top: 27%;
+  width: clamp(220px, min(38vw, 46vh), 400px);
+  translate: -50% 0;
+  animation: settle 0.8s 0.1s var(--spring) both;
+}
+
+.nametag svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.nametag text {
+  font-family: inherit;
+}
+
+.tag-swing {
+  transform-origin: 160px 110px;
+  animation: tag-swing 3.2s ease-in-out infinite alternate;
+}
+
+.tag-bump {
+  transform-origin: 160px 136px;
+  animation: tag-bump 0.45s var(--spring);
+}
+
+@keyframes tag-swing {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes tag-bump {
+  from {
+    transform: scale(0.9) rotate(5deg);
+  }
+  to {
+    transform: scale(1) rotate(0deg);
   }
 }
 
@@ -556,20 +1092,118 @@ button.chip:active {
 
 /* ---------- breed pick ---------- */
 
-/* The dogs are scattered round a living-room-ish scene, each in its own
-   spot, with the name underneath. */
-.breed-scene {
+/* A search box, then six flat heads to tap: five breeds and "mixed". */
+.breed-pick {
   position: absolute;
-  inset: 17% 0 0;
-}
-
-.breed-spot {
-  position: absolute;
+  inset: 24% 0 0;
+  padding: 0 20px clamp(16px, 4vh, 40px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: clamp(14px, 4vh, 40px);
+}
+
+.search {
+  position: relative;
+  z-index: 3;
+  width: min(420px, 100%);
+}
+
+.field {
+  display: block;
+  width: min(420px, 100%);
+}
+
+.field input {
+  width: 100%;
+  height: 54px;
+  padding: 0 24px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--sky);
   color: var(--ink);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.field input::placeholder {
+  color: rgba(33, 30, 28, 0.62);
+  font-weight: 500;
+}
+
+.field input:focus-visible,
+.kg:focus-visible {
+  outline: 3px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.matches {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  border: 2px solid var(--ink);
+  border-radius: 26px;
+  background: var(--sky);
+  box-shadow: 0 6px 0 rgba(33, 30, 28, 0.16);
+  animation: settle 0.4s var(--spring) both;
+}
+
+.matches button {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.matches button:hover,
+.matches button:focus-visible {
+  background: var(--ink);
+  color: var(--sun);
+}
+
+.tiles {
+  width: min(660px, 100%);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(10px, 2.4vh, 22px) clamp(8px, 2vw, 24px);
+  align-items: end;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+}
+
+.tile .face {
+  width: min(100%, 19vh);
+  transition: transform 0.5s var(--spring);
+}
+
+.tile:hover .face {
+  transform: translateY(-8px) scale(1.06);
 }
 
 .breed-name {
@@ -582,42 +1216,104 @@ button.chip:active {
   transition: transform 0.25s cubic-bezier(0.3, 1.8, 0.5, 1), background 0.15s, color 0.15s;
 }
 
-.breed-spot:hover .breed-name {
+.tile:hover .breed-name {
   background: var(--ink);
   color: var(--sun);
   transform: scale(1.08) rotate(-2deg);
 }
 
-.at-beagle {
-  left: -1%;
-  bottom: 5%;
-  width: clamp(230px, 31vw, 470px);
+/* ---------- flat dog heads ---------- */
+
+.face {
+  display: block;
+  width: 100%;
 }
 
-.at-gsd {
-  left: 33%;
-  top: 2%;
-  width: clamp(110px, 13.5vw, 200px);
+.face-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
 }
 
-.at-golden {
-  left: 52%;
-  top: 30%;
-  width: clamp(120px, 15vw, 220px);
-  z-index: 1;
+.f-head {
+  transform-origin: 100px 176px;
+  transition: transform 0.6s var(--spring);
 }
 
-.at-indie {
-  right: 5%;
-  top: 4%;
-  width: clamp(105px, 12.5vw, 185px);
+.f-ear {
+  animation: f-ear 3.8s ease-in-out infinite alternate;
 }
 
-.at-shihtzu {
-  right: 9%;
-  bottom: 5%;
-  width: clamp(88px, 10.5vw, 155px);
-  z-index: 1;
+.f-eyes {
+  transform: translate(calc(var(--lx, 0) * 3px), calc(var(--ly, 0) * 2px));
+  transition: transform 0.2s ease-out;
+}
+
+.f-eye {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: f-blink 4.8s infinite;
+}
+
+.f-tongue {
+  transform: scaleY(0);
+  transition: transform 0.35s var(--spring);
+}
+
+/* Happy: under the hand, or just after an answer. Head tilts, ears flap, tongue out. */
+.reactive:hover .f-head,
+.is-happy .f-head {
+  transform: rotate(-6deg);
+}
+
+.reactive:hover .f-ear,
+.is-happy .f-ear {
+  animation: f-ear-happy 0.32s ease-in-out infinite alternate;
+}
+
+.reactive:hover .f-tongue,
+.is-happy .f-tongue {
+  transform: scaleY(1);
+  animation: f-pant 0.26s ease-in-out infinite alternate;
+}
+
+@keyframes f-ear {
+  from {
+    transform: rotate(-2deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes f-ear-happy {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(9deg);
+  }
+}
+
+@keyframes f-blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+  97% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes f-pant {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(0.84);
+  }
 }
 
 /* The couch drawing is wider than tall and bleeds off the left edge. */
@@ -688,102 +1384,25 @@ button.chip:active {
 .poster {
   position: absolute;
   left: 50%;
-  top: 19%;
-  width: min(92vw, 96vh, 920px);
-  aspect-ratio: 3 / 2;
+  top: 34%;
+  width: min(92vw, 150vh, 980px);
+  aspect-ratio: 5 / 2;
   transform: translateX(-50%);
   overflow: hidden;
   border-radius: clamp(16px, 2.4vw, 30px);
   background: #fff;
-  box-shadow: 0 18px 0 rgba(33, 30, 28, 0.12);
+  box-shadow: 0 16px 0 rgba(33, 30, 28, 0.12);
   container-type: inline-size;
-}
-
-/* A line of paw prints that appear one after another, left to right. */
-.paw-trail {
-  display: flex;
-  justify-content: center;
-  gap: clamp(6px, 1.4vw, 16px);
-  margin-bottom: 10px;
-}
-
-.paw-trail svg {
-  width: clamp(16px, 2.2vw, 24px);
-  height: auto;
-  fill: var(--ink);
-  opacity: 0;
-  rotate: 90deg;
-  animation: paw-step 2.8s calc(var(--i) * 0.3s) ease-out infinite;
-}
-
-.paw-trail svg:nth-child(odd) {
-  translate: 0 -5px;
-}
-
-.paw-trail svg:nth-child(even) {
-  translate: 0 5px;
-}
-
-@keyframes paw-step {
-  0% {
-    opacity: 0;
-    scale: 0.4;
-  }
-  8%,
-  60% {
-    opacity: 1;
-    scale: 1;
-  }
-  80%,
-  100% {
-    opacity: 0;
-    scale: 1;
-  }
-}
-
-.poster-title {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 7%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #111;
-  font-family: Rockwell, "Rockwell Nova", "Roboto Slab", Georgia, "Times New Roman", serif;
-  font-weight: 900;
-  line-height: 0.86;
-}
-
-.poster-title span {
-  font-size: 7cqw;
-  letter-spacing: 0.01em;
-  transform: scaleY(1.25);
-}
-
-.poster-title strong {
-  margin-top: 2.4cqw;
-  font-size: 13cqw;
-  font-weight: 900;
-  letter-spacing: -0.01em;
-  transform: scaleY(1.3);
-  transform-origin: 50% 0;
-}
-
-/* The big opening letter, as on a band logo. */
-.poster-title b {
-  font-size: 1.45em;
-  line-height: 0;
-  vertical-align: -0.06em;
+  animation: settle 0.8s 0.1s var(--spring) both;
 }
 
 /* The crossing: black bars fanning out towards the viewer. */
 .zebra {
   position: absolute;
   left: 0;
-  bottom: 6%;
+  bottom: 9%;
   width: 100%;
-  height: 26%;
+  height: 40%;
 }
 
 .zebra polygon {
@@ -794,7 +1413,7 @@ button.chip:active {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 19%;
+  bottom: 31%;
   height: 0;
 }
 
@@ -852,26 +1471,6 @@ button.chip:active {
 
 .w-ear {
   animation: w-ear calc(var(--stride) / 2) ease-in-out infinite alternate;
-}
-
-.curating-note {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: clamp(16px, 4vh, 44px);
-  margin: 0;
-  text-align: center;
-  color: var(--ink);
-  font-size: clamp(16px, 2vw, 20px);
-  font-weight: 700;
-}
-
-.dots::after {
-  content: "";
-  display: inline-block;
-  width: 1.2em;
-  text-align: left;
-  animation: dots 1.4s steps(1) infinite;
 }
 
 @keyframes cross {
@@ -955,18 +1554,578 @@ button.chip:active {
   }
 }
 
-@keyframes dots {
-  0% {
-    content: "";
+/* ---------- results ---------- */
+
+/* The one screen that scrolls: a column of cards on the ground colour. */
+.results {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  padding: clamp(28px, 6vh, 64px) 20px 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  color: var(--ink);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.results > * {
+  width: min(100%, 760px);
+  flex: none;
+  animation: settle 0.8s var(--spring) both;
+}
+
+/* Scenes are revealed by scrolling instead (see Scene in Results.tsx). */
+.results > .scene {
+  animation: none;
+}
+
+.results > :nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.results > :nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.results > :nth-child(4) {
+  animation-delay: 0.24s;
+}
+
+.results > :nth-child(n + 5) {
+  animation-delay: 0.32s;
+}
+
+.results > .pill {
+  width: auto;
+  margin-top: 8px;
+}
+
+.results-head {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 3vw, 28px);
+}
+
+.results-pet {
+  flex: none;
+  width: clamp(96px, 18vw, 160px);
+}
+
+.results h1 {
+  margin: 0;
+  font-size: clamp(28px, 4.6vw, 46px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--cobalt);
+}
+
+.results h2 {
+  margin: 0 0 8px;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.results p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  max-width: 56ch;
+}
+
+.results a {
+  color: var(--cobalt);
+  font-weight: 700;
+}
+
+.kicker {
+  margin: 0 0 6px !important;
+  font-size: 12px !important;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.small {
+  margin-top: 12px !important;
+  font-size: 14px !important;
+  opacity: 0.75;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.facts span {
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: rgba(248, 239, 226, 0.75);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.card {
+  padding: clamp(20px, 3.4vw, 32px);
+  border-radius: 26px;
+  background: var(--sky);
+  box-shadow: 0 8px 0 rgba(33, 30, 28, 0.1);
+}
+
+.card-lead {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.card-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-diy {
+  background: #fbd98b;
+}
+
+.card-soon {
+  background: rgba(248, 239, 226, 0.55);
+  box-shadow: none;
+}
+
+.card-soon .facts span {
+  background: var(--sky);
+}
+
+.draft {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1.5px dashed currentColor;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
+.reasons {
+  padding: 0 clamp(4px, 2vw, 16px);
+  display: grid;
+  gap: 10px;
+}
+
+.caution {
+  margin-top: 14px !important;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: rgba(33, 30, 28, 0.08);
+  font-size: 15px !important;
+}
+
+.card-vet {
+  background: #cfe0ee;
+}
+
+/* Written steps that light up one after another, in a loop. */
+.beats {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: beat;
+  display: grid;
+  gap: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.beats li {
+  counter-increment: beat;
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 6px 12px;
+  margin-left: -12px;
+  border-radius: 14px;
+  animation: beat calc(var(--n) * 2s) calc(var(--i) * 2s) infinite;
+}
+
+.beats li::before {
+  content: counter(beat);
+  flex: none;
+  width: 1.2em;
+  font-weight: 800;
+}
+
+@keyframes beat {
+  0%,
+  22% {
+    background: rgba(33, 30, 28, 0.1);
   }
-  25% {
-    content: ".";
+  27%,
+  100% {
+    background: rgba(33, 30, 28, 0);
+  }
+}
+
+/* the sock trick: 8s loop, four beats of 2s, in step with the list beside it */
+.sock {
+  flex: none;
+  width: clamp(130px, 28%, 210px);
+  height: auto;
+  overflow: visible;
+}
+
+.sock-body {
+  transform-origin: 100px 100px;
+  animation: sock-body 8s ease-in-out infinite;
+}
+
+.sock-treat {
+  animation: sock-treat 8s calc(var(--i) * 0.22s) ease-in infinite;
+}
+
+.sock-nose {
+  animation: sock-nose 8s ease-in-out infinite;
+}
+
+@keyframes sock-body {
+  0%,
+  50% {
+    transform: scale(1) rotate(0deg);
+  }
+  58%,
+  75% {
+    transform: scale(0.74) rotate(-24deg);
+  }
+  80% {
+    transform: scale(0.74) rotate(-14deg);
+  }
+  85% {
+    transform: scale(0.74) rotate(-30deg);
+  }
+  90% {
+    transform: scale(0.74) rotate(-16deg);
+  }
+  96%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes sock-treat {
+  0%,
+  26% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  28% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(58px);
+    opacity: 1;
+  }
+  42%,
+  100% {
+    transform: translateY(58px);
+    opacity: 0;
+  }
+}
+
+@keyframes sock-nose {
+  0%,
+  74% {
+    transform: translate(230px, 96px);
+  }
+  80%,
+  92% {
+    transform: translate(158px, 92px);
+  }
+  86% {
+    transform: translate(166px, 100px);
+  }
+  98%,
+  100% {
+    transform: translate(230px, 96px);
+  }
+}
+
+.next {
+  padding: clamp(20px, 4vw, 36px);
+  border-radius: 26px;
+  background: var(--ink);
+  color: var(--sky);
+  text-align: center;
+}
+
+.next p {
+  margin: 0 auto 8px;
+  font-weight: 700;
+  color: var(--sun);
+}
+
+.next h2 {
+  margin: 0;
+}
+
+.results-note {
+  text-align: center;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* the snuffle mat */
+.mat {
+  flex: none;
+  width: clamp(150px, 32%, 250px);
+  height: auto;
+  overflow: visible;
+}
+
+.mat-strip {
+  animation: ruffle 1.5s calc(var(--i) * -0.11s) ease-in-out infinite alternate;
+}
+
+.mat-treat {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: treat 6s calc(var(--i) * 2s) ease-in-out infinite;
+}
+
+.mat-nose {
+  animation: nose-sweep 6s ease-in-out infinite;
+}
+
+.mat-puff {
+  animation: bark-flash 0.5s steps(1) infinite;
+}
+
+@keyframes ruffle {
+  from {
+    transform: rotate(-11deg);
+  }
+  to {
+    transform: rotate(11deg);
+  }
+}
+
+@keyframes treat {
+  0%,
+  20% {
+    transform: scale(1);
+  }
+  30%,
+  90% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes nose-sweep {
+  0%,
+  100% {
+    transform: translate(58px, 52px) rotate(-8deg);
+  }
+  16% {
+    transform: translate(58px, 62px) rotate(-8deg);
+  }
+  33% {
+    transform: translate(128px, 70px) rotate(0deg);
   }
   50% {
-    content: "..";
+    transform: translate(128px, 82px) rotate(0deg);
   }
-  75% {
-    content: "...";
+  66% {
+    transform: translate(190px, 44px) rotate(8deg);
+  }
+  83% {
+    transform: translate(190px, 54px) rotate(8deg);
+  }
+}
+
+/* zoomies to settled: one track, three stages written underneath it */
+.calm {
+  padding: 6px clamp(4px, 2vw, 16px);
+}
+
+.calm-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.calm-track {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--coral), var(--sun) 50%, #5c9f9a);
+}
+
+/* A rail as wide as the track less the marker; sliding it by its own
+   width carries the marker from one end to the other. */
+.calm-track i {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: calc(100% - 26px);
+  height: 0;
+  animation: calm-down 7s var(--glide) infinite;
+}
+
+.calm-track i::before {
+  content: "";
+  position: absolute;
+  top: -13px;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 4px solid var(--sky);
+  box-sizing: border-box;
+}
+
+@keyframes calm-down {
+  0%,
+  8% {
+    transform: translateX(0);
+  }
+  80%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.calm-steps {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(12px, 3vw, 28px);
+}
+
+.calm-steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.calm-steps li:nth-child(2) {
+  text-align: center;
+}
+
+.calm-steps li:nth-child(3) {
+  text-align: right;
+}
+
+.calm-steps strong {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* things to buy: two columns of pill rows, name on the left, price on the right */
+.shop {
+  padding: 0 clamp(4px, 2vw, 16px);
+}
+
+.toys {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.toy {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: 999px;
+  background: var(--sky);
+  color: var(--ink) !important;
+  text-decoration: none;
+  box-shadow: 0 4px 0 rgba(33, 30, 28, 0.12);
+  transition: transform 0.55s var(--spring), box-shadow 0.2s var(--glide), background 0.2s var(--glide);
+  animation: chip-in 0.6s calc(var(--i) * 0.06s + 0.4s) var(--spring) both;
+}
+
+.toy:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 0 rgba(33, 30, 28, 0.12);
+}
+
+.toy:active {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 2px 0 rgba(33, 30, 28, 0.12);
+}
+
+.toy strong {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.toy span {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.toy .arrow {
+  flex: none;
+  color: var(--cobalt);
+}
+
+.toy:hover .arrow {
+  width: 24px;
+}
+
+.diy {
+  margin: 4px 0 0;
+  padding-left: 22px;
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .card-lead {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mat {
+    width: 62%;
+    align-self: center;
+  }
+
+  .toys,
+  .calm-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .calm-steps li:nth-child(n) {
+    text-align: left;
   }
 }
 
@@ -976,9 +2135,8 @@ button.chip:active {
   position: absolute;
   left: 50%;
   z-index: 1;
-  width: clamp(190px, 30vw, 360px);
-  margin-left: calc(clamp(190px, 30vw, 360px) / -2);
-  translate: 0 -50%;
+  width: clamp(170px, min(30vw, 38vh), 360px);
+  translate: -50% -50%;
 }
 
 .hero-size {
@@ -986,18 +2144,9 @@ button.chip:active {
   transition: transform 0.35s cubic-bezier(0.3, 1.8, 0.5, 1);
 }
 
-.hero .pet-cat {
-  width: 62%;
+.hero .face {
+  width: 70%;
   margin: 0 auto;
-}
-
-.hero .sitter {
-  width: 58%;
-  margin: 0 auto;
-}
-
-.hero .sitter-shihtzu {
-  width: 42%;
 }
 
 /* ---------- pets ---------- */
@@ -1230,24 +2379,16 @@ button.chip:active {
 }
 
 .sitter-indie .head {
-  animation: head-tilt 4.4s -2s cubic-bezier(0.4, 1.5, 0.5, 1) infinite;
+  animation: head-bob 2s ease-in-out infinite alternate;
 }
 
-/* Shih Tzu: bounces on the spot, hair and topknot flopping after it. */
-.sitter-shihtzu .bounce {
-  animation: boing 0.9s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.sitter-shihtzu .ear {
-  animation: flop 0.9s ease-in-out infinite;
-}
-
+/* Shih Tzu: stays put. It breathes and its topknot sways a little. */
 .sitter-shihtzu .knot {
-  animation: knot-flop 0.9s ease-in-out infinite;
+  animation: knot-sway 3.2s ease-in-out infinite alternate;
 }
 
 .sitter-shihtzu .head {
-  animation: none;
+  animation: head-bob 2.4s ease-in-out infinite alternate;
 }
 
 @keyframes breathe-body {
@@ -1316,10 +2457,10 @@ button.chip:active {
 
 @keyframes head-bob {
   from {
-    transform: rotate(-3deg);
+    transform: rotate(-1.6deg);
   }
   to {
-    transform: rotate(3deg) translateY(1.5px);
+    transform: rotate(1.6deg);
   }
 }
 
@@ -1331,11 +2472,11 @@ button.chip:active {
   }
   32%,
   52% {
-    transform: rotate(-15deg);
+    transform: rotate(-4deg);
   }
   62%,
   84% {
-    transform: rotate(13deg);
+    transform: rotate(3.5deg);
   }
 }
 
@@ -1344,43 +2485,16 @@ button.chip:active {
     transform: translateY(0);
   }
   to {
-    transform: translateY(-9px);
+    transform: translateY(-4px);
   }
 }
 
-@keyframes boing {
-  0%,
-  100% {
-    transform: translateY(0) scale(1.07, 0.92);
+@keyframes knot-sway {
+  from {
+    transform: rotate(-4deg);
   }
-  20% {
-    transform: translateY(-4px) scale(0.97, 1.05);
-  }
-  50% {
-    transform: translateY(-20px) scale(0.98, 1.03);
-  }
-  80% {
-    transform: translateY(-4px) scale(0.97, 1.05);
-  }
-}
-
-@keyframes flop {
-  0%,
-  100% {
-    transform: rotate(0deg) scaleY(0.94);
-  }
-  50% {
-    transform: rotate(0deg) scaleY(1.08) translateY(-3px);
-  }
-}
-
-@keyframes knot-flop {
-  0%,
-  100% {
-    transform: rotate(-10deg) scaleY(0.9);
-  }
-  50% {
-    transform: rotate(8deg) scaleY(1.1);
+  to {
+    transform: rotate(4deg);
   }
 }
 
@@ -1574,6 +2688,21 @@ button.chip:active {
   pointer-events: none;
 }
 
+.hand-say {
+  position: absolute;
+  left: 46px;
+  top: -44px;
+  padding: 8px 14px;
+  border-radius: 16px 16px 16px 4px;
+  background: var(--ink);
+  color: var(--sky);
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+  transform-origin: 0 100%;
+  box-shadow: 0 4px 0 rgba(33, 30, 28, 0.18);
+}
+
 .hand svg {
   display: block;
   overflow: visible;
@@ -1598,37 +2727,32 @@ button.chip:active {
 
 @media (max-width: 640px) {
   .landing-copy {
-    top: 26%;
+    top: 16%;
   }
 
-  .cast .c-gsd {
-    left: -15%;
-    bottom: -1%;
-    width: 52vw;
+  .card-page {
+    --k: 0.7vh;
   }
 
-  .cast .c-golden {
-    right: -15%;
-    bottom: -1%;
-    width: 52vw;
+  .fact {
+    width: 80vw;
   }
 
-  .cast .c-indie {
-    left: -6%;
-    top: -9%;
-    width: 38vw;
+  .floater {
+    height: calc(12 * var(--k));
   }
 
-  .cast .c-beagle {
-    right: 6%;
-    top: -5%;
-    width: 27vw;
+  .niche {
+    top: 44%;
   }
 
-  .cast .c-cat {
-    width: 34vw;
-    margin-left: -17vw;
-    z-index: 1;
+  .e-peek {
+    --h: 30;
+    top: calc(70 * var(--k));
+  }
+
+  .nametag {
+    top: 24%;
   }
 
   .sides {
@@ -1650,40 +2774,17 @@ button.chip:active {
     bottom: 38%;
   }
 
-  .breed-scene {
-    inset: 15% 0 0;
+  .breed-pick {
+    inset: 22% 0 0;
   }
 
-  .at-beagle {
-    left: -6%;
-    bottom: 2%;
-    width: 62vw;
+  .tiles {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px 8px;
   }
 
-  .at-gsd {
-    left: 6%;
-    top: 2%;
-    width: 30vw;
-  }
-
-  .at-golden {
-    left: auto;
-    right: 6%;
-    top: 22%;
-    width: 33vw;
-  }
-
-  .at-indie {
-    right: auto;
-    left: 38%;
-    top: 0;
-    width: 27vw;
-  }
-
-  .at-shihtzu {
-    right: 4%;
-    bottom: 4%;
-    width: 25vw;
+  .tile .face {
+    width: min(100%, 15vh);
   }
 
   .breed-name {
@@ -1708,7 +2809,27 @@ button.chip:active {
   .pack *,
   .pet *,
   .hand-pat,
-  .chip {
+  .chip,
+  .mat *,
+  .sock *,
+  .lean,
+  .niche,
+  .niche .bust-svg,
+  .bust-img,
+  .floater img,
+  .floater i,
+  .paper,
+  .sit,
+  .sit *,
+  .spot,
+  .halo,
+  .doodle path,
+  .nametag *,
+  .beats li,
+  .face *,
+  .calm-track i,
+  .toy,
+  .scene {
     animation: none !important;
   }
 }
