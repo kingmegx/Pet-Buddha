@@ -1577,18 +1577,21 @@ button.chip:active {
   position: absolute;
   inset: 0;
   overflow-y: auto;
-  padding: clamp(28px, 6vh, 64px) 20px 72px;
+  scroll-behavior: smooth;
+  padding: 0 20px 72px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 22px;
+  /* White, covering the teal hill behind. */
+  background: var(--bg);
   color: var(--ink);
   user-select: text;
   -webkit-user-select: text;
 }
 
 .results > * {
-  width: min(100%, 760px);
+  width: min(100%, 980px);
   flex: none;
   animation: settle 0.8s var(--spring) both;
 }
@@ -1619,6 +1622,769 @@ button.chip:active {
   margin-top: 8px;
 }
 
+/* A thin bar that fills as the page is scrolled. */
+.results > .results-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  width: 100%;
+  height: 5px;
+  background: var(--cobalt);
+  transform-origin: 0 50%;
+  animation: none;
+}
+
+/* Stays at the top while scrolling: who this is for, and the way to their profile. */
+.results > .results-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  width: min(100%, 980px);
+  padding: 16px 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(var(--bg) 78%, transparent);
+  animation: none;
+}
+
+.results-who {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.results-mini {
+  width: 40px;
+}
+
+.results-bar .pill {
+  padding: 11px 22px;
+}
+
+.results .facts .fact-need {
+  background: var(--ink);
+  color: var(--sky);
+}
+
+.results > .shop,
+.results > .why {
+  width: min(100%, 980px);
+  padding: 0;
+}
+
+/* Why a walk alone will not do it: tabs, a dog that reacts, three scales. */
+.why > p {
+  margin-bottom: 16px;
+}
+
+.why-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 14px;
+}
+
+.why-tabs .chip {
+  padding: 9px 16px;
+  font-size: 15px;
+}
+
+.why-tabs .chip:not([aria-pressed="true"]) {
+  background: #fff;
+}
+
+.why-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr);
+  gap: clamp(16px, 3vw, 36px);
+  align-items: center;
+  padding: clamp(18px, 3vw, 32px);
+  border-radius: 26px;
+  background: #fbe3d6;
+  transition: background 0.5s var(--glide);
+}
+
+/* Warm while the activity winds them up, cool once it calms them. */
+.why-panel.is-down {
+  background: #d9ebe7;
+}
+
+.why-dog {
+  width: min(100%, 220px);
+  margin: 0 auto;
+}
+
+.why-text {
+  display: grid;
+  gap: 18px;
+}
+
+.why-text h3 {
+  margin: 0 0 6px;
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.why-text > div:first-child {
+  min-height: 9.5em;
+}
+
+.why-scales {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.pips {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.pips-row {
+  display: flex;
+  gap: 6px;
+}
+
+.pips-row i {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+
+/* Calm dog: eyes nearly closed, ears still. */
+.is-calm .f-eye {
+  animation: none;
+  transform: scaleY(0.14);
+}
+
+.is-calm .f-ear {
+  animation-duration: 6s;
+}
+
+.calm h2 {
+  margin-bottom: 18px;
+}
+
+.shop h2 {
+  margin: 0;
+}
+
+/* What to look for: a checklist beside the thing to skip. */
+.look {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 18px;
+}
+
+.look h3 {
+  margin: 0 0 10px;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.look .caution {
+  margin-top: 0 !important;
+}
+
+.ticks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.ticks li {
+  position: relative;
+  padding-left: 30px;
+}
+
+.ticks li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0.28em;
+  width: 13px;
+  height: 7px;
+  border-left: 3px solid var(--cobalt);
+  border-bottom: 3px solid var(--cobalt);
+  transform: rotate(-45deg);
+}
+
+.product-store {
+  padding: 0 4px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.shop-visit {
+  margin: 16px 0 0 !important;
+}
+
+.shop-note {
+  max-width: 62ch !important;
+  margin: 0 0 16px !important;
+  font-size: 15px !important;
+}
+
+/* Product cards. A closed card is a tile; an open one takes the whole row
+   and lays its explanation out beside the photo. */
+.products {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.product {
+  border-radius: 26px;
+  background: var(--sky);
+  box-shadow: 0 8px 0 rgba(33, 30, 28, 0.1);
+  overflow: hidden;
+}
+
+.product.is-open {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+}
+
+.product-top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 14px 18px;
+  color: var(--ink);
+  text-align: left;
+}
+
+.product-top img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 16px;
+  background: #fff;
+  transition: transform 0.6s var(--spring);
+}
+
+.product-top:hover img {
+  transform: scale(1.03) rotate(-1deg);
+}
+
+.product-name {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 4px 0;
+}
+
+.product-name strong {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.product-name span {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.product-plain {
+  padding: 0 4px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.product-more {
+  align-self: flex-start;
+  margin: 4px 4px 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--sky);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 0.4s var(--spring);
+}
+
+.product-top:hover .product-more {
+  transform: translateX(4px);
+}
+
+.product-top:focus-visible {
+  outline: 3px solid var(--cobalt);
+  outline-offset: -3px;
+  border-radius: 26px;
+}
+
+.product-body {
+  padding: 22px clamp(16px, 2.6vw, 30px) 24px 8px;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.product-body h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.product-body .caution {
+  margin-top: 0 !important;
+}
+
+.product-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.product-links .pill {
+  color: var(--sky);
+  text-decoration: none;
+}
+
+.product-links .pill-quiet {
+  background: #fff;
+  color: var(--ink);
+}
+
+.more {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 0;
+}
+
+.more .row {
+  margin-top: 12px;
+}
+
+/* ---- the suggestions page in the landing page's look: white, hand-drawn
+   headings in ink, pale blue and sage panels, coral for emphasis ---- */
+
+.results h1,
+.results h2 {
+  font-family: var(--font-hand), sans-serif;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--ink);
+  -webkit-text-stroke: 0.02em var(--ink);
+  paint-order: stroke fill;
+}
+
+/* The page title is in the everyday font; section headings keep the hand-drawn one. */
+.results h1 {
+  font-family: inherit;
+  font-size: clamp(30px, 4.4vw, 48px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  -webkit-text-stroke: 0;
+}
+
+.results h2 {
+  font-size: clamp(28px, 3.6vw, 40px);
+  line-height: 1;
+}
+
+/* Top bar: the name of the site on the left, the way to the dog's profile on the right. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-hand), sans-serif;
+  font-size: 28px;
+  line-height: 1;
+  -webkit-text-stroke: 0.02em var(--ink);
+}
+
+.brand img {
+  display: block;
+  height: 42px;
+  width: auto;
+  animation: hover 3.6s ease-in-out infinite alternate;
+}
+
+/* A plain text button: no box, no shadow. */
+.linklike {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 4px;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 700;
+  transition: color 0.2s;
+}
+
+.linklike:hover {
+  color: #d9482a;
+}
+
+.linklike:focus-visible,
+.tab:focus-visible {
+  outline: 3px solid var(--cobalt);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.chev {
+  width: 9px;
+  height: 9px;
+  border-right: 2.5px solid currentColor;
+  border-bottom: 2.5px solid currentColor;
+  transform: translateY(-3px) rotate(45deg);
+  transition: transform 0.3s var(--spring);
+}
+
+.linklike:hover .chev {
+  transform: translateY(0) rotate(45deg);
+}
+
+/* Tabs: words on a line, with a coral marker that slides under the chosen one. */
+.tabs {
+  display: flex;
+  gap: clamp(16px, 3vw, 34px);
+  margin: 14px 0 20px;
+  border-bottom: 2px solid rgba(33, 30, 28, 0.1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab {
+  position: relative;
+  flex: none;
+  padding: 10px 2px 13px;
+  color: rgba(33, 30, 28, 0.62);
+  font-size: 17px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.tab:hover,
+.tab[aria-selected="true"] {
+  color: var(--ink);
+}
+
+.tab-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  border-radius: 4px 4px 0 0;
+  background: #d9482a;
+}
+
+.results .card {
+  background: #eaf2f9;
+  box-shadow: none;
+}
+
+.results .card-diy {
+  background: #fdf0cf;
+}
+
+.results .card-vet {
+  background: #e1eeec;
+}
+
+.results .card-soon {
+  background: #f3f1ec;
+}
+
+.results .next {
+  background: #68918a;
+  color: #fff;
+}
+
+.results .next h2 {
+  color: #fff;
+  -webkit-text-stroke-color: #fff;
+}
+
+.results .next p {
+  color: #fdf0cf;
+}
+
+.results .facts span {
+  background: #eaf2f9;
+}
+
+.results .facts .fact-need {
+  background: #68918a;
+  color: #fff;
+}
+
+.results .product {
+  background: #fff;
+  box-shadow: 0 24px 44px -28px rgba(31, 79, 163, 0.42), 0 0 0 1.5px rgba(33, 30, 28, 0.07);
+}
+
+.results .product-top img {
+  background: #f3f6f9;
+}
+
+.why-panel {
+  background: #fdeae2;
+}
+
+.why-panel.is-down {
+  background: #dcebe7;
+}
+
+/* ---- what the dog is doing, one small scene per activity ---- */
+
+.doing {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.12;
+  display: grid;
+  place-items: center;
+}
+
+.doing-walk {
+  --size: 1;
+  --stride: 0.9s;
+  --head: -4deg;
+  --tail: -30deg;
+}
+
+.doing-walk .walker {
+  width: 104%;
+}
+
+/* dashes sliding backwards under its feet */
+.doing-road {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: 13%;
+  height: 4px;
+  border-radius: 4px;
+  background: repeating-linear-gradient(90deg, rgba(33, 30, 28, 0.25) 0 18px, transparent 18px 34px);
+  animation: road 0.5s linear infinite;
+}
+
+@keyframes road {
+  to {
+    background-position: -34px 0;
+  }
+}
+
+.doing-fetch .sit {
+  height: 96%;
+  animation: none;
+}
+
+.ball {
+  position: absolute;
+  width: 19%;
+}
+
+.ball-held {
+  width: 15%;
+  left: 42.5%;
+  top: 46%;
+  animation: ball-chomp 0.3s ease-in-out infinite alternate;
+}
+
+.ball-bounce {
+  left: 2%;
+  bottom: 4%;
+  animation: ball-bounce 0.55s cubic-bezier(0.3, 0, 0.7, 1) infinite alternate;
+}
+
+.ball-roll {
+  right: 0;
+  bottom: 3%;
+  animation: ball-roll 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes ball-chomp {
+  to {
+    transform: translateY(3%) scale(1.04, 0.96);
+  }
+}
+
+@keyframes ball-bounce {
+  from {
+    transform: translateY(0) scale(1.06, 0.94);
+  }
+  to {
+    transform: translateY(-150%) scale(1);
+  }
+}
+
+@keyframes ball-roll {
+  from {
+    transform: translateX(-60%) rotate(-140deg);
+  }
+  to {
+    transform: translateX(10%) rotate(40deg);
+  }
+}
+
+.doing-sniff .mat {
+  width: 100%;
+}
+
+.doing-chew {
+  align-content: center;
+  justify-items: center;
+}
+
+.doing-chew .face {
+  width: 76%;
+}
+
+.doing-chew .f-head {
+  animation: munch 0.5s ease-in-out infinite alternate;
+}
+
+.chew-bit {
+  position: relative;
+  width: 72%;
+  margin-top: -9%;
+}
+
+.chew-stick {
+  transform-origin: 100px 31px;
+  animation: chew-wiggle 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes munch {
+  to {
+    transform: translateY(2.5px);
+  }
+}
+
+@keyframes chew-wiggle {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+/* ---------- profile ---------- */
+
+.profile {
+  padding-top: clamp(24px, 5vh, 56px);
+}
+
+.profile > .pill {
+  width: auto;
+}
+
+.profile-card {
+  display: grid;
+  gap: 0;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.profile-row {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 18px 0;
+}
+
+.profile-row + .profile-row {
+  border-top: 2px solid rgba(33, 30, 28, 0.08);
+}
+
+.profile-row > span:first-child {
+  padding-top: 10px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.profile-field {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+.profile-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.profile input[type="text"],
+.profile input[type="number"] {
+  height: 46px;
+  width: min(100%, 320px);
+  padding: 0 18px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.profile input[type="number"] {
+  width: 110px;
+}
+
+.profile input:focus-visible {
+  outline: 3px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+.profile .chip {
+  padding: 9px 16px;
+  font-size: 15px;
+}
+
+.profile .chip:not([aria-pressed="true"]) {
+  background: #fff;
+}
+
+.chips-left {
+  justify-content: flex-start;
+  max-width: none;
+}
+
+.profile .slider {
+  width: min(100%, 420px);
+}
+
 .results-head {
   display: flex;
   align-items: center;
@@ -1630,21 +2396,13 @@ button.chip:active {
   width: clamp(96px, 18vw, 160px);
 }
 
+/* Sizes, font and colour for these are set further up, under "the suggestions page in the landing page's look". */
 .results h1 {
   margin: 0;
-  font-size: clamp(28px, 4.6vw, 46px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  color: var(--cobalt);
 }
 
 .results h2 {
   margin: 0 0 8px;
-  font-size: clamp(22px, 3vw, 30px);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
 }
 
 .results p {
@@ -2754,6 +3512,45 @@ button.chip:active {
     width: 80vw;
   }
 
+  .products {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .product.is-open {
+    grid-template-columns: 1fr;
+  }
+
+  .why-panel,
+  .look {
+    grid-template-columns: 1fr;
+  }
+
+  .why-dog {
+    width: 44%;
+  }
+
+  .why-scales {
+    grid-template-columns: 1fr;
+  }
+
+  .why-text > div:first-child {
+    min-height: 0;
+  }
+
+  .product-body {
+    padding: 4px 16px 20px;
+  }
+
+  .profile-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .profile-row > span:first-child {
+    padding-top: 0;
+  }
+
   .floater {
     height: calc(12 * var(--k));
   }
@@ -2833,6 +3630,8 @@ button.chip:active {
   .niche .bust-svg,
   .bust-img,
   .floater img,
+  .brand img,
+  .doing *,
   .floater i,
   .paper,
   .sit,

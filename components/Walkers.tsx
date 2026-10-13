@@ -47,7 +47,8 @@ function Leg({ x, y, beat, hind, far }: { x: number; y: number; beat: 1 | 2; hin
   );
 }
 
-function Beagle() {
+// Also used on its own in the suggestions page, to show "a walk".
+export function WalkingBeagle() {
   return (
     <svg viewBox="0 0 296 190" className="walker" aria-hidden>
       <defs>
@@ -122,7 +123,7 @@ export function Walkers() {
             className="walk-spot"
             style={{ "--size": dog.size, "--head": `${dog.head}deg`, "--tail": `${dog.tail}deg`, "--lap": `${(-12.8 * i) / PACK.length}s` } as React.CSSProperties}
           >
-            <Beagle />
+            <WalkingBeagle />
           </span>
         ))}
       </div>

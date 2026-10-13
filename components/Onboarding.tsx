@@ -13,10 +13,11 @@ import { Pack, aimPack, type PackMood } from "./Pack";
 import { CatBox, type BoxBrand, type CatCoat } from "./CatBox";
 import { Walkers } from "./Walkers";
 import { Results } from "./Results";
+import { Profile } from "./Profile";
 import Slider from "./Slider";
 import HandCursor from "./HandCursor";
 
-type Step = "landing" | "species" | "name" | "breed" | "weight" | "age" | "sex" | "needs" | "curating" | "done";
+type Step = "landing" | "species" | "name" | "breed" | "weight" | "age" | "sex" | "needs" | "curating" | "done" | "profile";
 
 // The hill is one path that re-shapes itself on every step. All shapes use
 // the same commands so they can morph into each other.
@@ -31,6 +32,7 @@ const HILL: Record<Step, string> = {
   needs: "M0,26 C30,36 66,20 100,30 L100,100 L0,100 Z",
   curating: "M0,60 C30,60 66,60 100,60 L100,100 L0,100 Z",
   done: "M0,-6 C30,-6 66,-6 100,-6 L100,100 L0,100 Z",
+  profile: "M0,-6 C30,-6 66,-6 100,-6 L100,100 L0,100 Z",
 };
 
 const wobble = { type: "spring", stiffness: 90, damping: 9, mass: 1 } as const;
@@ -52,6 +54,9 @@ const CAT_BOXES: { coat: CatCoat; brand: BoxBrand; delay: number; style: React.C
   { coat: "orange", brand: "pawmazon", delay: 2.6, style: { left: "54%", top: "18%", width: "38%" } },
   { coat: "spotted", brand: "plain", delay: 5.4, style: { left: "27%", top: "52%", width: "40%" } },
 ];
+
+// "quro" becomes "Quro".
+const cap = (s: string) => s.trim().replace(/^./, (c) => c.toUpperCase());
 
 // A heading whose words rise into place one after another.
 function Rise({ text }: { text: string }) {
@@ -103,7 +108,7 @@ export default function Onboarding() {
   // The name is remembered on this device only.
   useEffect(() => {
     try {
-      setName(localStorage.getItem("petbuddha.name") ?? "");
+      setName(cap(localStorage.getItem("petbuddha.name") ?? ""));
     } catch {}
   }, []);
 
@@ -129,8 +134,11 @@ export default function Onboarding() {
   };
 
   const saveName = () => {
+    // Names always start with a capital, however they were typed.
+    const tidy = cap(name);
+    setName(tidy);
     try {
-      localStorage.setItem("petbuddha.name", name.trim());
+      localStorage.setItem("petbuddha.name", tidy);
     } catch {}
     go("breed");
   };
@@ -159,7 +167,7 @@ export default function Onboarding() {
 
   // Later flows will read this instead of asking again.
   useEffect(() => {
-    if (step !== "done" || !pet) return;
+    if ((step !== "done" && step !== "profile") || !pet) return;
     const profile = { name: name.trim() || null, breed: pet.name, ageMonths: months, dateOfBirth: dobMonths !== null ? dob : null, weightKg: kg, weightSure, sex, needs };
     try {
       localStorage.setItem("petbuddha.profile", JSON.stringify(profile));
@@ -178,12 +186,13 @@ export default function Onboarding() {
     needs: ["Step 7", "What do you need help with?", `We ticked what is common at ${formatAge(months)}. Untick anything that isn't true for ${who}.`],
     curating: ["One moment", `Putting it together for ${who}`, ""],
     done: ["", "", ""],
+    profile: ["", "", ""],
   };
   const [eyebrow, title, sub] = titles[step];
 
   // How far through the flow we are, for the bar along the top.
   const ORDER: Step[] = ["landing", "species", "name", "breed", "weight", "age", "sex", "needs", "curating", "done"];
-  const progress = ORDER.indexOf(step) / (ORDER.length - 1);
+  const progress = step === "profile" ? 1 : ORDER.indexOf(step) / (ORDER.length - 1);
 
   // Where the picked pet sits. It moves up and shrinks on steps with taller
   // controls, so there is always clear space between it and the question.
@@ -220,11 +229,14 @@ export default function Onboarding() {
         <motion.path initial={false} animate={{ d: HILL[step] }} transition={wobble} />
       </svg>
 
-      <div className="progress" aria-hidden>
-        <motion.span initial={false} animate={{ scaleX: progress }} transition={{ type: "spring", stiffness: 120, damping: 20 }} />
-      </div>
+      {/* The step bar belongs to the questions, so it goes once they are done. */}
+      {step !== "done" && step !== "profile" && (
+        <div className="progress" aria-hidden>
+          <motion.span initial={false} animate={{ scaleX: progress }} transition={{ type: "spring", stiffness: 120, damping: 20 }} />
+        </div>
+      )}
 
-      {trail.length > 0 && step !== "done" && step !== "curating" && (
+      {trail.length > 0 && step !== "done" && step !== "curating" && step !== "profile" && (
         <button className="back" onClick={back} aria-label="Back">
           ←
         </button>
@@ -559,7 +571,40 @@ export default function Onboarding() {
 
           {step === "curating" && <Walkers />}
 
-          {step === "done" && pet && <Results pet={pet} name={name.trim()} months={months} kg={kg} weightSure={weightSure} sex={sex} needs={needs} onRestart={restart} />}
+          {step === "profile" && pet && (
+            <Profile
+              name={name}
+              setName={(v) => {
+                setName(v);
+                try {
+                  localStorage.setItem("petbuddha.name", v.trim());
+                } catch {}
+              }}
+              breed={pet}
+              setBreed={setBreed}
+              kg={kg}
+              setKg={(v) => {
+                setWeight((v - minKg) / (maxKg - minKg));
+                setWeightSure(true);
+              }}
+              age={age}
+              setAge={(v) => {
+                setAge(v);
+                if (dob) setDob("");
+              }}
+              months={months}
+              sex={sex}
+              setSex={setSex}
+              needs={needs}
+              setNeeds={(fn) => {
+                setNeedsTouched(true);
+                setNeeds(fn);
+              }}
+              onDone={() => setStep("done")}
+            />
+          )}
+
+          {step === "done" && pet && <Results pet={pet} name={cap(name)} months={months} kg={kg} weightSure={weightSure} sex={sex} needs={needs} onProfile={() => setStep("profile")} onRestart={restart} />}
         </motion.section>
       </AnimatePresence>
 
