@@ -1833,8 +1833,8 @@ button.chip:active {
   opacity: 0.6;
 }
 
-.shop-visit {
-  margin: 16px 0 0 !important;
+.shop .shop-note.shop-visit {
+  margin: 44px 0 0 !important;
 }
 
 .shop-note {
@@ -1848,11 +1848,14 @@ button.chip:active {
 .products {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  align-items: start;
+  gap: 18px;
+  /* every card in a row is as tall as the tallest */
+  align-items: stretch;
 }
 
 .product {
+  display: flex;
+  flex-direction: column;
   border-radius: 26px;
   background: var(--sky);
   box-shadow: 0 8px 0 rgba(33, 30, 28, 0.1);
@@ -1866,11 +1869,12 @@ button.chip:active {
 }
 
 .product-top {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
-  padding: 14px 14px 18px;
+  padding: 14px 14px 20px;
   color: var(--ink);
   text-align: left;
 }
@@ -1891,10 +1895,9 @@ button.chip:active {
 
 .product-name {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 4px 4px 0;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 4px 0;
 }
 
 .product-name strong {
@@ -1910,14 +1913,15 @@ button.chip:active {
 }
 
 .product-plain {
-  padding: 0 4px;
+  padding: 4px 4px 14px;
   font-size: 15px;
   line-height: 1.4;
 }
 
+/* pinned to the bottom, so the buttons line up across the row */
 .product-more {
   align-self: flex-start;
-  margin: 4px 4px 0;
+  margin: auto 4px 0;
   padding: 7px 14px;
   border-radius: 999px;
   background: var(--ink);

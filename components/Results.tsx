@@ -116,9 +116,12 @@ function ProductCard({ p, open, onToggle, who, needs }: { p: Product; open: bool
               <a className="pill" href={STORES[p.store].url + p.path} target="_blank" rel="noreferrer">
                 See it at the store <span className="arrow" aria-hidden />
               </a>
-              <a className="pill pill-quiet" href="#diy">
-                Or make one for free
-              </a>
+              {/* The sock trick is a home-made snuffle toy, so only those link to it. */}
+              {p.kind === "sniff" && (
+                <a className="pill pill-quiet" href="#diy">
+                  Or make one for free
+                </a>
+              )}
             </div>
           </motion.div>
         )}
