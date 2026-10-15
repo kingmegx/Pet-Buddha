@@ -15,7 +15,7 @@ export const COAT = {
   gold: "#e3a44a",
   honey: "#cf8a30",
   sand: "#d9a06a",
-  cream: "#f7f1e3",
+  cream: "#f4e9d3",
   oat: "#efe3cd",
   charcoal: "#3a3640",
   cocoa: "#5a4640",

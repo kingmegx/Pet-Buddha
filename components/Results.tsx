@@ -5,18 +5,17 @@ import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
 import { ACTIVITIES, CALM, CHECKED, KINDS, NEUTER_FOR, PROBLEMS, STORES, WHY, neuterNote, pickProducts, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
-import type { FaceId } from "@/lib/flow";
 import { Face } from "./Faces";
-import { Doing } from "./Doing";
+import { Logo } from "./Logo";
+import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
 
-// The suggestions page teaches first and suggests second:
-//   1. Why a walk alone will not calm a dog (tap each activity to compare).
-//   2. What to do instead, in three steps.
-//   3. What to look for in each kind of toy or chew, with a few picks from
-//      different stores. Each pick opens to explain itself.
-// The free alternative and the cautions follow. A bar along the top fills
-// as you scroll. All the words come from
-// lib/content.ts. Styles are in globals.css under ".results".
+// The suggestions page. It reads like the end of a consultation, in three
+// parts that answer the owner's three questions:
+//   What's good for my dog?   a one-line answer, then why a walk is not enough
+//   What do I need?           three kinds of things, what to look for, a few picks
+//   How do I get more help?   edit the profile, what is still being written, shops
+// Only the sock trick animates on its own; everything else responds to taps
+// and hovers, and each section fades in once. Styles are in globals.css under ".sugg".
 
 // Text Claude drafted is still marked `draft: true` in lib/content.ts, for
 // Meghna's own review. The tag is not shown on the page.
@@ -33,22 +32,9 @@ function Scene({ className = "", id, children }: { className?: string; id?: stri
   );
 }
 
-// Tabs for switching between views of the same thing (not filters): plain
-// words on a line, with a marker that slides under the chosen one.
-function Tabs<T extends string>({ id, items, value, onChange }: { id: string; items: { id: T; label: string }[]; value: T; onChange: (v: T) => void }) {
-  return (
-    <div className="tabs" role="tablist">
-      {items.map((x) => (
-        <button key={x.id} role="tab" aria-selected={x.id === value} className="tab" onClick={() => onChange(x.id)}>
-          {x.label}
-          {x.id === value && <motion.span layoutId={`tab-${id}`} className="tab-line" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// The sock trick as a four-beat loop, in step with the written steps beside it.
+// The sock trick on a loop: a flat sock, treats dropping in, then the sock
+// rolling up into a ball with the treats inside. The written steps beside
+// it light up in time.
 function Sock() {
   return (
     <svg viewBox="0 0 200 150" className="sock" aria-hidden>
@@ -60,9 +46,11 @@ function Sock() {
       {[0, 1, 2].map((i) => (
         <circle key={i} className="sock-treat" cx={84 + i * 9} cy="6" r="5" fill="#a8552c" style={{ "--i": i } as React.CSSProperties} />
       ))}
-      <g className="sock-nose">
-        <ellipse cx="0" cy="0" rx="13" ry="10" fill="#211e1c" />
-        <path d="M-22 4 q-7 4 -5 11 M-16 12 q-5 5 -1 10" fill="none" stroke="#211e1c" strokeWidth="2.6" strokeLinecap="round" />
+      {/* the same sock, rolled up */}
+      <g className="sock-roll">
+        <circle cx="100" cy="96" r="30" fill="#ee5f3f" />
+        <path d="M76 82 C88 70 112 70 124 82" fill="none" stroke="#f7f1e3" strokeWidth="5" strokeLinecap="round" />
+        <path d="M100 96 m-14 0 a14 14 0 1 1 14 14 a8 8 0 1 1 -8 -8" fill="none" stroke="#c94a2e" strokeWidth="3.5" strokeLinecap="round" />
       </g>
     </svg>
   );
@@ -83,7 +71,9 @@ function ProductCard({ p, open, onToggle, who, needs }: { p: Product; open: bool
         </span>
         <span className="product-store">{STORES[p.store].name}</span>
         <span className="product-plain">{p.plain}</span>
-        <span className="product-more">{open ? "Close" : "How it helps"}</span>
+        <span className="product-more">
+          {open ? "Close" : "How it helps"} <i className={`chev ${open ? "chev-up" : ""}`} aria-hidden />
+        </span>
       </motion.button>
       <AnimatePresence initial={false}>
         {open && (
@@ -130,116 +120,46 @@ function ProductCard({ p, open, onToggle, who, needs }: { p: Product; open: bool
   );
 }
 
-// How much of something, as three pips that fill.
-function Pips({ label, level }: { label: string; level: number }) {
-  return (
-    <div className="pips">
-      <span>{label}</span>
-      <span className="pips-row" aria-label={`${level} out of 3`}>
-        {[1, 2, 3].map((n) => (
-          <motion.i key={n} initial={false} animate={{ scale: n <= level ? 1 : 0.55, backgroundColor: n <= level ? "#d9482a" : "rgba(33,30,28,0.14)" }} transition={{ type: "spring", stiffness: 300, damping: 18, delay: n * 0.05 }} />
-        ))}
-      </span>
-    </div>
-  );
-}
+const ICONS: Record<string, () => React.ReactNode> = { walk: WalkIcon, fetch: BallIcon, sniff: SniffIcon, chew: ChewIcon };
 
-// Why a walk alone will not do it. Tap an activity: the dog reacts, the
-// three scales move, and the explanation changes.
-function Why({ face }: { face: FaceId }) {
-  const [at, setAt] = useState<string>("walk");
-  const a = ACTIVITIES.find((x) => x.id === at)!;
+// Why a longer walk will not fix it: every activity side by side, scored
+// on three things, so the answer is visible without tapping anything.
+function Compare() {
+  const heads = ["Tires the body", "Works the mind", "Calm afterwards"];
   return (
-    <section className="why">
-      <h2>
-        {WHY.title} <Draft on={WHY.draft} />
-      </h2>
-      <p>{WHY.lead}</p>
-      <Tabs id="why" items={ACTIVITIES} value={at} onChange={setAt} />
-      <div className={`why-panel is-${a.mood}`}>
-        <div className="why-dog">
-          <AnimatePresence mode="wait">
-            <motion.div key={a.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.94 }} transition={{ duration: 0.22 }}>
-              <Doing what={a.id} face={face} />
-            </motion.div>
-          </AnimatePresence>
-        </div>
-        <div className="why-text">
-          <AnimatePresence mode="wait">
-            <motion.div key={a.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }}>
-              <h3>{a.title}</h3>
-              <p>{a.text}</p>
-            </motion.div>
-          </AnimatePresence>
-          <div className="why-scales">
-            <Pips label={WHY.scales[0]} level={a.body} />
-            <Pips label={WHY.scales[1]} level={a.mind} />
-            <Pips label={WHY.scales[2]} level={a.calm} />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// What to look for in each kind of thing, then a few picks of that kind.
-function Finder({ products, start, who, needs }: { products: Product[]; start: KindId; who: string; needs: ProblemId[] }) {
-  const [kind, setKind] = useState<KindId>(start);
-  const [open, setOpen] = useState<string | null>(null);
-  const k = KINDS.find((x) => x.id === kind)!;
-  const shown = products.filter((p) => p.kind === kind);
-  const stores = [...new Set(shown.map((p) => p.store))];
-  return (
-    <section className="shop">
-      <h2>What to look for</h2>
-      <Tabs
-        id="kind"
-        items={KINDS}
-        value={kind}
-        onChange={(v) => {
-          setKind(v);
-          setOpen(null);
-        }}
-      />
-      <div className="look">
-        <div>
-          <h3>
-            {k.lead} <Draft on={k.draft} />
-          </h3>
-          <ul className="ticks">
-            {k.lookFor.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      <p className="shop-note">
-        A few that fit, from{" "}
-        {stores.map((id, i) => (
-          <span key={id}>
-            {i > 0 && (i === stores.length - 1 ? " and " : ", ")}
-            <a href={STORES[id].url} target="_blank" rel="noreferrer">
-              {STORES[id].name}
-            </a>
+    <div className="s-compare" role="table" aria-label="What each activity does">
+      <div className="s-row s-row-head" role="row">
+        <span role="columnheader">Activity</span>
+        {heads.map((h) => (
+          <span key={h} role="columnheader">
+            {h}
           </span>
         ))}
-        . Tap one to see how it helps. Prices read from their sites on {CHECKED}, so check the store. We earn nothing from these links.
-      </p>
-      <div className="products">
-        {shown.map((p) => (
-          <ProductCard key={p.id} p={p} open={open === p.id} onToggle={() => setOpen(open === p.id ? null : p.id)} who={who} needs={needs} />
-        ))}
       </div>
-      {stores.includes("huft") && (
-        <p className="shop-note shop-visit">
-          Prefer to see things in person? {STORES.huft.name} has shops in many cities.{" "}
-          <a href={STORES.huft.shops} target="_blank" rel="noreferrer">
-            Find your nearest one
-          </a>
-          .
-        </p>
-      )}
-    </section>
+      {ACTIVITIES.map((a) => {
+        const Icon = ICONS[a.id];
+        return (
+          <div key={a.id} className={`s-row ${a.mood === "down" ? "is-good" : ""}`} role="row">
+            <span className="s-act" role="cell">
+              <span className="s-icon">
+                <Icon />
+              </span>
+              <span>
+                <strong>{a.label}</strong>
+                <em>{a.title}</em>
+              </span>
+            </span>
+            {[a.body, a.mind, a.calm].map((n, i) => (
+              <span key={i} className="s-dots" role="cell" aria-label={`${heads[i]}: ${n} of 3`}>
+                {[1, 2, 3].map((d) => (
+                  <i key={d} className={d <= n ? "on" : ""} />
+                ))}
+              </span>
+            ))}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -264,126 +184,186 @@ export function Results({
   onProfile: () => void;
   onRestart: () => void;
 }) {
+  const [open, setOpen] = useState<string | null>(null);
   const chosen = PROBLEMS.filter((p) => needs.includes(p.id));
-  const calm = chosen.filter((p) => p.guide === "calm").map((p) => p.id);
+  const calm = chosen.filter((p) => p.guide === "calm");
   const waiting = chosen.filter((p) => !p.guide);
   const neuter = chosen.some((p) => NEUTER_FOR.includes(p.id)) ? neuterNote(sex, months) : null;
-  const breedName = pet.face === "mixed" && pet.name.startsWith("Mixed") ? "dog" : pet.name;
-  const who = name || `your ${breedName}`;
-  const facts = [`${formatAge(months)} old`, `${kg} kg${weightSure ? "" : " (a guess)"}`, sex === "boy" ? "Boy" : sex === "girl" ? "Girl" : null].filter(Boolean);
+  const breedName = pet.face === "mixed" && pet.name.startsWith("Mixed") ? "Mixed breed" : pet.name;
+  const who = name || "your dog";
+  const Who = name || "Your dog";
+  const meta = [`${formatAge(months)} old`, `${kg} kg${weightSure ? "" : " (a guess)"}`, sex === "boy" ? "Boy" : sex === "girl" ? "Girl" : null].filter(Boolean).join(" · ");
   const products = calm.length > 0 ? pickProducts(needs, months) : [];
+  // Chewers see chews first; everyone else starts with sniffing.
+  const order: KindId[] = needs.includes("chew") ? ["chew", "sniff", "puzzle"] : ["sniff", "puzzle", "chew"];
+  const told = chosen.map((p) => p.label.toLowerCase());
+  const toldText = told.length > 1 ? `${told.slice(0, -1).join(", ")} and ${told.at(-1)}` : told[0];
+  const huft = products.some((p) => p.store === "huft");
 
   return (
-    <div className="results">
+    <div className="results sugg">
       <div className="results-bar">
-        <span className="brand">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/art/buddha.png" alt="" draggable={false} />
-          Pet Buddha
-        </span>
+        <Logo />
         <button className="linklike" onClick={onProfile}>
           {name || "Profile"} <i className="chev" aria-hidden />
         </button>
       </div>
 
-      <header className="results-head">
-        <div className="results-pet">
-          <Face id={pet.face} className="reactive" />
-        </div>
-        <div>
-          <h1>{calm.length > 0 ? `Helping ${who} settle` : `For ${who}`}</h1>
-          <div className="facts">
-            {facts.map((f) => (
-              <span key={f}>{f}</span>
-            ))}
-            {chosen.map((p) => (
-              <span key={p.id} className="fact-need">
-                {p.label}
-              </span>
-            ))}
+      {/* 1. What's good for my dog: the answer, the dog it is for, and the plan at a glance */}
+      <header className="s-top">
+        <div className="s-top-text">
+          <p className="s-kicker">{name ? `${name}'s plan` : "Your plan"}</p>
+          {calm.length > 0 ? (
+            <h1>
+              {Who} needs work for the <span className="hl">nose</span>, not more for the <span className="dim">legs</span>.
+            </h1>
+          ) : (
+            <h1>Here's where we are with {who}.</h1>
+          )}
+          {toldText && (
+            <p className="s-sub">
+              You told us {who} {told.length === 1 ? "has this going on" : "has these going on"}: {toldText}.
+            </p>
+          )}
+          <div className="s-top-actions">
+            {calm.length > 0 && (
+              <a className="pill" href="#what">
+                See what helps <span className="arrow arrow-down" aria-hidden />
+              </a>
+            )}
+            <button className="linklike" onClick={onProfile}>
+              Edit profile
+            </button>
           </div>
+        </div>
+        <div className="s-id">
+          <div className="s-id-face">
+            <Face id={pet.face} />
+          </div>
+          <strong>{name || breedName}</strong>
+          <span>{name ? breedName : null}</span>
+          <span>{meta}</span>
         </div>
       </header>
 
       {calm.length > 0 && (
-        <>
-          <Why face={pet.face} />
+        <ol className="s-glance">
+          {WHY.plan.map((step, i) => {
+            const Icon = [WalkIcon, SniffIcon, ChewIcon][i];
+            return (
+              <li key={step.word}>
+                <span className="s-icon">
+                  <Icon />
+                </span>
+                <span className="s-num">0{i + 1}</span>
+                <strong>{step.word}</strong>
+                <span>{step.line}</span>
+              </li>
+            );
+          })}
+        </ol>
+      )}
 
-          <Scene className="calm">
-            <h2>So what should you do?</h2>
-            <div className="calm-ends" aria-hidden>
-              <span>Zoomies</span>
-              <span>Settled</span>
-            </div>
-            <div className="calm-track" aria-hidden>
-              <i />
-            </div>
-            <ol className="calm-steps">
-              {WHY.plan.map((s) => (
-                <li key={s.word}>
-                  <strong>{s.word}</strong>
-                  <span>{s.line}</span>
-                </li>
-              ))}
-            </ol>
+      {calm.length > 0 && (
+        <>
+          <Scene className="s-sec">
+            <h2>Why a longer walk won't fix it</h2>
+            <p className="s-lead">There is more than one kind of tired. A walk tires the body, and a fit dog bounces back. Sniffing and chewing tire the mind, and leave a dog calm.</p>
+            <Compare />
           </Scene>
 
-          <Finder products={products} start={needs.includes("chew") ? "chew" : "sniff"} who={who} needs={needs} />
+          {/* 2. What do I need */}
+          <section className="s-sec" id="what">
+            <h2>What will help</h2>
+            <p className="s-lead">Three kinds of things. You do not need all of them. Start with one, and add another if it helps.</p>
+            {order.map((id, i) => {
+              const k = KINDS.find((x) => x.id === id)!;
+              const shown = products.filter((p) => p.kind === id);
+              if (shown.length === 0) return null;
+              return (
+                <Scene key={id} className="s-kind">
+                  <div className="s-kind-head">
+                    <span className="s-num">0{i + 1}</span>
+                    <div>
+                      <h3>{k.label}</h3>
+                      <p>{k.lead}</p>
+                    </div>
+                    <ul className="s-look">
+                      {k.lookFor.map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="products">
+                    {shown.map((p) => (
+                      <ProductCard key={p.id} p={p} open={open === p.id} onToggle={() => setOpen(open === p.id ? null : p.id)} who={who} needs={needs} />
+                    ))}
+                  </div>
+                </Scene>
+              );
+            })}
+            <p className="s-note">
+              Photos and prices from each store's own site, read on {CHECKED}. Check the store before you buy. We earn nothing from these links.
+            </p>
+          </section>
 
-          <Scene id="diy" className="card card-diy card-lead">
-            <div className="card-text">
-              <h2>Or make one: {CALM.diy.title.toLowerCase()}</h2>
-              <ol className="beats">
-                {CALM.diy.steps.map((line, i) => (
-                  <li key={line} style={{ "--i": i, "--n": CALM.diy.steps.length } as React.CSSProperties}>
-                    {line}
-                  </li>
+          <Scene id="diy" className="s-free">
+            <div>
+              <p className="s-kicker">A free DIY option</p>
+              <h2>{CALM.diy.title}</h2>
+              <ol>
+                {CALM.diy.steps.map((line) => (
+                  <li key={line}>{line}</li>
                 ))}
               </ol>
-              <p className="caution">
-                <strong>Watch out.</strong> {CALM.diy.caution}
-              </p>
+              <p className="s-muted">{CALM.diy.caution}</p>
             </div>
             <Sock />
           </Scene>
-
         </>
       )}
 
-      {neuter && (
-        <Scene className="card card-vet">
-          <h2>
-            About neutering <Draft on={neuter.draft} />
-          </h2>
-          <p>{neuter.text}</p>
-        </Scene>
-      )}
-
-      {waiting.length > 0 && (
-        <Scene className="card card-soon">
-          <h2>Still being written</h2>
-          <div className="facts">
-            {waiting.map((p) => (
-              <span key={p.id}>{p.label}</span>
-            ))}
+      {/* 3. How do I get more help */}
+      <Scene className="s-sec">
+        <h2>Need more help?</h2>
+        <div className="s-help">
+          <div className="s-help-card">
+            <h3>Something else going on?</h3>
+            <p>Add it to {name ? `${name}'s` : "the"} profile, or change anything we got wrong. The plan updates.</p>
+            <button className="pill" onClick={onProfile}>
+              Edit profile
+            </button>
           </div>
-        </Scene>
-      )}
-
-      <Scene className="more">
-        <h2>Need help with something else?</h2>
-        <p>Open {name ? `${name}'s` : "the"} profile to tick more, or to change anything we got wrong.</p>
-        <div className="row">
-          <button className="pill" onClick={onProfile}>
-            Open profile <span className="arrow" aria-hidden />
-          </button>
-          <button className="pill pill-quiet" onClick={onRestart}>
-            Start over
-          </button>
+          {waiting.length > 0 && (
+            <div className="s-help-card">
+              <h3>Coming soon</h3>
+              <p>We are still writing guides for {waiting.map((p) => p.label.toLowerCase()).join(", ")}.</p>
+            </div>
+          )}
+          {neuter && (
+            <div className="s-help-card">
+              <h3>About neutering</h3>
+              <p>{neuter.text}</p>
+            </div>
+          )}
+          {huft && (
+            <div className="s-help-card">
+              <h3>See things in person</h3>
+              <p>{STORES.huft.name} has shops in many cities, if you would rather pick toys and chews in hand.</p>
+              <a className="linklike" href={STORES.huft.shops} target="_blank" rel="noreferrer">
+                Find your nearest <i className="chev chev-right" aria-hidden />
+              </a>
+            </div>
+          )}
         </div>
       </Scene>
 
-      <p className="small results-note">General guidance, not a diagnosis. For anything about health, check with your vet. Pet Buddha carries no ads and earns no commission.</p>
+      <footer className="s-foot">
+        <p>General guidance, not a diagnosis. For anything about health, check with your vet. Pet Buddha carries no ads and earns no commission.</p>
+        <button className="linklike" onClick={onRestart}>
+          Start over
+        </button>
+      </footer>
     </div>
   );
 }

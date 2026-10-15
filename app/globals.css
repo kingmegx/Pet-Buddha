@@ -3,13 +3,17 @@
      dusty teal ground, and marigold / coral / cobalt for the characters. */
   --sky: #f5e6cf;
   /* The page behind everything. Cards and pills keep the cream above. */
-  --bg: #fbfaf6;
-  --ground: #8fc4bf;
-  --ground-deep: #5c9f9a;
+  --bg: #ffffff;
+  /* Only the loading screen's walkers still stand on this. */
+  --ground: #f4f2ee;
+  --ground-deep: #e6e2da;
   --sun: #f5b041;
   --coral: #ee5f3f;
   --cobalt: #1f4fa3;
-  --ink: #211e1c;
+  /* Text: near-black for headings, grey for everything that supports them. */
+  --ink: #111111;
+  --muted: #5f5f5f;
+  --line: rgba(17, 17, 17, 0.09);
   --hand: #f7b2ac;
 
   /* One shared feel for every small movement: a spring that overshoots a
@@ -28,7 +32,7 @@ body {
   height: 100%;
   overflow: hidden;
   background: var(--bg);
-  color: var(--cobalt);
+  color: var(--ink);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -56,22 +60,6 @@ button {
   -webkit-user-select: none;
 }
 
-.hill {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.hill path {
-  fill: var(--ground);
-}
-
-.hill .hill-far {
-  fill: #b5dad5;
-  transform: translateY(-4.5%);
-}
-
 /* A thin bar along the top that fills as the steps go by. */
 .progress {
   position: absolute;
@@ -84,7 +72,7 @@ button {
 .progress span {
   display: block;
   height: 100%;
-  background: var(--cobalt);
+  background: var(--ink);
   border-radius: 0 5px 5px 0;
   transform-origin: 0 50%;
 }
@@ -102,15 +90,10 @@ button {
 
 .title .eyebrow {
   display: inline-block;
-  margin: 0 0 8px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: rgba(33, 30, 28, 0.08);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink);
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
   animation: fade-up 0.5s var(--glide) both;
 }
 
@@ -118,7 +101,7 @@ button {
   margin: 0;
   font-size: clamp(30px, 5.2vw, 56px);
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.045em;
   line-height: 1.04;
 }
 
@@ -140,7 +123,7 @@ button {
   margin: 10px 0 0;
   font-size: clamp(15px, 1.7vw, 19px);
   font-weight: 500;
-  color: var(--ink);
+  color: var(--muted);
   animation: fade-up 0.6s 0.28s var(--glide) both;
 }
 
@@ -195,15 +178,14 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 15px 30px;
+  padding: 13px 24px;
   border-radius: 999px;
   background: var(--ink);
-  color: var(--sky);
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  box-shadow: 0 10px 22px -10px rgba(33, 30, 28, 0.55);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  box-shadow: none;
   transition: transform 0.55s var(--spring), box-shadow 0.2s var(--glide), opacity 0.2s, background 0.2s;
 }
 
@@ -259,14 +241,14 @@ button {
 .chip {
   display: inline-flex;
   align-items: center;
-  padding: 12px 20px;
+  padding: 11px 18px;
   border-radius: 999px;
-  border: 2px solid var(--ink);
-  background: rgba(248, 239, 226, 0.55);
+  border: 1.5px solid rgba(17, 17, 17, 0.14);
+  background: #fff;
   color: var(--ink);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  box-shadow: 0 4px 0 rgba(33, 30, 28, 0.14);
+  box-shadow: none;
   transition: transform 0.55s var(--spring), box-shadow 0.2s var(--glide), background 0.18s, color 0.18s;
 }
 
@@ -302,8 +284,9 @@ button.chip:active {
 }
 
 .chip[aria-pressed="true"] {
+  border-color: var(--ink);
   background: var(--ink);
-  color: var(--sun);
+  color: #fff;
 }
 
 .chip[aria-pressed="true"]:hover {
@@ -314,7 +297,7 @@ button.chip:active {
   width: 15px;
   margin-right: 10px;
   opacity: 1;
-  border-color: var(--sun);
+  border-color: #fff;
 }
 
 .chip-static {
@@ -501,7 +484,7 @@ button.chip:active {
 .dob input {
   height: 46px;
   padding: 0 20px;
-  border: 2px solid var(--ink);
+  border: 1.5px solid rgba(17, 17, 17, 0.16);
   border-radius: 999px;
   background: rgba(248, 239, 226, 0.9);
   color: var(--ink);
@@ -678,10 +661,9 @@ button.chip:active {
 }
 
 .fact strong {
-  font-family: var(--font-hand), sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  letter-spacing: 0.14em;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #d9482a;
 }
@@ -689,10 +671,11 @@ button.chip:active {
 /* Two lines are always reserved, so the page does not jump when the fact changes. */
 .fact p {
   margin: 0;
-  min-height: 2.5em;
-  font-family: var(--font-hand), sans-serif;
-  font-size: 20px;
-  line-height: 1.25;
+  min-height: 2.9em;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--muted);
 }
 
 .fact p span {
@@ -991,7 +974,7 @@ button.chip:active {
   position: relative;
   flex: 1;
   min-width: 0;
-  transition: background 0.25s;
+  overflow: hidden;
 }
 
 .side-dog .crowd {
@@ -1134,7 +1117,7 @@ button.chip:active {
   width: 100%;
   height: 54px;
   padding: 0 24px;
-  border: 2px solid var(--ink);
+  border: 1.5px solid rgba(17, 17, 17, 0.16);
   border-radius: 999px;
   background: var(--sky);
   color: var(--ink);
@@ -1200,21 +1183,32 @@ button.chip:active {
 .tiles {
   width: min(660px, 100%);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(10px, 2.4vh, 22px) clamp(8px, 2vw, 24px);
-  align-items: end;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(10px, 2vh, 16px) clamp(8px, 1.6vw, 16px);
+  align-items: stretch;
 }
 
 .tile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  min-width: 0;
+  gap: 8px;
+  padding: 12px 8px 14px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: #fff;
   color: var(--ink);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.tile:hover {
+  border-color: rgba(17, 17, 17, 0.22);
 }
 
 .tile .face {
-  width: min(100%, 19vh);
+  width: min(100%, 16vh);
   transition: transform 0.5s var(--spring);
 }
 
@@ -1225,9 +1219,10 @@ button.chip:active {
 .breed-name {
   padding: 5px 13px;
   border-radius: 999px;
-  background: rgba(248, 239, 226, 0.85);
+  border: 1px solid var(--line);
+  background: #fff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
   transition: transform 0.25s cubic-bezier(0.3, 1.8, 0.5, 1), background 0.15s, color 0.15s;
 }
@@ -2564,7 +2559,8 @@ button.chip:active {
 }
 
 .sock-body {
-  transform-origin: 100px 100px;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
   animation: sock-body 8s ease-in-out infinite;
 }
 
@@ -2572,31 +2568,28 @@ button.chip:active {
   animation: sock-treat 8s calc(var(--i) * 0.22s) ease-in infinite;
 }
 
-.sock-nose {
-  animation: sock-nose 8s ease-in-out infinite;
+.sock-roll {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: sock-roll 8s ease-in-out infinite;
 }
 
+/* 0-50%: flat sock, treats drop in. 50-60%: it rolls up from the toe.
+   60-92%: a rolled sock with the treats inside. Then back to the start. */
 @keyframes sock-body {
   0%,
   50% {
-    transform: scale(1) rotate(0deg);
+    transform: scale(1);
+    opacity: 1;
   }
-  58%,
-  75% {
-    transform: scale(0.74) rotate(-24deg);
+  60%,
+  94% {
+    transform: scale(0.5, 0.15);
+    opacity: 0;
   }
-  80% {
-    transform: scale(0.74) rotate(-14deg);
-  }
-  85% {
-    transform: scale(0.74) rotate(-30deg);
-  }
-  90% {
-    transform: scale(0.74) rotate(-16deg);
-  }
-  96%,
   100% {
-    transform: scale(1) rotate(0deg);
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
@@ -2621,21 +2614,25 @@ button.chip:active {
   }
 }
 
-@keyframes sock-nose {
+@keyframes sock-roll {
   0%,
-  74% {
-    transform: translate(230px, 96px);
+  52% {
+    transform: scale(0) rotate(-200deg);
+    opacity: 0;
   }
-  80%,
-  92% {
-    transform: translate(158px, 92px);
+  62% {
+    transform: scale(1.06) rotate(10deg);
+    opacity: 1;
   }
-  86% {
-    transform: translate(166px, 100px);
+  66%,
+  90% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
   }
-  98%,
+  96%,
   100% {
-    transform: translate(230px, 96px);
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
   }
 }
 
@@ -3575,7 +3572,10 @@ button.chip:active {
   .sides {
     flex-direction: column;
     inset: 16% 0 0;
+    gap: 0;
+    padding: 0 12px;
   }
+
 
   .side-dog .crowd {
     inset: 0 30% 0 0;
@@ -3591,22 +3591,39 @@ button.chip:active {
     bottom: 38%;
   }
 
+  /* On the card, the cat's boxes take the top and the label sits below them. */
+  .side-cat .crowd {
+    inset: 2% 6% 24% 6%;
+  }
+
+  .side-cat .side-label {
+    bottom: 6%;
+  }
+
   .breed-pick {
     inset: 22% 0 0;
   }
 
   .tiles {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .tile {
+    padding: 8px 4px 10px;
+    border-radius: 16px;
   }
 
   .tile .face {
-    width: min(100%, 15vh);
+    width: min(100%, 12vh);
   }
 
   .breed-name {
     font-size: 12px;
-    padding: 4px 10px;
+    padding: 4px 8px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
   }
 
   .chip {
@@ -3651,4 +3668,902 @@ button.chip:active {
   .scene {
     animation: none !important;
   }
+}
+
+
+/* ================= suggestions page (the portfolio's system) =================
+   One focal point per section. Headings: Manrope 800, tight tracking.
+   Supporting text: grey, 500. Soft pastel panels with a hairline border.
+   Nothing moves on its own here. */
+
+.logo-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-hand), sans-serif;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--ink);
+  -webkit-text-stroke: 0.02em var(--ink);
+}
+
+.results.sugg {
+  gap: 0;
+  padding-bottom: 40px;
+  background: #fff;
+}
+
+.sugg > * {
+  width: min(100%, 1040px);
+}
+
+/* Full width and solid, so nothing scrolling underneath shows at its sides. */
+.sugg .results-bar {
+  align-self: stretch;
+  width: auto;
+  margin: 0 -20px;
+  padding: 18px max(20px, calc(50% - 520px));
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+
+.sugg h1,
+.sugg h2,
+.sugg h3 {
+  font-family: inherit;
+  color: var(--ink);
+  -webkit-text-stroke: 0;
+}
+
+.sugg h1 {
+  margin: 0;
+  font-size: clamp(34px, 4.6vw, 56px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
+}
+
+.sugg h2 {
+  margin: 0 0 10px;
+  font-size: clamp(28px, 3.4vw, 40px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.sugg h3 {
+  margin: 0 0 4px;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.sugg p {
+  max-width: none;
+}
+
+.s-kicker {
+  margin: 0 0 12px !important;
+  font-size: 14px !important;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.s-muted,
+.s-sub,
+.s-lead,
+.s-note {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* 1. The answer, with the dog's profile beside it */
+.s-hero {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: center;
+  padding: clamp(36px, 7vh, 72px) 0 clamp(40px, 8vh, 80px);
+}
+
+.s-profile {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #fff;
+}
+
+.s-face {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1.2;
+  border-radius: 16px;
+  background: #fbefe6;
+}
+
+.s-face .face {
+  width: 62%;
+}
+
+.s-profile strong {
+  display: block;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.s-profile span {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.s-edit {
+  position: absolute;
+  top: 26px;
+  right: 26px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 14px;
+}
+
+.s-sub {
+  margin: 16px 0 0 !important;
+  font-size: clamp(16px, 1.6vw, 19px) !important;
+  line-height: 1.5 !important;
+  max-width: 52ch !important;
+}
+
+/* sections */
+.s-sec {
+  padding: clamp(40px, 8vh, 80px) 0 0;
+}
+
+.s-lead {
+  margin: 0 0 28px !important;
+  font-size: 17px !important;
+  line-height: 1.55 !important;
+  max-width: 60ch !important;
+}
+
+/* Why: every activity side by side, scored with still dots */
+.s-compare {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.s-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: center;
+  padding: 16px 24px;
+}
+
+.s-row + .s-row {
+  border-top: 1px solid var(--line);
+}
+
+.s-row-head {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  background: #fafafa;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.s-row.is-good {
+  background: #f1f8f6;
+}
+
+.s-act {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.s-act strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.s-act em {
+  display: block;
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.s-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.s-icon svg {
+  width: 44px;
+  height: 44px;
+}
+
+.icon-walk {
+  width: 64px;
+  margin-left: 4px;
+}
+
+.icon-walk * {
+  animation: none !important;
+}
+
+.s-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.s-dots i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(17, 17, 17, 0.1);
+}
+
+.s-dots i.on {
+  background: var(--ink);
+}
+
+.s-row.is-good .s-dots i.on {
+  background: #3f8a77;
+}
+
+/* 2. What will help: one block per kind */
+.s-kind {
+  padding: 28px 0 8px;
+  border-top: 1px solid var(--line);
+}
+
+.s-kind + .s-kind {
+  margin-top: 24px;
+}
+
+.s-kind-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 22px;
+}
+
+.s-num {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  padding-top: 4px;
+}
+
+.s-kind-head p {
+  margin: 0 !important;
+  font-size: 15px !important;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.s-look {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.s-look li {
+  position: relative;
+  padding-left: 20px;
+}
+
+.s-look li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.45em;
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  transform: rotate(-45deg);
+}
+
+.s-note {
+  margin: 28px 0 0 !important;
+  font-size: 13px !important;
+}
+
+/* product cards, quieter */
+.sugg .product {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: none;
+  transition: border-color 0.2s, box-shadow 0.3s var(--glide);
+}
+
+.sugg .product:hover {
+  border-color: rgba(17, 17, 17, 0.18);
+  box-shadow: 0 18px 40px -26px rgba(17, 17, 17, 0.35);
+}
+
+.sugg .product-top img {
+  border-radius: 16px;
+  background: #f6f6f6;
+}
+
+.sugg .product-top:hover img {
+  transform: none;
+}
+
+.sugg .product-name strong {
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+
+.sugg .product-name span,
+.sugg .product-store {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 1;
+}
+
+.sugg .product-plain {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.sugg .product-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  background: none;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.sugg .product-body h3 {
+  font-size: 16px;
+}
+
+.sugg .product-body p,
+.sugg .beats li {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.sugg .beats li {
+  animation: none;
+}
+
+.sugg .caution {
+  background: #fbf3e8;
+  color: var(--ink);
+}
+
+.sugg .product-links .pill {
+  color: #fff;
+}
+
+.chev-up {
+  transform: translateY(2px) rotate(-135deg) !important;
+}
+
+.chev-right {
+  transform: rotate(-45deg) !important;
+}
+
+/* The free version */
+.s-free {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: center;
+  margin-top: clamp(40px, 8vh, 80px);
+  padding: clamp(24px, 4vw, 44px);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #fdf6e7;
+}
+
+.s-free ol {
+  margin: 14px 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.s-free .sock {
+  width: min(100%, 220px);
+  justify-self: center;
+}
+
+
+
+.sugg a.linklike {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* 3. Need more help */
+.s-help {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.s-help-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #f4f6fb;
+}
+
+.s-help-card:nth-child(2) {
+  background: #fbf3e8;
+}
+
+.s-help-card:nth-child(3) {
+  background: #f1f8f6;
+}
+
+.s-help-card p {
+  margin: 0 0 6px !important;
+  font-size: 15px !important;
+  color: var(--muted);
+  font-weight: 500;
+  flex: 1;
+}
+
+.s-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: clamp(48px, 9vh, 96px);
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.s-foot p {
+  margin: 0 !important;
+  font-size: 13px !important;
+  color: var(--muted);
+  max-width: 70ch !important;
+}
+
+@media (max-width: 760px) {
+  .s-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .s-profile {
+    grid-template-columns: 72px minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .s-face {
+    aspect-ratio: 1;
+  }
+
+  .s-face .face {
+    width: 80%;
+  }
+
+  .s-edit {
+    top: 50%;
+    translate: 0 -50%;
+  }
+
+  .s-row {
+    grid-template-columns: minmax(0, 1fr) repeat(3, 44px);
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .s-row-head span:not(:first-child) {
+    font-size: 11px;
+  }
+
+  .s-act em {
+    display: none;
+  }
+
+  .s-dots {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .s-kind-head,
+  .s-free {
+    grid-template-columns: 1fr;
+  }
+
+  .s-foot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.sugg.profile .results-head {
+  padding: clamp(28px, 6vh, 56px) 0 24px;
+}
+
+.sugg.profile .results-head p {
+  margin: 8px 0 0 !important;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.sugg .profile-card {
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.sugg.profile > .pill {
+  width: auto;
+  margin-top: 24px;
+}
+
+.sugg .profile input[type="text"],
+.sugg .profile input[type="number"],
+.profile input[type="text"],
+.profile input[type="number"] {
+  border: 1.5px solid rgba(17, 17, 17, 0.16);
+}
+
+/* ---- suggestions: the top of the page ---- */
+
+.s-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: clamp(28px, 5vw, 72px);
+  align-items: center;
+  padding: clamp(40px, 8vh, 88px) 0 clamp(32px, 6vh, 56px);
+}
+
+.s-top h1 {
+  font-size: clamp(40px, 5.6vw, 72px) !important;
+  line-height: 1 !important;
+}
+
+/* "nose" gets a marker stroke; "legs" is crossed out and greyed. */
+.hl {
+  background: linear-gradient(transparent 62%, #ffd9cc 62%, #ffd9cc 92%, transparent 92%);
+  padding: 0 0.04em;
+}
+
+.dim {
+  color: #b9b6b0;
+  text-decoration: line-through;
+  text-decoration-thickness: 0.07em;
+  text-decoration-color: #e5533a;
+}
+
+.s-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-top: 28px;
+}
+
+.s-top-actions .pill {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* A straight arrow pointing down the page, like "See my work" on the
+   portfolio, so it reads as "jump down" and not as a dropdown. */
+.arrow-down {
+  rotate: 90deg;
+}
+
+/* the dog's ID card */
+.s-id {
+  display: grid;
+  gap: 2px;
+  padding: 18px 18px 22px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 30px 60px -40px rgba(17, 17, 17, 0.35);
+  rotate: 2deg;
+}
+
+.s-id-face {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  margin-bottom: 14px;
+  border-radius: 20px;
+  background: #fbefe6;
+}
+
+.s-id-face .face {
+  width: 64%;
+}
+
+.s-id strong {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.s-id span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* the plan at a glance: three steps */
+.s-glance {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.s-glance li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto auto;
+  column-gap: 14px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #f4f6fb;
+}
+
+.s-glance li:nth-child(2) {
+  background: #f1f8f6;
+}
+
+.s-glance li:nth-child(3) {
+  background: #fbf3e8;
+}
+
+.s-glance .s-icon {
+  grid-row: span 3;
+}
+
+.s-glance .s-num {
+  padding: 0;
+  font-size: 13px;
+}
+
+.s-glance strong {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.s-glance li > span:last-child {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+@media (max-width: 760px) {
+  .s-top {
+    grid-template-columns: 1fr;
+  }
+
+  .s-id {
+    grid-template-columns: 72px 1fr;
+    column-gap: 14px;
+    rotate: 0deg;
+  }
+
+  .s-id-face {
+    grid-row: span 3;
+    margin: 0;
+  }
+
+  .s-glance {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- onboarding: one quiet system ----------
+   The page is white with no ground or wave. The chrome is black, white,
+   grey and 1px hairlines, so the only colour on a question screen is the
+   dog. Every control is either a black pill (the main action) or white
+   with a hairline (everything else). */
+
+.back {
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+
+.progress {
+  height: 3px;
+  background: rgba(17, 17, 17, 0.06);
+}
+
+.field input,
+.dob input {
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  background: #fff;
+  font-weight: 600;
+}
+
+.field input::placeholder {
+  color: var(--muted);
+}
+
+.matches {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 16px 40px -16px rgba(17, 17, 17, 0.18);
+}
+
+.matches button {
+  background: none;
+}
+
+.matches button:hover,
+.matches button:focus-visible,
+.tile:hover .breed-name {
+  color: #fff;
+}
+
+.pill-quiet {
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  box-shadow: none;
+}
+
+.side-label small {
+  color: #fff;
+}
+
+.hint,
+.controls .hint {
+  color: var(--muted);
+  opacity: 1;
+}
+
+/* The question screens continue the landing: a white card on the pale blue
+   page, at the same insets as the landing card, so "Get started" feels like
+   turning a page rather than going somewhere new. Everything on a question
+   screen is placed inside the stage, so the card is the stage itself. */
+html:has(.stage-card),
+body:has(.stage-card) {
+  background: #e6f0f8;
+}
+
+.stage-card {
+  inset: clamp(14px, 5.5vh, 56px) clamp(14px, 4.5vw, 64px);
+  border-radius: clamp(22px, 3vw, 36px);
+  background: #fff;
+  box-shadow: 0 30px 60px -30px rgba(31, 79, 163, 0.35);
+}
+
+@media (max-width: 640px) {
+  .stage-card {
+    inset: 10px;
+    border-radius: 24px;
+  }
+}
+
+/* On the card the step bar is a short rounded track centred above the
+   step number, instead of a line clipped by the card's corner. */
+.stage-card .progress {
+  top: clamp(14px, 2.4vh, 22px);
+  left: 50%;
+  right: auto;
+  width: min(180px, 40%);
+  height: 4px;
+  translate: -50% 0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.stage-card .progress span {
+  border-radius: 999px;
+}
+
+/* Breed cards take a whisper of the page's blue, so they read as cards
+   on the white sheet and the cream coats still stand out. */
+.tile {
+  background: #f3f7fb;
+  border-color: transparent;
+}
+
+.tile:hover {
+  background: #eaf1f8;
+  border-color: transparent;
+}
+
+/* The picked dog sits on a soft disc of the page's blue, so it has a place
+   to stand instead of floating in the middle of the sheet. The disc hangs
+   off the face itself, centred on the head (which sits a touch below the
+   middle of its drawing), so it grows and moves with the dog. */
+.hero .face {
+  position: relative;
+}
+
+.hero .face::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 53%;
+  width: 128%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #eef4fa;
+  translate: -50% -50%;
+}
+
+.hero .face-svg {
+  position: relative;
+}
+
+/* The card is already the button, so the breed name is plain text in it,
+   not a second pill inside the card. */
+.tile .breed-name,
+.tile:hover .breed-name {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  transform: none;
+}
+
+/* A lighter slider: thin grey rail, small black knob. */
+.slider-track path {
+  stroke: rgba(17, 17, 17, 0.14);
+  stroke-width: 4;
+}
+
+.slider-knob {
+  top: 21px;
+  width: 26px;
+  height: 26px;
+  box-shadow: 0 0 0 4px #fff;
+}
+
+.slider-end {
+  color: var(--muted);
 }

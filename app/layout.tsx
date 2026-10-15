@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, Patrick_Hand } from "next/font/google";
+import { Manrope, Patrick_Hand } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
-// A hand-drawn face, used only for the "Pet Buddha" name on the landing page.
+// Manrope for everything; Patrick Hand only for the name "Pet Buddha".
+const manrope = Manrope({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const hand = Patrick_Hand({ subsets: ["latin"], weight: "400", variable: "--font-hand" });
 
 export const metadata: Metadata = {
@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   description: "Personalised guidance to help you choose what's best for your pet.",
 };
 
-export const viewport: Viewport = { themeColor: "#f5e6cf" };
+export const viewport: Viewport = { themeColor: "#ffffff" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${outfit.className} ${hand.variable}`}>{children}</body>
+      <body className={`${manrope.className} ${hand.variable}`}>{children}</body>
     </html>
   );
 }

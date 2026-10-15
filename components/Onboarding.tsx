@@ -19,23 +19,6 @@ import HandCursor from "./HandCursor";
 
 type Step = "landing" | "species" | "name" | "breed" | "weight" | "age" | "sex" | "needs" | "curating" | "done" | "profile";
 
-// The hill is one path that re-shapes itself on every step. All shapes use
-// the same commands so they can morph into each other.
-const HILL: Record<Step, string> = {
-  landing: "M0,112 C28,112 58,112 100,112 L100,114 L0,114 Z",
-  species: "M0,40 C30,30 62,48 100,36 L100,100 L0,100 Z",
-  name: "M0,58 C30,48 66,64 100,52 L100,100 L0,100 Z",
-  breed: "M0,38 C30,52 66,28 100,42 L100,100 L0,100 Z",
-  age: "M0,44 C34,34 60,52 100,32 L100,100 L0,100 Z",
-  weight: "M0,34 C30,50 64,34 100,46 L100,100 L0,100 Z",
-  sex: "M0,46 C36,36 62,46 100,36 L100,100 L0,100 Z",
-  needs: "M0,26 C30,36 66,20 100,30 L100,100 L0,100 Z",
-  curating: "M0,60 C30,60 66,60 100,60 L100,100 L0,100 Z",
-  done: "M0,-6 C30,-6 66,-6 100,-6 L100,100 L0,100 Z",
-  profile: "M0,-6 C30,-6 66,-6 100,-6 L100,100 L0,100 Z",
-};
-
-const wobble = { type: "spring", stiffness: 90, damping: 9, mass: 1 } as const;
 const pop = { type: "spring", stiffness: 260, damping: 18 } as const;
 
 // Where the age slider's knob sits for a given age in months: between the
@@ -211,7 +194,9 @@ export default function Onboarding() {
 
   return (
     <main
-      className="stage"
+      // The questions sit on the same white card, on the same pale blue page,
+      // as the landing, so the whole onboarding reads as one place.
+      className={`stage ${step !== "landing" && step !== "done" && step !== "profile" ? "stage-card" : ""}`}
       onPointerMove={(e) => {
         // Eyes follow the hand. Updated at most once per frame.
         const stage = e.currentTarget;
@@ -223,12 +208,6 @@ export default function Onboarding() {
         });
       }}
     >
-      {/* Two hills: the far one is paler and settles more slowly, for depth. */}
-      <svg className="hill" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
-        <motion.path className="hill-far" initial={false} animate={{ d: HILL[step] }} transition={{ type: "spring", stiffness: 46, damping: 9, mass: 1.2 }} />
-        <motion.path initial={false} animate={{ d: HILL[step] }} transition={wobble} />
-      </svg>
-
       {/* The step bar belongs to the questions, so it goes once they are done. */}
       {step !== "done" && step !== "profile" && (
         <div className="progress" aria-hidden>
@@ -318,7 +297,7 @@ export default function Onboarding() {
                     <button
                       className="pill"
                       onClick={() => {
-                        // Let the dogs leave before the hill rises.
+                        // Let the dogs leave before the questions come in.
                         setLeaving(true);
                         window.setTimeout(() => {
                           go("species");

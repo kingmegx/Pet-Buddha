@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AGE_STOPS, MIXED, POPULAR, WEIGHT_RANGE, formatAge, searchBreeds, type Breed } from "@/lib/flow";
 import { PROBLEMS, type ProblemId, type Sex } from "@/lib/content";
 import { Face } from "./Faces";
+import { Logo } from "./Logo";
 import Slider from "./Slider";
 
 // The dog's profile: everything the questions asked, on one page, all of it
@@ -47,7 +48,14 @@ export function Profile({
   const choices = [...POPULAR, MIXED];
 
   return (
-    <div className="results profile">
+    <div className="results profile sugg">
+      <div className="results-bar">
+        <Logo />
+        <button className="linklike" onClick={onDone}>
+          Back to the plan
+        </button>
+      </div>
+
       <header className="results-head">
         <div className="results-pet">
           <Face id={breed.face} className="reactive" />
