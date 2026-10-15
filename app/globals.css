@@ -4567,3 +4567,166 @@ body:has(.stage-card) {
 .slider-end {
   color: var(--muted);
 }
+
+/* House rules for chewing and nipping: numbered cards in one row. */
+.s-rules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.s-rules li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #fbf3e8;
+}
+
+.s-rules .s-num {
+  padding: 0;
+  font-size: 13px;
+}
+
+.s-rules strong {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.s-rules li > span:not(.s-num) {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.s-rules em {
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* Toilet training: a two-way switch, then the steps for that way. */
+.s-toilet {
+  padding: clamp(22px, 3.4vw, 36px);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #f4f6fb;
+}
+
+.s-switch {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.s-switch button {
+  padding: 9px 18px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--muted);
+  transition: background 0.2s, color 0.2s;
+}
+
+.s-switch button[aria-selected="true"] {
+  background: var(--ink);
+  color: #fff;
+}
+
+.s-toilet > .s-muted {
+  margin: 0 0 20px !important;
+  font-size: 15px;
+}
+
+.s-steps {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.s-steps li {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  align-items: baseline;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.s-steps .s-num {
+  padding: 0;
+  font-size: 13px;
+}
+
+.s-toilet-note {
+  margin: 18px 0 0 !important;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.s-trainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 18px 22px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.2s;
+}
+
+.s-trainer:hover {
+  border-color: rgba(17, 17, 17, 0.25);
+}
+
+.s-trainer > span {
+  display: grid;
+  gap: 2px;
+}
+
+.s-trainer strong {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.s-trainer span span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.sugg a.s-trainer,
+.sugg a.s-trainer strong {
+  color: var(--ink);
+}
+
+/* Jumping to a section leaves room for the top bar. */
+.sugg [id] {
+  scroll-margin-top: 90px;
+}

@@ -18,7 +18,9 @@ export type Problem = {
   // Age bands where this is common enough to be ticked for the owner.
   common: AgeBand[];
   // Which written guide answers it. Problems without one show as "still being written".
-  guide?: "calm";
+  //   calm   – sniffing and chewing (biting, chewing and restlessness all go here)
+  //   toilet – toilet training (accidents and marking indoors)
+  guide?: "calm" | "toilet";
   draft?: boolean;
 };
 
@@ -28,13 +30,13 @@ export const PROBLEMS: Problem[] = [
   { id: "busy", label: "Always wants something to do", common: ["puppy", "adolescent", "adult"], guide: "calm" },
   { id: "settle", label: "Can't settle", common: ["adolescent", "adult"], guide: "calm" },
   // Drafted: both the wording and the ages they are ticked for.
-  { id: "nip", label: "Nips and mouths hands", common: ["puppy"], draft: true },
-  { id: "toilet", label: "Toilet accidents indoors", common: ["puppy"], draft: true },
+  { id: "nip", label: "Nips and mouths hands", common: ["puppy"], guide: "calm", draft: true },
+  { id: "toilet", label: "Toilet accidents indoors", common: ["puppy"], guide: "toilet", draft: true },
   { id: "pull", label: "Pulls on the lead", common: ["adolescent"], draft: true },
   { id: "bark", label: "Barks a lot", common: [], draft: true },
   { id: "alone", label: "Struggles when left alone", common: [], draft: true },
-  { id: "mark", label: "Marks indoors or humps", common: [], draft: true },
-  { id: "night", label: "Restless at night", common: ["senior"], draft: true },
+  { id: "mark", label: "Marks indoors or humps", common: [], guide: "toilet", draft: true },
+  { id: "night", label: "Restless at night", common: ["senior"], guide: "calm", draft: true },
 ];
 
 export function commonProblems(band: AgeBand) {
@@ -73,6 +75,63 @@ export const CALM = {
   } as Record<AgeBand, { text: string; draft?: boolean }>,
   professional: "If your dog seems distressed, hurts themselves or shows aggression, talk to a vet or a trainer.",
   nextStep: "Tonight, before dinner: one sock, five treats, two minutes.",
+};
+
+// ---------- when they chew or bite the wrong thing ----------
+
+// Meghna's own advice. Shown when the owner ticks chewing or nipping.
+// Only the `note` on the first rule was added by Claude.
+export const HOUSE_RULES = {
+  title: "When they chew the wrong thing",
+  lead: "Give the chewing somewhere to go, make the furniture boring, and reward the good stuff.",
+  rules: [
+    {
+      word: "Make it taste bad",
+      line: "Spray apple cider vinegar on the furniture they go for. Neem oil works too.",
+      note: "Mix the vinegar half and half with water, try it on a hidden patch first, and never spray the dog.",
+      noteDraft: true,
+    },
+    { word: "Catch them in the act", line: "Say a stern \"No\" only when you catch them doing it. Scolding later is pointless: they don't remember what they did." },
+    { word: "Never hit", line: "A firm word is all it takes. Please don't hit your dog." },
+    { word: "Reward the good", line: "Every time they choose their own toy or chew, praise them and give them a treat." },
+  ],
+};
+
+// ---------- toilet training ----------
+
+// Meghna's own advice. Shown when the owner ticks toilet accidents or
+// marking indoors. Two ways in, depending on the owner's day.
+export const TOILET = {
+  title: "Toilet training",
+  lead: "Positive reinforcement all the way. Reward them for going in the right place, every single time.",
+  paths: [
+    {
+      id: "pads",
+      label: "Pee pads",
+      forWho: "For apartments, and for anyone who has to leave their dog alone for long stretches.",
+      steps: [
+        "Put a pee pad on the spot where they last peed, so they can sniff it and go there again.",
+        "Puppies pee often. In a few days you'll have an idea of how long they go between pees.",
+        "Around the time they're due, take them to the pad and keep repeating \"go pee\".",
+        "If they go on the pad, or even near it, give them a treat. If not, go back to step 1.",
+        "Once they use the pad every time, slowly move it towards where you want it. They'll follow it there.",
+      ],
+    },
+    {
+      id: "outside",
+      label: "Going outside",
+      forWho: "For anyone who can take their dog out when they need to go.",
+      steps: [
+        "Take them out around the times they're likely to go. Puppies usually poop right after eating.",
+        "Go every time you think they might. It takes time, and that's fine.",
+        "When they go outside, reward them straight away with a treat and a \"good boy\" or \"good girl\".",
+        "Keep at it. Slowly they understand that outside is the place to go.",
+      ],
+    },
+  ],
+  // Shown when marking indoors is ticked.
+  mark: { text: "Marking indoors is handled the same way: catch them in the act with a stern \"No\", take them to the right spot, and reward them when they go there.", draft: true },
+  trainer: { name: "Zak George", url: "https://www.youtube.com/@zakgeorge", line: "A dog trainer on YouTube who teaches with rewards. Good to follow for toilet training and much more." },
 };
 
 // ---------- why a walk is not enough ----------

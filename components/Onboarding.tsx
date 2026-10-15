@@ -587,7 +587,8 @@ export default function Onboarding() {
         </motion.section>
       </AnimatePresence>
 
-      <HandCursor />
+      {/* The hand belongs to the onboarding; the plan and profile use the normal pointer. */}
+      {step !== "done" && step !== "profile" && <HandCursor />}
     </main>
   );
 }

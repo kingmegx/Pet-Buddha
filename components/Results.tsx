@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
-import { ACTIVITIES, CALM, CHECKED, KINDS, NEUTER_FOR, PROBLEMS, STORES, WHY, neuterNote, pickProducts, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
+import { ACTIVITIES, CALM, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, WHY, neuterNote, pickProducts, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
@@ -14,6 +14,8 @@ import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
 //   What's good for my dog?   a one-line answer, then why a walk is not enough
 //   What do I need?           three kinds of things, what to look for, a few picks
 //   How do I get more help?   edit the profile, what is still being written, shops
+// Chewing and nipping also get the house rules; toilet accidents and marking
+// get the toilet training guide.
 // Only the sock trick animates on its own; everything else responds to taps
 // and hovers, and each section fades in once. Styles are in globals.css under ".sugg".
 
@@ -120,6 +122,48 @@ function ProductCard({ p, open, onToggle, who, needs }: { p: Product; open: bool
   );
 }
 
+// Toilet training: two ways in, picked with a switch, each a short numbered list.
+function Toilet({ who, sex, marks }: { who: string; sex: Sex | null; marks: boolean }) {
+  const [path, setPath] = useState(TOILET.paths[0].id);
+  const chosen = TOILET.paths.find((p) => p.id === path)!;
+  // "good boy" or "good girl" in the steps becomes just the right one when we know.
+  const praise = (line: string) => (sex === "boy" ? line.replace(' or "good girl"', "") : sex === "girl" ? line.replace('"good boy" or ', "") : line);
+  return (
+    <Scene id="toilet" className="s-sec">
+      <h2>{TOILET.title}</h2>
+      <p className="s-lead">{TOILET.lead}</p>
+      <div className="s-toilet">
+        <div className="s-switch" role="tablist" aria-label={`How ${who} will go`}>
+          {TOILET.paths.map((p) => (
+            <button key={p.id} role="tab" aria-selected={p.id === path} onClick={() => setPath(p.id)}>
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <p className="s-muted">{chosen.forWho}</p>
+        <AnimatePresence mode="wait">
+          <motion.ol key={path} className="s-steps" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            {chosen.steps.map((line, i) => (
+              <li key={line}>
+                <span className="s-num">0{i + 1}</span>
+                <span>{praise(line)}</span>
+              </li>
+            ))}
+          </motion.ol>
+        </AnimatePresence>
+        {marks && <p className="s-toilet-note">{TOILET.mark.text}</p>}
+      </div>
+      <a className="s-trainer" href={TOILET.trainer.url} target="_blank" rel="noreferrer">
+        <span>
+          <strong>Learn from a trainer: {TOILET.trainer.name}</strong>
+          <span>{TOILET.trainer.line}</span>
+        </span>
+        <i className="chev chev-right" aria-hidden />
+      </a>
+    </Scene>
+  );
+}
+
 const ICONS: Record<string, () => React.ReactNode> = { walk: WalkIcon, fetch: BallIcon, sniff: SniffIcon, chew: ChewIcon };
 
 // Why a longer walk will not fix it: every activity side by side, scored
@@ -188,6 +232,8 @@ export function Results({
   const chosen = PROBLEMS.filter((p) => needs.includes(p.id));
   const calm = chosen.filter((p) => p.guide === "calm");
   const waiting = chosen.filter((p) => !p.guide);
+  const toilet = chosen.some((p) => p.guide === "toilet");
+  const rules = needs.includes("chew") || needs.includes("nip");
   const neuter = chosen.some((p) => NEUTER_FOR.includes(p.id)) ? neuterNote(sex, months) : null;
   const breedName = pet.face === "mixed" && pet.name.startsWith("Mixed") ? "Mixed breed" : pet.name;
   const who = name || "your dog";
@@ -217,6 +263,10 @@ export function Results({
             <h1>
               {Who} needs work for the <span className="hl">nose</span>, not more for the <span className="dim">legs</span>.
             </h1>
+          ) : toilet ? (
+            <h1>
+              {Who} can learn where to go, one <span className="hl">treat</span> at a time.
+            </h1>
           ) : (
             <h1>Here's where we are with {who}.</h1>
           )}
@@ -226,9 +276,9 @@ export function Results({
             </p>
           )}
           <div className="s-top-actions">
-            {calm.length > 0 && (
-              <a className="pill" href="#what">
-                See what helps <span className="arrow arrow-down" aria-hidden />
+            {(calm.length > 0 || toilet) && (
+              <a className="pill" href={calm.length > 0 ? "#what" : "#toilet"}>
+                {calm.length > 0 ? "See what helps" : "See the steps"} <span className="arrow arrow-down" aria-hidden />
               </a>
             )}
             <button className="linklike" onClick={onProfile}>
@@ -322,6 +372,25 @@ export function Results({
           </Scene>
         </>
       )}
+
+      {rules && (
+        <Scene className="s-sec">
+          <h2>{HOUSE_RULES.title}</h2>
+          <p className="s-lead">{HOUSE_RULES.lead}</p>
+          <ol className="s-rules">
+            {HOUSE_RULES.rules.map((r, i) => (
+              <li key={r.word}>
+                <span className="s-num">0{i + 1}</span>
+                <strong>{r.word}</strong>
+                <span>{r.line}</span>
+                {"note" in r && r.note && <em>{r.note}</em>}
+              </li>
+            ))}
+          </ol>
+        </Scene>
+      )}
+
+      {toilet && <Toilet who={who} sex={sex} marks={needs.includes("mark")} />}
 
       {/* 3. How do I get more help */}
       <Scene className="s-sec">
