@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AGE_STOPS, MIXED, POPULAR, WEIGHT_RANGE, formatAge, searchBreeds, type Breed } from "@/lib/flow";
-import { PROBLEMS, type ProblemId, type Sex } from "@/lib/content";
+import { BOWLS, PROBLEMS, type Bowl, type ProblemId, type Sex } from "@/lib/content";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import Slider from "./Slider";
@@ -24,6 +24,8 @@ export function Profile({
   setSex,
   needs,
   setNeeds,
+  bowl,
+  setBowl,
   onDone,
 }: {
   name: string;
@@ -40,6 +42,8 @@ export function Profile({
   setSex: (s: Sex) => void;
   needs: ProblemId[];
   setNeeds: (fn: (now: ProblemId[]) => ProblemId[]) => void;
+  bowl: Bowl | null;
+  setBowl: (b: Bowl) => void;
   onDone: () => void;
 }) {
   const [typed, setTyped] = useState("");
@@ -146,9 +150,31 @@ export function Profile({
         </div>
 
         <div className="profile-row">
+          <span>Eats</span>
+          <div className="chips chips-left">
+            {BOWLS.map((b) => (
+              <button key={b.id} className="chip" aria-pressed={bowl === b.id} onClick={() => setBowl(b.id)}>
+                {b.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="profile-row">
+          <span>Body</span>
+          <div className="chips chips-left">
+            {PROBLEMS.filter((p) => p.body).map((p) => (
+              <button key={p.id} className="chip" aria-pressed={needs.includes(p.id)} onClick={() => setNeeds((now) => (now.includes(p.id) ? now.filter((x) => x !== p.id) : [...now, p.id]))}>
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="profile-row">
           <span>Needs help with</span>
           <div className="chips chips-left">
-            {PROBLEMS.map((p) => (
+            {PROBLEMS.filter((p) => !p.body).map((p) => (
               <button key={p.id} className="chip" aria-pressed={needs.includes(p.id)} onClick={() => setNeeds((now) => (now.includes(p.id) ? now.filter((x) => x !== p.id) : [...now, p.id]))}>
                 {p.label}
               </button>
@@ -157,7 +183,7 @@ export function Profile({
         </div>
       </section>
 
-      <button className="pill" disabled={needs.length === 0} onClick={onDone}>
+      <button className="pill" onClick={onDone}>
         Show suggestions <span className="arrow" aria-hidden />
       </button>
     </div>

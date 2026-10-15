@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { AGE_STOPS, MIXED, POPULAR, WEIGHT_RANGE, ageBand, formatAge, monthsSince, searchBreeds, type Breed } from "@/lib/flow";
-import { PROBLEMS, commonProblems, type ProblemId, type Sex } from "@/lib/content";
+import { BOWLS, PROBLEMS, commonProblems, type Bowl, type ProblemId, type Sex } from "@/lib/content";
 import { Face } from "./Faces";
 import { CatBust, ProfileBust } from "./Busts";
 import { NicheArt } from "./NicheArt";
@@ -17,7 +17,7 @@ import { Profile } from "./Profile";
 import Slider from "./Slider";
 import HandCursor from "./HandCursor";
 
-type Step = "landing" | "species" | "name" | "breed" | "weight" | "age" | "sex" | "needs" | "curating" | "done" | "profile";
+type Step = "landing" | "species" | "name" | "breed" | "weight" | "age" | "sex" | "needs" | "food" | "curating" | "done" | "profile";
 
 const pop = { type: "spring", stiffness: 260, damping: 18 } as const;
 
@@ -73,6 +73,8 @@ export default function Onboarding() {
   const [needs, setNeeds] = useState<ProblemId[]>([]);
   // Once the owner has ticked or unticked anything, their list is left alone.
   const [needsTouched, setNeedsTouched] = useState(false);
+  // What is in the bowl now, from the food step.
+  const [bowl, setBowl] = useState<Bowl | null>(null);
   const [cheer, setCheer] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [packMood, setPackMood] = useState<PackMood>("idle");
@@ -139,6 +141,7 @@ export default function Onboarding() {
     setDob("");
     setNeeds([]);
     setNeedsTouched(false);
+    setBowl(null);
   };
 
   // The curating screen is a short pause before the results.
@@ -151,11 +154,11 @@ export default function Onboarding() {
   // Later flows will read this instead of asking again.
   useEffect(() => {
     if ((step !== "done" && step !== "profile") || !pet) return;
-    const profile = { name: name.trim() || null, breed: pet.name, ageMonths: months, dateOfBirth: dobMonths !== null ? dob : null, weightKg: kg, weightSure, sex, needs };
+    const profile = { name: name.trim() || null, breed: pet.name, ageMonths: months, dateOfBirth: dobMonths !== null ? dob : null, weightKg: kg, weightSure, sex, needs, bowl };
     try {
       localStorage.setItem("petbuddha.profile", JSON.stringify(profile));
     } catch {}
-  }, [step, pet, name, months, dobMonths, dob, kg, weightSure, sex, needs]);
+  }, [step, pet, name, months, dobMonths, dob, kg, weightSure, sex, needs, bowl]);
 
   // Eyebrow, title and the line under the title, per step.
   const titles: Record<Step, [string, string, string]> = {
@@ -167,6 +170,7 @@ export default function Onboarding() {
     age: ["Step 5", `How old is ${who}?`, "Age decides what is safe, and what they need."],
     sex: ["Step 6", "Good boy or good girl?", "A few behaviours differ between the two."],
     needs: ["Step 7", "What do you need help with?", `We ticked what is common at ${formatAge(months)}. Untick anything that isn't true for ${who}.`],
+    food: ["Step 8", `What's in ${who}'s bowl?`, "And tick anything you've noticed about their body."],
     curating: ["One moment", `Putting it together for ${who}`, ""],
     done: ["", "", ""],
     profile: ["", "", ""],
@@ -174,7 +178,7 @@ export default function Onboarding() {
   const [eyebrow, title, sub] = titles[step];
 
   // How far through the flow we are, for the bar along the top.
-  const ORDER: Step[] = ["landing", "species", "name", "breed", "weight", "age", "sex", "needs", "curating", "done"];
+  const ORDER: Step[] = ["landing", "species", "name", "breed", "weight", "age", "sex", "needs", "food", "curating", "done"];
   const progress = step === "profile" ? 1 : ORDER.indexOf(step) / (ORDER.length - 1);
 
   // Where the picked pet sits. It moves up and shrinks on steps with taller
@@ -184,6 +188,7 @@ export default function Onboarding() {
     age: { top: "36%", scale: 0.92 },
     sex: { top: "44%", scale: 1.08 },
     needs: { top: "30%", scale: 0.7 },
+    food: { top: "30%", scale: 0.7 },
   };
   const hero = HERO[step];
 
@@ -527,7 +532,7 @@ export default function Onboarding() {
           {step === "needs" && (
             <div className="controls">
               <div className="chips">
-                {PROBLEMS.map((p) => (
+                {PROBLEMS.filter((p) => !p.body).map((p) => (
                   <button
                     key={p.id}
                     className="chip"
@@ -542,7 +547,45 @@ export default function Onboarding() {
                   </button>
                 ))}
               </div>
-              <button className="pill" disabled={needs.length === 0} onClick={() => go("curating")}>
+              <button className="pill" onClick={() => go("food")}>
+                Next <span className="arrow" aria-hidden />
+              </button>
+            </div>
+          )}
+
+          {step === "food" && (
+            <div className="controls">
+              <div className="chips" role="radiogroup" aria-label="What they eat">
+                {BOWLS.map((b) => (
+                  <button
+                    key={b.id}
+                    className="chip chip-big"
+                    role="radio"
+                    aria-checked={bowl === b.id}
+                    aria-pressed={bowl === b.id}
+                    onClick={() => {
+                      setBowl(b.id);
+                      celebrate();
+                    }}
+                  >
+                    {b.label}
+                  </button>
+                ))}
+              </div>
+              <p className="hint">Anything about their body?</p>
+              <div className="chips chips-quiet">
+                {PROBLEMS.filter((p) => p.body).map((p) => (
+                  <button
+                    key={p.id}
+                    className="chip"
+                    aria-pressed={needs.includes(p.id)}
+                    onClick={() => setNeeds((now) => (now.includes(p.id) ? now.filter((x) => x !== p.id) : [...now, p.id]))}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+              <button className="pill" onClick={() => go("curating")}>
                 Show me <span className="arrow" aria-hidden />
               </button>
             </div>
@@ -579,11 +622,13 @@ export default function Onboarding() {
                 setNeedsTouched(true);
                 setNeeds(fn);
               }}
+              bowl={bowl}
+              setBowl={setBowl}
               onDone={() => setStep("done")}
             />
           )}
 
-          {step === "done" && pet && <Results pet={pet} name={cap(name)} months={months} kg={kg} weightSure={weightSure} sex={sex} needs={needs} onProfile={() => setStep("profile")} onRestart={restart} />}
+          {step === "done" && pet && <Results pet={pet} name={cap(name)} months={months} kg={kg} weightSure={weightSure} sex={sex} needs={needs} bowl={bowl} onProfile={() => setStep("profile")} onRestart={restart} />}
         </motion.section>
       </AnimatePresence>
 

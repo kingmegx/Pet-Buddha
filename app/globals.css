@@ -4730,3 +4730,688 @@ body:has(.stage-card) {
 .sugg [id] {
   scroll-margin-top: 90px;
 }
+
+.s-avoid {
+  margin: 18px 0 0 !important;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: #fdeee9;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.s-avoid strong,
+.s-toilet-note strong {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+/* ---------- suggestions, rebuilt to be scanned ----------
+   Hierarchy, top to bottom: the aha (h1), three things this week (checkable),
+   the plan in tabs (each tab: aha, short tips, don't, get help, people),
+   then more help. Cards share one radius (20-24px) and hairline borders;
+   colour only comes from soft fills that mark what kind of thing a box is:
+   blue for plan, peach for "don't", green for "get help". */
+
+/* What the owner told us, as small tags on the ID card. */
+.s-id-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.s-id-tags li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f4f6fb;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Three things this week */
+.s-week {
+  margin-top: clamp(28px, 5vh, 48px);
+}
+
+.s-week-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.s-week-head h2 {
+  margin: 0;
+  font-size: clamp(20px, 2.2vw, 26px) !important;
+}
+
+.s-week-head > span {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.s-week ol {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.s-check {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  height: 100%;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: #fff;
+  text-align: left;
+  color: var(--ink);
+  transition: background 0.25s, border-color 0.25s, transform 0.3s var(--spring);
+}
+
+.s-check:hover {
+  border-color: rgba(17, 17, 17, 0.22);
+}
+
+.s-check:active {
+  transform: scale(0.98);
+}
+
+.s-check.is-on {
+  background: #eef7f2;
+  border-color: transparent;
+}
+
+.s-box {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid rgba(17, 17, 17, 0.25);
+  border-radius: 8px;
+  background: #fff;
+  transition: background 0.2s, border-color 0.2s, transform 0.35s var(--spring);
+}
+
+.s-box svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  transition: stroke-dashoffset 0.3s ease 0.05s;
+}
+
+.s-check.is-on .s-box {
+  background: #1f8a5b;
+  border-color: #1f8a5b;
+  transform: scale(1.1);
+}
+
+.s-check.is-on .s-box svg {
+  stroke-dashoffset: 0;
+}
+
+.s-check-text {
+  display: grid;
+  gap: 3px;
+}
+
+.s-check-text .s-num {
+  padding: 0;
+  font-size: 12px;
+}
+
+.s-check-text strong {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.s-check.is-on .s-check-text strong {
+  text-decoration: line-through;
+  text-decoration-color: rgba(17, 17, 17, 0.35);
+}
+
+.s-check-text > span:last-child {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* The plan, in tabs */
+.s-plan {
+  margin-top: clamp(40px, 8vh, 72px);
+}
+
+.s-tabs {
+  position: sticky;
+  top: 61px;
+  z-index: 4;
+  display: flex;
+  gap: 4px;
+  padding: 10px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 61px;
+}
+
+.s-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.s-tabs button {
+  position: relative;
+  flex: none;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+
+.s-tabs button:hover {
+  color: var(--ink);
+}
+
+.s-tabs button[aria-selected="true"] {
+  color: #fff;
+}
+
+.s-tab-pill {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--ink);
+}
+
+.s-tab-label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.s-tab-icon {
+  display: none;
+}
+
+.s-panel {
+  padding-top: clamp(24px, 4vh, 40px);
+}
+
+.s-panel-head h2 {
+  margin: 0 0 8px;
+  font-size: clamp(24px, 3vw, 36px) !important;
+  max-width: 22ch;
+}
+
+.s-panel-head p {
+  margin: 0 0 8px !important;
+  max-width: 58ch !important;
+  font-size: 17px !important;
+  line-height: 1.5 !important;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.s-subhead {
+  margin: 32px 0 14px;
+}
+
+.s-subhead h3 {
+  margin: 0;
+  font-size: 18px !important;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.s-subhead p {
+  margin: 4px 0 0 !important;
+  font-size: 15px !important;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* Short tips: a bold few words and one line, in a grid of cards. */
+.s-tips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.s-tips li {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: #f4f6fb;
+  animation: tip-in 0.45s calc(var(--i) * 0.05s) var(--glide) both;
+}
+
+@keyframes tip-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.s-tips .s-num {
+  padding: 0;
+  font-size: 12px;
+}
+
+.s-tips strong {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.s-tips li > span:last-child {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* Inside a tab the kinds of things are not numbered sections any more. */
+.s-panel .s-kind-head {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.s-panel .s-kind {
+  padding-top: 20px;
+}
+
+/* A section folded away until asked for. */
+.s-fold {
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+
+.s-fold-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 20px;
+  text-align: left;
+  color: var(--ink);
+}
+
+.s-fold-btn > span {
+  display: grid;
+  gap: 2px;
+}
+
+.s-fold-btn strong {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.s-fold-btn > span > span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.s-fold .s-compare {
+  margin: 0 12px 12px;
+}
+
+/* Don't, and when to get help. */
+.s-careful {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.s-careful .s-avoid,
+.s-gethelp {
+  margin: 0 !important;
+  padding: 16px 20px;
+  border-radius: 20px;
+  font-size: 15px !important;
+  font-weight: 500;
+  line-height: 1.5 !important;
+  color: var(--muted);
+}
+
+.s-gethelp {
+  background: #eef7f2;
+}
+
+.s-gethelp strong {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+/* People to follow */
+.s-experts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.s-expert {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fff;
+}
+
+.s-expert-kind {
+  align-self: flex-start;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #f4f6fb;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.s-expert strong {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.s-expert-what {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.s-expert-where {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.s-expert-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 4px;
+}
+
+.sugg .s-expert-links a {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: rgba(17, 17, 17, 0.25);
+  text-underline-offset: 3px;
+}
+
+.sugg .s-expert-links a:hover {
+  text-decoration-color: var(--ink);
+}
+
+/* Coming soon on the Food tab */
+.s-soon {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 20px 22px;
+  border: 1px dashed rgba(17, 17, 17, 0.2);
+  border-radius: 20px;
+}
+
+.s-soon-tag {
+  justify-self: start;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.s-soon strong {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.s-soon > span:last-child {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* At the end of a tab: go to the next one. */
+.s-next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 28px;
+  padding: 18px 22px;
+  border-radius: 20px;
+  background: var(--ink);
+  color: #fff;
+  text-align: left;
+  transition: transform 0.3s var(--spring);
+}
+
+.s-next:hover {
+  transform: translateY(-2px);
+}
+
+.s-next > span:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.s-next .s-muted {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+}
+
+.s-next strong {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.s-everyone {
+  margin-top: 20px;
+}
+
+.s-everyone-group {
+  padding: 0 16px 16px;
+}
+
+.s-everyone-group h3 {
+  margin: 8px 0 10px;
+  font-size: 14px !important;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+/* The body chips on the food step sit under the bowl choice, a size down. */
+.chips-quiet {
+  max-width: 560px;
+}
+
+@media (max-width: 760px) {
+  .s-week ol {
+    grid-template-columns: 1fr;
+  }
+
+  .s-panel .s-kind-head {
+    grid-template-columns: 1fr;
+  }
+
+  .s-tabs button {
+    padding: 9px 14px;
+    font-size: 14px;
+  }
+}
+
+/* Without its own heading, the first tab starts straight at "Do this". */
+.s-panel > .s-subhead:first-child {
+  margin-top: 0;
+}
+
+.s-more {
+  margin-top: 12px;
+}
+
+.s-panel-head h2 {
+  max-width: 28ch;
+}
+
+@media (max-width: 760px) {
+  /* A hint that the tab row scrolls sideways. */
+  .s-tabs {
+    -webkit-mask-image: linear-gradient(to right, #000 85%, transparent);
+    mask-image: linear-gradient(to right, #000 85%, transparent);
+  }
+
+  /* On a phone, tips are compact rows rather than tall cards. */
+  .s-tips {
+    gap: 8px;
+  }
+
+  .s-tips li {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    column-gap: 8px;
+    row-gap: 2px;
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+
+  .s-tips .s-num {
+    grid-row: span 2;
+    padding-top: 3px;
+  }
+
+  .s-tips strong {
+    font-size: 16px;
+  }
+}
+
+.s-id-tags {
+  grid-column: 1 / -1;
+}
+
+/* The fresh food ladder: four steps on one track that fills up to the one picked. */
+.s-ladder {
+  display: grid;
+  gap: 14px;
+}
+
+.s-rungs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.s-rung-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: #eef7f2;
+}
+
+.s-rungs button {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding: 14px 16px;
+  text-align: left;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+
+.s-rungs button + button {
+  border-left: 1px solid var(--line);
+}
+
+.s-rungs strong {
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.s-rungs span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.s-rungs button.is-in {
+  color: var(--ink);
+}
+
+.s-rungs button[aria-selected="true"] strong {
+  color: #1f8a5b;
+}
+
+.sugg .s-note a {
+  color: var(--ink);
+}
+
+@media (max-width: 760px) {
+  .s-rungs button {
+    padding: 12px 10px;
+  }
+
+  .s-rungs span {
+    font-size: 11px;
+  }
+}
+
+.s-week h2 {
+  margin: 0 0 14px;
+  font-size: clamp(20px, 2.2vw, 26px) !important;
+}
+
+.s-week .s-tips {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* Cards in a row share a height; keep their text at the top. */
+.s-tips li {
+  align-content: start;
+  justify-content: flex-start;
+}

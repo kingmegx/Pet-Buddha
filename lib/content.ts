@@ -10,7 +10,7 @@ export type Sex = "boy" | "girl";
 
 // ---------- what do you need help with? ----------
 
-export type ProblemId = "chew" | "busy" | "settle" | "nip" | "toilet" | "pull" | "bark" | "alone" | "mark" | "night";
+export type ProblemId = "chew" | "busy" | "settle" | "nip" | "toilet" | "pull" | "bark" | "alone" | "mark" | "night" | "itch" | "ticks" | "coat" | "tummy" | "picky" | "weight";
 
 export type Problem = {
   id: ProblemId;
@@ -20,7 +20,11 @@ export type Problem = {
   // Which written guide answers it. Problems without one show as "still being written".
   //   calm   – sniffing and chewing (biting, chewing and restlessness all go here)
   //   toilet – toilet training (accidents and marking indoors)
-  guide?: "calm" | "toilet";
+  //   steps  – short tips in lib/plan.ts (pulling, barking, being alone)
+//   body   – the Food and Skin tabs in lib/plan.ts
+  guide?: "calm" | "toilet" | "steps" | "body";
+  // Asked on the food step ("Anything about their body?") instead of with the behaviours.
+  body?: boolean;
   draft?: boolean;
 };
 
@@ -32,11 +36,27 @@ export const PROBLEMS: Problem[] = [
   // Drafted: both the wording and the ages they are ticked for.
   { id: "nip", label: "Nips and mouths hands", common: ["puppy"], guide: "calm", draft: true },
   { id: "toilet", label: "Toilet accidents indoors", common: ["puppy"], guide: "toilet", draft: true },
-  { id: "pull", label: "Pulls on the lead", common: ["adolescent"], draft: true },
-  { id: "bark", label: "Barks a lot", common: [], draft: true },
-  { id: "alone", label: "Struggles when left alone", common: [], draft: true },
+  { id: "pull", label: "Pulls on the lead", common: ["adolescent"], guide: "steps", draft: true },
+  { id: "bark", label: "Barks a lot", common: [], guide: "steps", draft: true },
+  { id: "alone", label: "Struggles when left alone", common: [], guide: "steps", draft: true },
   { id: "mark", label: "Marks indoors or humps", common: [], guide: "toilet", draft: true },
   { id: "night", label: "Restless at night", common: ["senior"], guide: "calm", draft: true },
+  // Asked on the food step. Answered in the Food and Skin tabs (lib/plan.ts).
+  { id: "itch", label: "Itchy skin", common: [], guide: "body", body: true, draft: true },
+  { id: "ticks", label: "Ticks and fleas", common: [], guide: "body", body: true, draft: true },
+  { id: "coat", label: "Shedding or smelly coat", common: [], guide: "body", body: true, draft: true },
+  { id: "tummy", label: "Upset tummy", common: [], guide: "body", body: true, draft: true },
+  { id: "picky", label: "Picky eater", common: [], guide: "body", body: true, draft: true },
+  { id: "weight", label: "Carrying extra weight", common: [], guide: "body", body: true, draft: true },
+];
+
+// What is in the bowl now. Asked on the food step.
+export type Bowl = "kibble" | "home" | "fresh" | "mix";
+export const BOWLS: { id: Bowl; label: string }[] = [
+  { id: "kibble", label: "Packaged food" },
+  { id: "home", label: "Home-cooked" },
+  { id: "fresh", label: "Fresh or raw" },
+  { id: "mix", label: "A mix" },
 ];
 
 export function commonProblems(band: AgeBand) {
@@ -133,6 +153,10 @@ export const TOILET = {
   mark: { text: "Marking indoors is handled the same way: catch them in the act with a stern \"No\", take them to the right spot, and reward them when they go there.", draft: true },
   trainer: { name: "Zak George", url: "https://www.youtube.com/@zakgeorge", line: "A dog trainer on YouTube who teaches with rewards. Good to follow for toilet training and much more." },
 };
+
+// ---------- the other guides ----------
+
+// Pulling, barking and being alone are answered in short tips in lib/plan.ts.
 
 // ---------- why a walk is not enough ----------
 
