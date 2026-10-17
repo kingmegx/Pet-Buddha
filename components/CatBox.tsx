@@ -7,10 +7,9 @@ import { motion } from "motion/react";
 // letterbox slot cut in the front and a cat hiding inside. The eyes are
 // bigger than the slot, so its edges crop them: the cat reads as sitting
 // behind the cardboard, not painted on it. The white-and-brown cat is the
-// exception: it has climbed up and peeks over the top of its box instead. On a loop the cat
-// looks around, blinks, curls both arms out of the slot, swipes with one of
-// them, pulls them back in and ducks out of sight. Hovering a box makes the
-// cat reach out and bat at the hand.
+// exception: it has climbed up and peeks over the top of its box instead. The
+// cats are kept calm: they look slowly from side to side and blink. (The arm
+// poses below are left in place in case swiping comes back.)
 //
 // Each arm is one thick line that bends between a few poses, so it unfurls
 // and swings like a real limb instead of popping in and out.
@@ -75,7 +74,7 @@ const RIGHT: Record<"tuck" | "curl" | "hang", Pose> = {
   hang: { d: "M156 152 C182 148 184 184 176 212", x: 175, y: 216, rotate: -8, scale: 1, opacity: 1 },
 };
 
-const LOOP = 9; // seconds for one full idle cycle
+const LOOP = 14; // seconds for one full idle cycle
 const LEFT_STEPS = ["tuck", "tuck", "curl", "hang", "hang", "reach", "swipe", "reach", "swipe", "hang", "curl", "tuck", "tuck"] as const;
 const LEFT_TIMES = [0, 0.455, 0.46, 0.55, 0.6, 0.66, 0.7, 0.74, 0.78, 0.85, 0.905, 0.91, 1];
 const RIGHT_STEPS = ["tuck", "tuck", "curl", "hang", "hang", "curl", "tuck", "tuck"] as const;
@@ -111,15 +110,17 @@ export function CatBox({ coat, brand, delay = 0 }: { coat: CatCoat; brand: BoxBr
     const quick = { duration: mode === "settle" ? 0.34 : 0.24, ease: "easeOut" as const };
     const swing = { duration: 0.27, repeat: Infinity, repeatType: "mirror" as const, ease: "easeInOut" as const };
 
+    // Calm by request: arms stay inside the box and the cat no longer ducks
+    // away. It only looks slowly from side to side and blinks.
     if (mode === "idle") {
       return {
-        left: column(LEFT_STEPS, LEFT),
-        leftT: loop(LEFT_TIMES),
-        right: column(RIGHT_STEPS, RIGHT),
-        rightT: loop(RIGHT_TIMES),
-        face: { y: [0, 0, 60, 60, 0] },
-        faceT: loop([0, 0.92, 0.95, 0.975, 1]),
-        look: { x: [0, -6, -6, 6, 6, 0, 0] },
+        left: still(LEFT.tuck),
+        leftT: quick,
+        right: still(RIGHT.tuck),
+        rightT: quick,
+        face: { y: 0 },
+        faceT: quick,
+        look: { x: [0, -4, -4, 4, 4, 0, 0] },
         lookT: loop([0, 0.07, 0.15, 0.23, 0.31, 0.37, 1]),
         blink: { scaleY: [1, 1, 0.08, 1, 1] },
         blinkT: loop([0, 0.395, 0.415, 0.435, 1]),
@@ -146,11 +147,6 @@ export function CatBox({ coat, brand, delay = 0 }: { coat: CatCoat; brand: BoxBr
       viewBox="0 0 300 250"
       data-pat
       aria-hidden
-      onPointerEnter={() => {
-        firstRun.current = false;
-        setMode("reach");
-      }}
-      onPointerLeave={() => setMode("settle")}
     >
       <polygon points="40,216 178,236 294,198 252,186" fill="rgba(33,30,28,0.2)" />
       <polygon points="108,62 252,74 232,36 100,28" fill="#f1d9c6" />

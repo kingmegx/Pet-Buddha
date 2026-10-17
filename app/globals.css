@@ -625,7 +625,7 @@ button.chip:active {
 .logo {
   position: relative;
   margin: 0;
-  font-family: var(--font-hand), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: clamp(52px, 9vw, 148px);
   font-weight: 400;
   letter-spacing: 0;
@@ -1990,7 +1990,7 @@ button.chip:active {
 
 .results h1,
 .results h2 {
-  font-family: var(--font-hand), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-weight: 400;
   letter-spacing: 0;
   color: var(--ink);
@@ -2018,7 +2018,7 @@ button.chip:active {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-family: var(--font-hand), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 28px;
   line-height: 1;
   -webkit-text-stroke: 0.02em var(--ink);
@@ -3680,7 +3680,7 @@ button.chip:active {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-family: var(--font-hand), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 26px;
   line-height: 1;
   color: var(--ink);
@@ -5033,7 +5033,7 @@ body:has(.stage-card) {
   letter-spacing: -0.02em;
 }
 
-.s-tips li > span:last-child {
+.s-tips li > span:not(.s-num) {
   font-size: 14px;
   font-weight: 500;
   line-height: 1.45;
@@ -5414,4 +5414,850 @@ body:has(.stage-card) {
 .s-tips li {
   align-content: start;
   justify-content: flex-start;
+}
+
+/* Food tab: toppers as scannable tags, grouped. */
+.s-toppers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.s-toppers > div {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+
+.s-toppers h4 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.s-toppers ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.s-toppers li {
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: #eef7f2;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.s-fold-body {
+  padding: 0 16px 16px;
+}
+
+.s-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 14px 0 0 !important;
+}
+
+.sugg .s-links a {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* Starch check */
+.s-starch > .s-muted {
+  margin: 0 0 14px !important;
+  font-size: 14px !important;
+}
+
+.s-starch-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+.s-starch-fields label {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.s-starch-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.s-starch-input input {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.s-starch-result {
+  display: grid;
+  gap: 2px;
+  margin-top: 14px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: #f4f6fb;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: background 0.3s;
+}
+
+.s-starch-result strong {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.s-starch-result[data-grade="Best"],
+.s-starch-result[data-grade="Better"],
+.s-starch-result[data-grade="Good"] {
+  background: #eef7f2;
+}
+
+.s-starch-result[data-grade="High in starch"] {
+  background: #fdeee9;
+}
+
+.s-skip {
+  margin: 14px 0 0 !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  color: var(--muted);
+}
+
+.s-skip strong {
+  color: var(--ink);
+}
+
+/* Which account a tip comes from. */
+.s-tips .s-src {
+  margin-top: 4px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  color: rgba(17, 17, 17, 0.45);
+}
+
+@media (max-width: 760px) {
+  .s-tips .s-src {
+    grid-column: 2;
+  }
+}
+
+.s-space {
+  margin-top: 12px;
+}
+
+/* Research papers, listed plainly. */
+.s-papers {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.s-papers li {
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: #f4f6fb;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.sugg .s-papers a {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.s-papers-cite {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(17, 17, 17, 0.45);
+}
+
+/* =====================================================================
+   v3: grown-up and calm.
+   Feedback: no blue, no boxed UI, fewer cards, smaller type and
+   illustrations, less empty space, nothing that feels like a children's
+   book. So: a plain white page; type at reading sizes; illustrations
+   scaled down; lists separated by hairlines instead of cards (cards are
+   kept only for products); the name set in Bricolage Grotesque.
+   ===================================================================== */
+
+/* The pointer is the normal one; the hand only appears to pat a pet. */
+.is-patting,
+.is-patting * {
+  cursor: none !important;
+}
+
+.hand {
+  margin: -8px 0 0 -29px;
+}
+
+.hand-pat {
+  animation: pat var(--pat) ease-in-out var(--pats) alternate both;
+}
+
+.hand-say {
+  left: 18px;
+  top: 18px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+/* ---- the name ---- */
+.logo,
+.logo-lockup,
+.brand {
+  font-family: var(--font-brand), sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  -webkit-text-stroke: 0;
+}
+
+.logo-lockup {
+  font-size: 22px;
+}
+
+.fact p {
+  font-family: inherit;
+}
+
+/* ---- landing: white page, no card, everything a size down ---- */
+.landing-bg {
+  background: #fff;
+}
+
+.paper {
+  inset: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.card-page {
+  --k: min(0.85vh, 0.6vw);
+}
+
+.landing-copy {
+  top: 18%;
+}
+
+.logo {
+  font-size: clamp(40px, 5.2vw, 76px);
+  line-height: 0.95;
+}
+
+.lede {
+  max-width: 34ch;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.floater {
+  height: calc(10 * var(--k));
+  margin-bottom: calc(2 * var(--k));
+}
+
+.niche {
+  top: 26%;
+  width: calc(26 * var(--k));
+  height: calc(36 * var(--k));
+}
+
+.n-left {
+  left: 12%;
+}
+
+.n-right {
+  right: 12%;
+}
+
+.fact {
+  bottom: clamp(20px, 6vh, 56px);
+}
+
+.fact strong {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.fact p {
+  font-size: 14px;
+}
+
+/* ---- questions: white page, smaller type and pictures ---- */
+html:has(.stage),
+body:has(.stage) {
+  background: #fff;
+}
+
+.title {
+  top: clamp(24px, 6vh, 56px);
+}
+
+.title .eyebrow {
+  font-size: 13px;
+}
+
+.title h1 {
+  font-size: clamp(24px, 3vw, 36px);
+  letter-spacing: -0.035em;
+}
+
+.title .sub {
+  margin-top: 6px;
+  font-size: 15px;
+}
+
+.progress {
+  height: 3px;
+}
+
+.hero {
+  width: clamp(120px, min(17vw, 22vh), 210px);
+}
+
+.hero .face::before {
+  display: none;
+}
+
+.nametag {
+  top: 30%;
+  width: clamp(180px, min(26vw, 32vh), 280px);
+}
+
+.field input {
+  height: 48px;
+  font-size: 16px;
+}
+
+.readout {
+  font-size: clamp(20px, 2.2vw, 26px);
+}
+
+.pill {
+  padding: 12px 22px;
+  font-size: 15px;
+}
+
+/* Cat or dog: the two halves sit closer in, smaller. */
+.sides {
+  inset: 22% 8% 6%;
+}
+
+.side-label {
+  font-size: clamp(24px, 3vw, 36px);
+  bottom: 0;
+}
+
+.side-dog .crowd {
+  inset: 6% 4% 16% 10%;
+}
+
+.side-cat .crowd {
+  inset: 6% 8% 16% 6%;
+}
+
+/* Breeds: faces on the page, no cards around them. */
+.tiles {
+  width: min(560px, 100%);
+  gap: 18px 12px;
+}
+
+.tile,
+.tile:hover {
+  padding: 6px 0;
+  border: 0;
+  background: none;
+}
+
+.tile .face {
+  width: min(100%, 12vh);
+}
+
+.tile .breed-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tile:hover .breed-name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.breed-pick .field input {
+  height: 44px;
+}
+
+/* ---- suggestions: hierarchy by type and hairlines, not boxes ---- */
+.s-top {
+  padding: clamp(32px, 6vh, 64px) 0 clamp(24px, 4vh, 40px);
+  grid-template-columns: minmax(0, 1fr) 260px;
+}
+
+.s-top h1 {
+  font-size: clamp(30px, 3.6vw, 46px) !important;
+  letter-spacing: -0.035em;
+  max-width: 18ch;
+}
+
+.s-sub {
+  font-size: 16px !important;
+}
+
+/* The dog's card becomes a quiet block beside the headline. */
+.s-id {
+  padding: 0 0 0 24px;
+  border: 0;
+  border-left: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
+  rotate: 0deg;
+  background: none;
+}
+
+.s-id-face {
+  width: 72px;
+  margin: 0 0 10px;
+  background: none !important;
+}
+
+.s-id-tags li {
+  background: none;
+  padding: 0;
+  font-size: 13px;
+}
+
+.s-id-tags li + li::before {
+  content: "· ";
+}
+
+.sugg h2,
+.s-week h2 {
+  font-size: clamp(20px, 2vw, 24px) !important;
+  letter-spacing: -0.03em;
+}
+
+.s-panel-head h2 {
+  font-size: clamp(22px, 2.4vw, 28px) !important;
+  max-width: 30ch;
+}
+
+.s-panel-head p,
+.s-lead {
+  font-size: 16px !important;
+}
+
+.s-subhead {
+  margin: 28px 0 8px;
+}
+
+.s-subhead h3 {
+  font-size: 13px !important;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.s-subhead p {
+  font-size: 14px !important;
+}
+
+/* Tips: rows in two columns, divided by hairlines. */
+.s-tips {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 32px;
+}
+
+.s-week .s-tips {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.s-tips li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  column-gap: 8px;
+  row-gap: 2px;
+  padding: 14px 0;
+  border-radius: 0;
+  border-top: 1px solid var(--line);
+  background: none;
+  animation: none;
+}
+
+.s-tips .s-num {
+  grid-row: span 3;
+  padding-top: 2px;
+  font-size: 12px;
+}
+
+.s-tips strong {
+  font-size: 15px;
+}
+
+.s-tips li > span:not(.s-num) {
+  font-size: 14px;
+}
+
+.s-tips .s-src {
+  grid-column: 2;
+}
+
+/* Grouped lists without boxes. */
+.s-toppers {
+  gap: 4px 32px;
+}
+
+.s-toppers > div {
+  padding: 12px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.s-toppers li {
+  background: none;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.s-toppers li + li::before {
+  content: "· ";
+  color: var(--muted);
+}
+
+.s-toppers ul {
+  gap: 2px 6px;
+}
+
+.s-fold {
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.s-fold + .s-fold {
+  border-top: 0;
+}
+
+.s-fold-btn {
+  padding: 14px 0;
+}
+
+.s-fold-body {
+  padding: 0 0 16px;
+}
+
+/* Don't and get help: labelled text, no coloured boxes. */
+.s-careful .s-avoid,
+.s-gethelp,
+.s-avoid {
+  padding: 14px 0;
+  border-radius: 0;
+  border-top: 1px solid var(--line);
+  background: none;
+}
+
+/* Rules, toilet steps and the ladder lose their fills. */
+.s-rules li {
+  padding: 14px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: none;
+}
+
+.s-toilet {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.s-steps li {
+  padding: 12px 0;
+  border-radius: 0;
+  border-top: 1px solid var(--line);
+  background: none;
+  font-size: 15px;
+}
+
+.s-rungs {
+  border-radius: 12px;
+}
+
+.s-papers li,
+.s-starch-result {
+  padding: 12px 0;
+  border-radius: 0;
+  border-top: 1px solid var(--line);
+  background: none !important;
+}
+
+.s-free {
+  padding: 24px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: none;
+}
+
+.s-soon {
+  border-radius: 12px;
+}
+
+/* People: a compact list, not a wall of cards. */
+.s-experts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 32px;
+}
+
+.s-expert {
+  padding: 14px 0;
+  gap: 3px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.s-expert-kind {
+  padding: 0;
+  background: none;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.s-expert strong {
+  font-size: 15px;
+}
+
+.s-expert-what {
+  font-size: 14px;
+}
+
+/* More help: a plain list. */
+.s-help {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 32px;
+}
+
+.s-help-card,
+.s-help-card:nth-child(2),
+.s-help-card:nth-child(3) {
+  padding: 16px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: none;
+}
+
+.s-next {
+  border-radius: 12px;
+}
+
+.s-sec {
+  padding-top: clamp(32px, 6vh, 56px);
+}
+
+.s-plan {
+  margin-top: clamp(32px, 6vh, 56px);
+}
+
+@media (max-width: 760px) {
+  .s-tips,
+  .s-week .s-tips,
+  .s-experts,
+  .s-help {
+    grid-template-columns: 1fr;
+  }
+
+  .s-id {
+    padding: 16px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .n-left {
+    left: 4%;
+  }
+
+  .n-right {
+    right: 4%;
+  }
+
+  .sides {
+    inset: 18% 4% 4%;
+  }
+}
+
+/* Keep the landing in one compact group: name, pair, then the fact close under. */
+.landing-copy {
+  top: 22%;
+}
+
+.niche {
+  top: 30%;
+}
+
+.fact {
+  top: 66%;
+  bottom: auto;
+}
+
+/* Controls sit just under the picture instead of at the bottom of the screen. */
+.screen .controls {
+  bottom: auto;
+}
+
+.screen-name .controls {
+  top: 52%;
+}
+
+.screen-weight .controls,
+.screen-sex .controls {
+  top: 50%;
+}
+
+.screen-age .controls {
+  top: 46%;
+}
+
+.screen-needs .controls,
+.screen-food .controls {
+  top: 37%;
+}
+
+.nametag {
+  top: 24%;
+}
+
+/* The patting hand is pointer-sized; its fingertips sit where the pointer's tip was. */
+.hand {
+  margin: -2px 0 0 -12px;
+}
+
+.hand-icon {
+  display: block;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+  transform-origin: 50% 100%;
+  animation: pat-small var(--pat) ease-in-out var(--pats) alternate both;
+}
+
+@keyframes pat-small {
+  from {
+    transform: translateY(0) rotate(0deg);
+  }
+  to {
+    transform: translateY(3px) rotate(-8deg);
+  }
+}
+
+/* Primary buttons: a quiet lift on hover, no heavy shadow. */
+.pill:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px -6px rgba(17, 17, 17, 0.35);
+}
+
+.pill:active:not(:disabled) {
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+/* Calmer dogs: slower, smaller movements when happy or sniffing. */
+.reactive:hover .f-ear,
+.is-happy .f-ear {
+  animation: f-ear 1.6s ease-in-out infinite alternate;
+}
+
+.reactive:hover .f-tongue,
+.is-happy .f-tongue {
+  animation: f-pant 0.9s ease-in-out infinite alternate;
+}
+
+.reactive:hover .f-head,
+.is-happy .f-head {
+  transform: rotate(-3deg);
+}
+
+.pack[data-mood="wag"] .p-tail {
+  animation: sway 1.4s var(--d) ease-in-out infinite alternate;
+}
+
+.pack[data-mood="wag"] .p-ear,
+.pack[data-mood="wag"] .p-ear-up {
+  animation: none;
+}
+
+.pack[data-mood="sniff"] .p-nose {
+  animation: nose-twitch 0.5s ease-in-out infinite alternate;
+}
+
+.p-head {
+  transition: transform 0.6s ease-out;
+}
+
+/* The bowing pair sits right beside the name, not out at the edges. */
+.n-left {
+  left: auto;
+  right: calc(50% + clamp(170px, 16vw, 250px));
+}
+
+.n-right {
+  right: auto;
+  left: calc(50% + clamp(170px, 16vw, 250px));
+}
+
+@media (max-width: 760px) {
+  .n-left {
+    right: auto;
+    left: 4%;
+  }
+
+  .n-right {
+    left: auto;
+    right: 4%;
+  }
 }

@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
 import { ACTIVITIES, BOWLS, CALM, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
-import { BALANCE, BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, LADDER, LADDER_START, WALK_TIPS, expert, groupsFor, weekPlan, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
+import { BALANCE, BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, weekPlan, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
@@ -44,6 +44,7 @@ function Tips({ tips, start = 0 }: { tips: Tip[]; start?: number }) {
           <span className="s-num">{String(start + i + 1).padStart(2, "0")}</span>
           <strong>{tip.t}</strong>
           <span>{tip.d}</span>
+          {tip.src && <em className="s-src">From {tip.src}</em>}
         </li>
       ))}
     </ol>
@@ -132,6 +133,73 @@ function Ladder({ start }: { start: string }) {
           <Tips tips={r.tips} />
         </motion.div>
       </AnimatePresence>
+    </div>
+  );
+}
+
+// A titled section folded away until asked for.
+function Fold({ title, line, open: start = false, children }: { title: string; line: string; open?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(start);
+  return (
+    <div className={`s-fold ${open ? "is-open" : ""}`}>
+      <button className="s-fold-btn" onClick={() => setOpen(!open)} aria-expanded={open}>
+        <span>
+          <strong>{title}</strong>
+          <span>{line}</span>
+        </span>
+        <i className={`chev ${open ? "chev-up" : ""}`} aria-hidden />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} style={{ overflow: "hidden" }}>
+            <div className="s-fold-body">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// Starch in packaged food, worked out from the numbers on the bag.
+function StarchCheck() {
+  const [v, setV] = useState({ protein: "", fat: "", fibre: "", moisture: "", ash: "" });
+  const n = (x: string) => Number(x.replace(",", ".")) || 0;
+  const ready = v.protein && v.fat && v.fibre && v.moisture;
+  const pct = starchPercent({ protein: n(v.protein), fat: n(v.fat), fibre: n(v.fibre), moisture: n(v.moisture), ash: v.ash ? n(v.ash) : undefined });
+  const grade = starchGrade(pct);
+  const fields: [keyof typeof v, string][] = [
+    ["protein", "Protein"],
+    ["fat", "Fat"],
+    ["fibre", "Fibre"],
+    ["moisture", "Moisture"],
+    ["ash", "Ash (if listed)"],
+  ];
+  return (
+    <div className="s-starch">
+      <p className="s-muted">Find the "Guaranteed analysis" on the bag and type in the percentages. Dogs need no starch at all.</p>
+      <div className="s-starch-fields">
+        {fields.map(([k, label]) => (
+          <label key={k}>
+            <span>{label}</span>
+            <span className="s-starch-input">
+              <input inputMode="decimal" value={v[k]} placeholder={k === "ash" ? "6" : ""} onChange={(e) => setV({ ...v, [k]: e.target.value })} />%
+            </span>
+          </label>
+        ))}
+      </div>
+      <div className={`s-starch-result ${ready ? "is-ready" : ""}`} data-grade={ready ? grade : ""}>
+        {ready ? (
+          <>
+            <strong>{pct}% starch</strong>
+            <span>{grade === "High in starch" ? "Over 20%. Worth adding fresh food, or looking for a lower-starch brand." : `${grade}. Under ${grade === "Best" ? 10 : grade === "Better" ? 15 : 20}%.`}</span>
+          </>
+        ) : (
+          <span>Good is under 20%, better under 15%, best under 10%.</span>
+        )}
+      </div>
+      <p className="s-skip">
+        <strong>Skip foods with:</strong> {SKIP_INGREDIENTS.join(", ")}.
+      </p>
     </div>
   );
 }
@@ -585,10 +653,90 @@ export function Results({
 
             {g.id === "food" && (
               <>
-                <Sub note={bowl ? BOWL_NOTE[bowl] : "Every bit of fresh food counts. Pick how far you want to go."}>How much fresh?</Sub>
+                <Sub note="Whatever is in the bowl now, start here.">Step 1 · Fresh toppers, up to 10%</Sub>
+                <Tips tips={TOPPER_TIPS} />
+                <div className="s-toppers">
+                  {TOPPERS.map((grp) => (
+                    <div key={grp.group}>
+                      <h4>{grp.group}</h4>
+                      <ul>
+                        {grp.items.map((it) => (
+                          <li key={it}>{it}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+                <Fold title="How much of each?" line="Organs, sardines, spices, garlic, and what to do if they're chubby.">
+                  <Tips
+                    tips={[
+                      ...TOPPER_AMOUNTS,
+                      {
+                        t: "Garlic: fresh and measured",
+                        d: garlicCloves(kg)
+                          ? `At ${kg} kg, up to ${garlicCloves(kg)} of fresh garlic a day. Fresh only, no pills or powders. Onion is never safe.`
+                          : "Very small dogs: skip garlic. Onion is never safe.",
+                        src: "The Forever Dog, @backintheday.in, @doggiliciouus",
+                      },
+                    ]}
+                  />
+                </Fold>
+
+                <Fold title="Garlic: what the research says" line="The studies behind the garlic advice, in plain words.">
+                  <ul className="s-papers">
+                    {GARLIC_RESEARCH.map((r) => (
+                      <li key={r.url}>
+                        <a href={r.url} target="_blank" rel="noreferrer">
+                          {r.title}
+                        </a>
+                        <span className="s-papers-cite">{r.cite}</span>
+                        <span>{r.plain}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="s-toilet-note">{GARLIC_CONTEXT}</p>
+                </Fold>
+
+                <Sub note={bowl ? BOWL_NOTE[bowl] : "Every bit of fresh food counts. Pick how far you want to go."}>Step 2 · How much of the bowl fresh?</Sub>
                 <Ladder start={bowl ? LADDER_START[bowl] : LADDER[0].id} />
-                <Sub>For every bowl</Sub>
-                <Tips tips={FOOD_TIPS} />
+                <Fold title="Making it at home" line="What makes a home-made bowl complete, not just fresh." open={bowl === "home" || bowl === "fresh"}>
+                  <Tips tips={HOMEMADE_TIPS} />
+                  <p className="s-links">
+                    {HOMEMADE_LINKS.map((l) => (
+                      <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
+                        {l.label} <i className="chev chev-right" aria-hidden />
+                      </a>
+                    ))}
+                  </p>
+                </Fold>
+                {bowl !== "home" && bowl !== "fresh" && (
+                  <Fold title="Check the bag" line="How much starch is in their packaged food? Work it out from the label.">
+                    <StarchCheck />
+                  </Fold>
+                )}
+
+                <Sub note={`${who === "your dog" ? "A grown dog" : Who} at ${kg} kg needs roughly ${dailyCalories(kg)} calories a day, more if very active.`}>When and how much</Sub>
+                <Tips tips={WHEN_TIPS} />
+                {kg >= 25 && (
+                  <div className="s-space">
+                    <Tips tips={BIG_DOG_TIPS} />
+                  </div>
+                )}
+                {months < 12 && <p className="s-toilet-note">{PUPPY_NOTE}</p>}
+
+                {months >= 84 && (
+                  <>
+                    <Sub>For an older dog</Sub>
+                    <Tips tips={SENIOR_TIPS} />
+                  </>
+                )}
+
+                <Sub>Switching food</Sub>
+                <Tips tips={SWITCH_TIPS} />
+
+                <Sub note="The habits that most often go wrong at home.">From an Indian kitchen</Sub>
+                <Tips tips={INDIAN_KITCHEN} />
+
                 {(["tummy", "picky", "weight"] as ProblemId[])
                   .filter((p) => needs.includes(p))
                   .map((p) => (
@@ -597,6 +745,10 @@ export function Results({
                       <Tips tips={BODY_TIPS[p]!} />
                     </div>
                   ))}
+
+                <Sub>For every bowl</Sub>
+                <Tips tips={FOOD_TIPS} />
+
                 <div className="s-soon">
                   <span className="s-soon-tag">Coming soon</span>
                   <strong>{BALANCE.title}</strong>
@@ -605,7 +757,7 @@ export function Results({
                 <p className="s-note">
                   {FOOD_CREDIT.text}{" "}
                   <a href={FOOD_CREDIT.url} target="_blank" rel="noreferrer">
-                    Read more from her
+                    foreverdog.com
                   </a>
                 </p>
               </>

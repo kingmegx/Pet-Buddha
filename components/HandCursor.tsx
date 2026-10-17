@@ -1,90 +1,79 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring } from "motion/react";
+import { motion, useMotionValue } from "motion/react";
 
-// The illustrated hand that replaces the mouse pointer: a hand and a short
-// wrist, nothing more. It points by default
-// and opens into a patting palm over anything marked data-pat (the pets).
+// The normal mouse pointer, with one exception: moving onto a pet (anything
+// marked data-pat) swaps the pointer for an illustrated hand that pats the pet
+// three times, then hands back the normal pointer. Leaving the pet and coming
+// back pats again. Things marked data-say show a small note by the pointer.
 // Touch devices keep their normal behaviour.
+const PATS = 3;
+const PAT_MS = 260; // one movement down or up; a pat is two of them
+
 export default function HandCursor() {
   const x = useMotionValue(-400);
   const y = useMotionValue(-400);
-  const sx = useSpring(x, { stiffness: 700, damping: 45, mass: 0.35 });
-  const sy = useSpring(y, { stiffness: 700, damping: 45, mass: 0.35 });
   const [enabled, setEnabled] = useState(false);
-  const [pat, setPat] = useState(false);
-  const [down, setDown] = useState(false);
-  const [seen, setSeen] = useState(false);
+  const [patting, setPatting] = useState(false);
   const [say, setSay] = useState("");
-  // Keep the last words on the bubble while it shrinks away.
+  // Keep the last words on the note while it shrinks away.
   const lastSaid = useRef("");
   if (say) lastSaid.current = say;
+  // The pet currently under the pointer, so a pat only starts on arrival.
+  const over = useRef<Element | null>(null);
+  const timer = useRef(0);
 
   useEffect(() => {
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     setEnabled(true);
-    document.documentElement.classList.add("has-hand");
+    const root = document.documentElement;
+    const stop = () => {
+      window.clearTimeout(timer.current);
+      setPatting(false);
+      root.classList.remove("is-patting");
+    };
     const move = (e: PointerEvent) => {
       x.set(e.clientX);
       y.set(e.clientY);
-      setSeen(true);
       const target = e.target as Element | null;
-      setPat(!!target?.closest?.("[data-pat]"));
       setSay(target?.closest?.("[data-say]")?.getAttribute("data-say") ?? "");
+      const pet = target?.closest?.("[data-pat]") ?? null;
+      if (pet === over.current) return;
+      over.current = pet;
+      stop();
+      if (!pet) return;
+      setPatting(true);
+      root.classList.add("is-patting");
+      timer.current = window.setTimeout(stop, PATS * 2 * PAT_MS + 120);
     };
-    const press = () => setDown(true);
-    const release = () => setDown(false);
     window.addEventListener("pointermove", move);
-    window.addEventListener("pointerdown", press);
-    window.addEventListener("pointerup", release);
     return () => {
-      document.documentElement.classList.remove("has-hand");
+      stop();
       window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerdown", press);
-      window.removeEventListener("pointerup", release);
     };
   }, [x, y]);
 
   if (!enabled) return null;
 
   return (
-    <motion.div className="hand" style={{ x: sx, y: sy, opacity: seen ? 1 : 0 }} aria-hidden>
-      <motion.span className="hand-say" initial={false} animate={{ scale: say ? 1 : 0, opacity: say ? 1 : 0, rotate: say ? -4 : -14 }} transition={{ type: "spring", stiffness: 420, damping: 22 }}>
+    <motion.div className="hand" style={{ x, y }} aria-hidden>
+      <motion.span className="hand-say" initial={false} animate={{ scale: say ? 1 : 0, opacity: say ? 1 : 0 }} transition={{ type: "spring", stiffness: 420, damping: 26 }}>
         {lastSaid.current}
       </motion.span>
-      <motion.svg
-        width="110"
-        height="140"
-        viewBox="0 0 110 140"
-        animate={{ scale: down ? 0.88 : 1, rotate: down ? -6 : 0 }}
-        transition={{ type: "spring", stiffness: 500, damping: 18 }}
-        style={{ transformOrigin: "29px 8px" }}
-      >
-        <g transform="rotate(-28 29 8)" className={pat ? "hand-pat" : undefined}>
-          {/* a short wrist, so it is just a hand and not an arm reaching in from the edge */}
-          <rect x="27" y="104" width="50" height="46" rx="21" fill="#f7b2ac" />
-          <ellipse cx="12" cy="92" rx="10" ry="22" transform="rotate(-22 12 92)" fill="#f7b2ac" />
-          <rect x="12" y="60" width="76" height="68" rx="28" fill="#f7b2ac" />
-          <rect x="18" y="4" width="22" height="80" rx="11" fill="#f7b2ac" />
-          {pat ? (
-            <>
-              <rect x="40" y="0" width="19" height="84" rx="9.5" fill="#f7b2ac" />
-              <rect x="59" y="6" width="18" height="80" rx="9" fill="#f7b2ac" />
-              <rect x="76" y="20" width="15" height="68" rx="7.5" fill="#f7b2ac" />
-              <path d="M40 30 v44 M59 30 v46 M76 36 v42" stroke="#211e1c" strokeWidth="1.6" strokeLinecap="round" />
-            </>
-          ) : (
-            <>
-              <rect x="40" y="54" width="17" height="36" rx="8.5" fill="#f7b2ac" />
-              <rect x="57" y="58" width="17" height="34" rx="8.5" fill="#f7b2ac" />
-              <rect x="73" y="64" width="15" height="30" rx="7.5" fill="#f7b2ac" />
-              <path d="M40 62 v22 M57 64 v24 M73 68 v22" stroke="#211e1c" strokeWidth="1.6" strokeLinecap="round" />
-              <path d="M23 16 q6 -6 12 0" fill="none" stroke="#211e1c" strokeWidth="1.6" strokeLinecap="round" />
-            </>
-          )}
-        </g>
-      </motion.svg>
+      {patting && (
+        // Drawn like the system's hand pointer: the same size, a white hand
+        // with a thin black outline, open to pat.
+        <svg className="hand-icon" width="24" height="26" viewBox="0 0 24 26" style={{ "--pat": `${PAT_MS}ms`, "--pats": PATS * 2 } as React.CSSProperties}>
+          <path
+            d="M8.2 12.4V4.2a1.6 1.6 0 0 1 3.2 0v6.6V2.9a1.6 1.6 0 0 1 3.2 0v7.9V3.9a1.6 1.6 0 0 1 3.2 0v7.4V6.4a1.6 1.6 0 0 1 3.2 0v9.4c0 5-3.3 8.7-8 8.7h-.9c-2.8 0-4.6-1.2-6.2-3.5L1.6 15.6a1.7 1.7 0 0 1 2.6-2.1l4 3.2Z"
+            fill="#fff"
+            stroke="#111"
+            strokeWidth="1.3"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )}
     </motion.div>
   );
 }

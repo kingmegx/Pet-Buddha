@@ -184,11 +184,11 @@ export default function Onboarding() {
   // Where the picked pet sits. It moves up and shrinks on steps with taller
   // controls, so there is always clear space between it and the question.
   const HERO: Partial<Record<Step, { top: string; scale: number }>> = {
-    weight: { top: "40%", scale: 1 },
-    age: { top: "36%", scale: 0.92 },
-    sex: { top: "44%", scale: 1.08 },
-    needs: { top: "30%", scale: 0.7 },
-    food: { top: "30%", scale: 0.7 },
+    weight: { top: "36%", scale: 1 },
+    age: { top: "33%", scale: 0.92 },
+    sex: { top: "38%", scale: 1 },
+    needs: { top: "27%", scale: 0.7 },
+    food: { top: "27%", scale: 0.7 },
   };
   const hero = HERO[step];
 
@@ -199,9 +199,7 @@ export default function Onboarding() {
 
   return (
     <main
-      // The questions sit on the same white card, on the same pale blue page,
-      // as the landing, so the whole onboarding reads as one place.
-      className={`stage ${step !== "landing" && step !== "done" && step !== "profile" ? "stage-card" : ""}`}
+      className="stage"
       onPointerMove={(e) => {
         // Eyes follow the hand. Updated at most once per frame.
         const stage = e.currentTarget;

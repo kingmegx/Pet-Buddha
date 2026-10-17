@@ -12,7 +12,8 @@ import type { Bowl, ProblemId } from "./content";
 
 export type GroupId = "energy" | "toilet" | "walks" | "alone" | "food" | "skin";
 
-export type Tip = { t: string; d: string };
+// `src` credits the account a tip comes from (shown small under the tip).
+export type Tip = { t: string; d: string; src?: string };
 
 export type Expert = {
   id: string;
@@ -226,12 +227,13 @@ export const GROUPS: Group[] = [
     id: "energy",
     tab: "Energy and chewing",
     problems: ["chew", "busy", "settle", "nip", "night"],
-    aha: "{who} isn't naughty. {who} is bored.",
+    aha: "{who} needs more work for the mind, not more exercise.",
     why: "Chewing, nipping and not settling are a busy brain looking for a job. Sniffing and chewing give it one, and a calm dog follows.",
     tips: [
       { t: "Slow the walk", d: "Let them stop and sniff. Ten minutes of their choosing beats thirty at your pace." },
       { t: "Make food a job", d: "Scatter part of a meal, or use a snuffle mat, instead of a bowl." },
       { t: "Give a chew", d: "Something safe to work on, lying down, when you need them to switch off." },
+      { t: "Let them sleep", d: "Grown dogs need 12 to 15 hours of sleep a day, puppies 16 to 18. A tired, rested dog is calmer.", src: "@kaninenutrition" },
       { t: "Swap, don't scold", d: "When teeth land on hands or furniture, swap in a toy, then praise them for taking it." },
     ],
     avoid: "Don't add more fetch or running to tire them out. It builds fitness and excitement, not calm.",
@@ -242,7 +244,7 @@ export const GROUPS: Group[] = [
     id: "toilet",
     tab: "Toilet",
     problems: ["toilet", "mark"],
-    aha: "{who} isn't being stubborn. Nobody has shown {who} where yet.",
+    aha: "{who} will learn where to go when the right spot is rewarded.",
     why: "Dogs go where it smells right and where it pays. Reward the right spot every time, and the habit forms.",
     tips: [],
     avoid: "Don't scold accidents you find later, or rub their nose in it. They can't link it to what they did.",
@@ -253,7 +255,7 @@ export const GROUPS: Group[] = [
     id: "walks",
     tab: "Walks and barking",
     problems: ["pull", "bark"],
-    aha: "{who} pulls and barks because it works.",
+    aha: "Pulling and barking continue because they get results.",
     why: "Pulling gets them there faster. Barking gets your attention. Make the calm choice the one that pays instead.",
     tips: [],
     avoid: "Don't yank the lead or shout back. Skip choke, prong and shock collars.",
@@ -264,7 +266,7 @@ export const GROUPS: Group[] = [
     id: "alone",
     tab: "Home alone",
     problems: ["alone"],
-    aha: "Being alone is a skill. {who} can learn it in small steps.",
+    aha: "Being alone is a skill {who} can learn gradually.",
     why: "Dogs are social. Being left is new and scary unless it is taught slowly, so it never gets too much.",
     tips: [],
     avoid: "Don't scold for what happened while you were out. They can't link it to what they did.",
@@ -275,16 +277,22 @@ export const GROUPS: Group[] = [
     id: "skin",
     tab: "Skin and coat",
     problems: ["itch", "ticks", "coat"],
-    aha: "Itchy skin is rarely just a skin problem.",
+    aha: "Itchy skin usually starts inside, not on the surface.",
     why: "Skin is where diet, gut health and what you wash them with all show up. Fix it from the inside and the outside.",
     tips: [
+      { t: "Feed the skin", d: "Skin shows what's happening in the gut and immune system. Animal protein first, grains and dal down.", src: "@backintheday.in" },
       { t: "Bath less, gently", d: "Once every 3 to 4 weeks is plenty, with a mild dog shampoo. Human shampoo is too harsh." },
-      { t: "Dry them fully", d: "Damp fur breeds fungus. Dry between the toes, in the ears and under the collar." },
-      { t: "Check after walks", d: "Run your fingers over ears, neck, armpits and between toes for ticks." },
-      { t: "Brush weekly", d: "It spreads natural oils and pulls out dead coat before it sheds on your sofa." },
-      { t: "Add good fats", d: "Omega-3 from fish oil helps skin from inside. Ask your vet or nutritionist how much." },
+      { t: "Dry them fully", d: "Monsoon damp breeds fungus. Dry between the toes, in the ears and under the collar.", src: "@backintheday.in" },
+      { t: "Check after walks", d: "Clean paws after every walk. Run your fingers over ears, neck, armpits and between toes for ticks.", src: "@kaninenutrition" },
+      { t: "Part the fur", d: "Brush short fur against the grain and part long fur, so you see the skin, not just the coat.", src: "@backintheday.in" },
+      { t: "Apple cider vinegar, maybe", d: "Some owners add a splash of raw apple cider vinegar to food daily to make them less tasty to ticks. Not proven, but harmless. Don't skip real tick checks.", src: "@backintheday.in" },
+      { t: "Treat the home too", d: "Ticks and fleas live in bedding and corners. Wash bedding hot; food-grade diatomaceous earth helps in the home.", src: "@backintheday.in" },
+      { t: "Allergic to chicken?", d: "Try quail, turkey, duck, mutton, buffalo or pork, rotating every few days. Retry chicken from a better source later.", src: "@carnikitchen" },
+      { t: "Add good fats", d: "Omega-3 from fish such as salmon or sardines helps calm itchy, inflamed skin.", src: "@canine_india" },
+      { t: "Deworm properly", d: "Herbal dewormers aren't enough on their own, especially in India. Test and treat with your vet.", src: "@happypuppyorganics" },
+      { t: "Itching isn't a personality", d: "Recurring itching, ear or paw trouble means something needs support. Look into it.", src: "@happypuppyorganics" },
     ],
-    avoid: "Don't put human products or neat essential oils on their skin, and don't shave a double coat.",
+    avoid: "Don't put human products or neat essential oils on their skin. Don't shave them: dogs sweat through their paws, and the coat protects them from heat.",
     help: "Raw red patches, hair loss, a smelly ear, or scratching that keeps them awake needs a vet. Hot spots can spread in a day.",
     experts: ["backintheday", "happypuppy", "nutkit", "georgina", "doggiliciouus"],
   },
@@ -292,11 +300,11 @@ export const GROUPS: Group[] = [
     id: "food",
     tab: "Food",
     problems: ["tummy", "picky", "weight"],
-    aha: "You don't have to change everything. A little fresh food goes a long way.",
-    why: "Fresh, lightly processed food shows up in their skin, tummy, energy and mood. Dr. Karen Becker's approach: start small, and every bit of fresh counts.",
+    aha: "Small amounts of fresh food make a real difference.",
+    why: "Fresh, lightly processed food shows up in their skin, gut, weight and mood. Start with fresh toppers, then swap in as much fresh food as you can.",
     tips: [],
-    avoid: "Never feed grapes or raisins, onion, garlic, chocolate, xylitol (in sugar-free gum and some peanut butter), macadamia nuts or cooked bones.",
-    help: "Vomiting or diarrhoea for more than a day, blood, not eating for a day, or sudden weight change needs a vet. A nutritionist can tailor a diet if you can, but a balanced published recipe works too.",
+    avoid: "Never feed grapes or raisins, onion (or chives), chocolate, macadamia nuts, nutmeg, xylitol (in sugar-free sweets and some peanut butter) or cooked bones.",
+    help: "Vomiting or diarrhoea for more than a day, blood, or sudden weight change needs a vet. For a dog with a medical condition, ask a vet nutritionist to formulate the diet.",
     experts: ["becker", "canineindia", "caninecraving", "doggiliciouus", "georgina", "carni", "kanine", "bowl", "woof", "proactive"],
   },
 ];
@@ -321,25 +329,55 @@ export const WALK_TIPS: Partial<Record<ProblemId, Tip[]>> = {
     { t: "A leaving-only treat", d: "A stuffed chew or lick mat they only get when you go." },
     { t: "Sniff before you go", d: "A short sniffing game tires the mind so they rest." },
     { t: "A cosy spot", d: "A bed with something that smells of you." },
+    { t: "Diwali and crackers", d: "Close doors and windows, draw curtains early, play calm music. Skip walks in peak cracker hours (6 to 11 pm). Keep their ID tag on.", src: "@kaninenutrition" },
+    { t: "Calming smells", d: "A calming spray goes on a cloth near them, never on the dog, so they can move away from it.", src: "@doggiliciouus" },
+    { t: "Not a second dog", d: "Getting another dog to keep them company rarely fixes it. You may end up with two dogs waiting for you.", src: "@kaninenutrition" },
   ],
 };
 
 // ---------- food ----------
 
-// The fresh food ladder, after Dr. Karen Becker (The Forever Dog, The Forever
-// Dog Life). Owners pick how far they want to go; each rung says what to do.
-// DRAFT: the 10% topper rule is hers; check the other rungs against the book.
+// Everything on the Food tab follows The Forever Dog (Rodney Habib and
+// Dr. Karen Becker), chapters 7 to 9, written in our own words. Amounts are
+// converted from pounds to kilos and rounded. The Indian-kitchen notes and
+// Indian names for foods are ours.
+
+// Step 1: up to 10% of the day's calories as fresh "longevity foods".
+export const TOPPER_TIPS: Tip[] = [
+  { t: "Up to a tenth, fresh", d: "Vets agree up to 10% of a dog's calories can come from extras without unbalancing the diet. Use that 10% for fresh food." },
+  { t: "Swap the junk treats", d: "Most dogs spend their 10% on biscuits and packaged treats. Give the same 10% as fresh bites instead." },
+  { t: "Pea-sized pieces", d: "Chop toppers small, mix them in, or use them as training treats. Big dogs just get more pieces." },
+  { t: "One new food at a time", d: "Try one bite of something new, then watch their poop. Refused today? Try again another day, or steamed." },
+];
+
+// What to put on top. Grouped so the list can be scanned.
+export const TOPPERS: { group: string; items: string[] }[] = [
+  { group: "Vegetables", items: ["Carrot", "Cucumber", "Broccoli", "Cauliflower (gobhi)", "Spinach (palak)", "Green beans", "Peas", "Okra (bhindi)", "Pumpkin", "Button mushrooms, cooked", "Celery", "Bell pepper"] },
+  { group: "Fruit", items: ["Raw green banana (kaccha kela)", "Papaya", "Pomegranate seeds", "Apple, no seeds", "Strawberries, no stems", "Blueberries", "Pineapple", "Coconut, unsweetened", "Kiwi"] },
+  { group: "Protein", items: ["Egg, any way", "Sardines (mathi), in water", "Liver, heart and other organs", "Plain cooked chicken, fish, mutton"] },
+  { group: "Spice box", items: ["Turmeric (haldi)", "Cumin (jeera)", "Cinnamon (dalchini)", "Fresh coriander", "Ginger", "Parsley", "A pinch of ground clove", "Fresh garlic, measured"] },
+];
+
+export const TOPPER_AMOUNTS: Tip[] = [
+  { t: "Organs: a paw a day", d: "Liver and other organs are rich. About the size of your dog's paw is plenty for a day." },
+  { t: "Sardines: 1 per 9 kg", d: "One sardine for every 9 kg of dog, two or three times a week." },
+  { t: "Spices: one shake per 5 kg", d: "One shake of a dried spice for every 5 kg, mixed into the food. Fresh herbs: a quarter teaspoon per 9 kg." },
+  { t: "Chubby dog? Swap, don't add", d: "If they need to lose weight, take 10% of their food away and replace it with toppers." },
+];
+
+// Step 2: how much of the bowl to make fresh. "Fresh" means lightly
+// processed: complete home-made food (raw or cooked), store-bought fresh or
+// raw, freeze-dried or dehydrated meals.
 export type Rung = { id: string; share: string; label: string; tips: Tip[] };
 
 export const LADDER: Rung[] = [
   {
     id: "toppers",
     share: "10%",
-    label: "Add toppers",
+    label: "Toppers only",
     tips: [
-      { t: "Up to a tenth, fresh", d: "Fresh food can make up to 10% of the day's food without unbalancing the diet. No recipe needed." },
-      { t: "Good toppers", d: "Blueberries, a lightly cooked egg, sardines in water (no salt), broccoli, pumpkin, cucumber, cooked mushrooms." },
-      { t: "Fresh treats", d: "Swap packaged treats for fresh bites: blueberries, carrot, cucumber, small pieces of cooked meat." },
+      { t: "Keep the base, add fresh", d: "Keep their usual food. Just add the 10% toppers above. A real step on its own." },
+      { t: "Better treats count too", d: "Swapping packaged treats for fresh bites or dried all-meat treats is a good first move." },
     ],
   },
   {
@@ -347,8 +385,8 @@ export const LADDER: Rung[] = [
     share: "25%",
     label: "A quarter fresh",
     tips: [
-      { t: "Swap, don't add", d: "Replace a quarter of the usual food with balanced fresh food, and cut the old food by the same amount." },
-      { t: "Balanced, not just meat", d: "Past 10%, the fresh part must be complete: a balanced recipe or a complete fresh food, not plain meat and rice." },
+      { t: "Swap a quarter", d: "Replace a quarter of their usual food with fresh food. With toppers, that's about a third of the bowl fresh." },
+      { t: "Take your time", d: "It's fine to take three months to get here. Just start somewhere." },
     ],
   },
   {
@@ -356,8 +394,8 @@ export const LADDER: Rung[] = [
     share: "50%",
     label: "Half fresh",
     tips: [
-      { t: "Half and half", d: "Half the bowl balanced fresh food. Many owners do one fresh meal and one usual meal a day." },
-      { t: "Rotate proteins", d: "Chicken, fish, mutton, egg: different proteins cover different nutrients." },
+      { t: "Half the bowl", d: "Half fresh food plus toppers: about two thirds of what they eat is fresh." },
+      { t: "Mix and match", d: "Some meals fully fresh, some half and half. Raw and cooked can share one bowl." },
     ],
   },
   {
@@ -365,9 +403,8 @@ export const LADDER: Rung[] = [
     share: "100%",
     label: "All fresh",
     tips: [
-      { t: "Complete recipes only", d: "Home-made food must supply calcium, zinc, vitamin E, iodine and more. Plain meat, rice and vegetables can't." },
-      { t: "Use a vet-made recipe", d: "The Forever Dog Life has balanced recipes. Follow them exactly, including the supplements they call for." },
-      { t: "Handle it clean", d: "Treat dog meat like your own: cold, clean surfaces, wash up after." },
+      { t: "The gold standard", d: "No packaged food at all, plus toppers. Home-made, store-bought fresh, or a mix of both." },
+      { t: "Rotate", d: "Change proteins and recipes over time. Variety feeds the gut and covers more nutrients." },
     ],
   },
 ];
@@ -375,45 +412,161 @@ export const LADDER: Rung[] = [
 // Where to start on the ladder, from what is in the bowl now.
 export const LADDER_START: Record<Bowl, string> = { kibble: "toppers", mix: "quarter", home: "all", fresh: "all" };
 
-// A line for what is in the bowl now, above the ladder.
 export const BOWL_NOTE: Record<Bowl, string> = {
-  kibble: "Packaged food is a fine base. Start by adding fresh on top.",
-  mix: "You're already part way. Make sure the fresh part is balanced.",
-  home: "Home-cooked is great, if it's balanced. Rice and chicken alone misses calcium and other minerals.",
-  fresh: "Fresh or raw is great, if it's balanced: the right mix of meat, bone, organ and nutrients.",
+  kibble: "Packaged food is a fine base to start from. Begin with toppers, then swap in fresh when you're ready.",
+  mix: "You're already part way. Make sure the fresh part is a complete recipe.",
+  home: "Home-cooked is the freshest food there is, if the recipe is complete. Rotating meat, rice and vegetables is not enough.",
+  fresh: "Fresh or raw is the gold standard, if the recipe is complete. Check it against the points below.",
 };
+
+// Making it at home: the rules for a complete recipe.
+export const HOMEMADE_TIPS: Tip[] = [
+  { t: "Follow a complete recipe", d: "Use a recipe made to meet a dog's nutrient needs (NRC, AAFCO or FEDIAF), and follow it exactly." },
+  { t: "Rotating isn't balancing", d: "Different meats and vegetables over the week still miss zinc, vitamins D and E, iodine, manganese and selenium." },
+  { t: "No ingredient swaps", d: "Swapping one thing for another slowly unbalances a recipe. A general multivitamin won't fix it." },
+  { t: "How to spot a good recipe", d: "It states which standard it meets, lists ingredients by weight, gives calories and a nutrient breakdown." },
+  { t: "Freeze, then thaw cold", d: "Freeze raw meat first, then thaw it in the fridge, not on the counter.", src: "@georginaskitchen.india" },
+  { t: "Start with chews and organs", d: "While you plan a full diet, start small amounts of organs and raw chews like chicken feet or necks. A little nausea at first is normal.", src: "@georginaskitchen.india" },
+  { t: "Poach, don't fry", d: "Gently poach meat in water until just cooked through. Browning creates harmful compounds. Raw is fine too, handled cleanly." },
+];
+
+export const HOMEMADE_LINKS = [
+  { label: "Complete recipes at foreverdog.com", url: "https://foreverdog.com" },
+  { label: "Find a fresh food consultant", url: "https://freshfoodconsultants.org" },
+];
+
+// Packaged food: how to read the bag.
+export const SKIP_INGREDIENTS = ["Any \"meal\" (meat meal, poultry meal)", "By-products", "Animal or poultry digest", "\"Animal fat\"", "Soy", "Added colours", "BHA, BHT or ethoxyquin", "Propylene glycol"];
+
+// When and how much.
+export const WHEN_TIPS: Tip[] = [
+  { t: "An 8-hour window", d: "Give all of the day's food within about 8 hours, and nothing in the last 2 hours before bed." },
+  { t: "One or two meals", d: "Grown dogs at a healthy weight do well on one or two meals a day. Pick the bowl up between meals." },
+  { t: "A skipped meal is fine", d: "If a healthy dog doesn't want a meal, let them skip it. Some nutritionists suggest a fast day once a month for healthy adults.", src: "@georginaskitchen.india" },
+  { t: "Treats with a purpose", d: "Treats are for rewards: pea-sized, fresh. No toast crusts or biscuits \"just because\"." },
+];
+
+// Shown for big dogs (25 kg and up).
+export const BIG_DOG_TIPS: Tip[] = [
+  { t: "Bloat: rest around meals", d: "Big dogs are prone to bloat, which can kill. Smaller meals, and no running for 30 minutes before and after food.", src: "@kaninenutrition" },
+];
+
+export const PUPPY_NOTE = "Puppies can start fresh food as soon as they're weaned, but they need more minerals and their amounts change as they grow (Carni Kitchen revises puppy charts every 2 months). Keep their meals spread through the day and ask your vet when to move to fewer.";
+
+// Switching food.
+export const SWITCH_TIPS: Tip[] = [
+  { t: "Start with a tenth", d: "Day one: swap 10% of the old food for the new. Add 5 to 10% more each day if their poop stays firm." },
+  { t: "Soft poop? Pause", d: "Hold at the same mix until it firms up, then carry on." },
+  { t: "Pumpkin helps", d: "A teaspoon of plain cooked pumpkin per 5 kg firms up soft stools during a switch." },
+  { t: "Buy before you run out", d: "Never jump straight to a new food because the old one ran out." },
+];
+
+// Indian kitchens: the habits that most often go wrong at home.
+export const INDIAN_KITCHEN: Tip[] = [
+  { t: "Cook theirs plain", d: "Set their portion aside before onion, salt, chilli and masala go in. Onion is one of the few truly toxic foods." },
+  { t: "Animal protein first", d: "Dogs with chronic itchy skin are often on bowls heavy in rice, roti, bajra, jowar, dal or soya. Meat should be the base.", src: "@backintheday.in" },
+  { t: "Skip the WhatsApp advice", d: "Rice isn't essential, and roti and rice isn't a diet. Start from the dog's biology, not human food habits.", src: "@georginaskitchen.india" },
+  { t: "Fruit: a few cubes", d: "Three or four small cubes a day is plenty. Too much fruit sugar can feed yeast and itchy skin.", src: "@backintheday.in" },
+  { t: "Veg-only bowls", d: "A good packaged food is better for a dog than an unbalanced or vegetarian home diet.", src: "@carnikitchen" },
+  { t: "Chicken in summer is fine", d: "If they handle chicken well, keep it. Add a cooling protein alongside, or pause it a few days.", src: "@carnikitchen" },
+  { t: "Fresh on a budget", d: "Rotating basic, cheaper meats works well. Exotic meats aren't needed for a fresh diet.", src: "@carnikitchen" },
+  { t: "Curd: plain only", d: "A spoon of plain curd is fine. Skip flavoured and sweetened yoghurt.", src: "@kaninenutrition" },
+  { t: "No biscuits as treats", d: "Swap Marie or Parle-G for fresh bites: carrot, cucumber, a bit of egg or chicken." },
+  { t: "Your spice box helps", d: "Haldi, jeera, dalchini and fresh coriander are good for dogs in pinches. Skip nutmeg (jaiphal)." },
+  { t: "Keep sweets away", d: "Chocolate and sugar-free sweets (xylitol) are toxic. Raisins in mithai and kheer are too." },
+];
 
 // For everyone, whatever the bowl.
 export const FOOD_TIPS: Tip[] = [
-  { t: "Switch slowly", d: "Change food over 7 to 10 days, a little more of the new each day." },
-  { t: "Clean water", d: "Fresh, filtered water, always out. Wash the bowl daily." },
+  { t: "One change at a time", d: "Change six things in a day and you can't tell what upset the tummy. New food, treat or supplement: one at a time.", src: "@georginaskitchen.india" },
+  { t: "Rotate proteins", d: "Keep at least 2 or 3 meats in rotation: chicken, mutton, fish, egg. The same one every day narrows what they get.", src: "@carnikitchen" },
+  { t: "Bones: raw, never cooked", d: "Cooked bones splinter. Raw, dried or ground bone is fine, sized for your dog's size and age.", src: "@carnikitchen" },
+  { t: "Keep supplements simple", d: "Good food first. A cupboard of supplements isn't the goal; add one only for a reason.", src: "@whatsinmydogbowl" },
+  { t: "Read past the front", d: "\"With chicken\" or a blueberry on the pack means little. Check the ingredient order and what fills the rest.", src: "@georginaskitchen.india" },
+  { t: "Watch the poop", d: "It tells you how fast to go. Firm is good. Soft means slow down." },
+  { t: "Clean water", d: "Fresh, filtered water, always out." },
+];
+
+// Older dogs.
+export const SENIOR_TIPS: Tip[] = [
+  { t: "More protein, not less", d: "Less protein for seniors is a myth. Keeping muscle matters more with age, so keep good protein in the bowl.", src: "@kaninenutrition" },
+  { t: "Ramps over jumps", d: "Jumping off beds and sofas adds up on joints. A ramp makes everyday movement easier.", src: "@carnikitchen" },
 ];
 
 // Kept for the week plan: the first thing to try, by bowl.
 export const BOWL_TIPS: Record<Bowl, Tip[]> = {
-  kibble: [LADDER[0].tips[0], LADDER[0].tips[2]],
-  mix: [LADDER[1].tips[1], LADDER[0].tips[2]],
-  home: [LADDER[3].tips[0], LADDER[3].tips[1]],
-  fresh: [LADDER[3].tips[0], LADDER[3].tips[1]],
+  kibble: [TOPPER_TIPS[0], TOPPER_TIPS[1]],
+  mix: [TOPPER_TIPS[0], HOMEMADE_TIPS[0]],
+  home: [HOMEMADE_TIPS[0], HOMEMADE_TIPS[1]],
+  fresh: [HOMEMADE_TIPS[0], TOPPER_TIPS[0]],
 };
 
 export const BODY_TIPS: Partial<Record<ProblemId, Tip[]>> = {
   tummy: [
-    { t: "Plain pumpkin", d: "A spoon of plain cooked pumpkin helps both loose and hard stools." },
-    { t: "Smaller meals", d: "Two or three small meals are easier than one big one." },
-    { t: "Gut support", d: "Probiotics can help. Ask your vet or nutritionist which one." },
+    { t: "Plain pumpkin", d: "A teaspoon of plain cooked pumpkin per 5 kg on the food firms up loose stools." },
+    { t: "Slow every change", d: "New foods one at a time, in tiny amounts. Wait for normal poop before the next one." },
+    { t: "Gut support", d: "Probiotics and digestive enzymes before a food change make it easier. Mild loose stools in the first week of a probiotic usually settle.", src: "@georginaskitchen.india" },
+    { t: "Ginger for gas", d: "Cooled ginger tea on the food can ease bloating, gas and acid reflux.", src: "@georginaskitchen.india" },
   ],
   picky: [
-    { t: "Meal times, not all day", d: "Put the bowl down for 15 minutes, then pick it up until the next meal." },
-    { t: "Warm it up", d: "Warm food smells stronger, and smell is what makes a dog hungry." },
-    { t: "Fewer treats", d: "A dog full of treats has no reason to eat dinner." },
+    { t: "Start with organs", d: "Few dogs refuse tiny bits of cooked liver or chicken heart. Cook carrots in with them, then less and less." },
+    { t: "Hide it, chop it fine", d: "Mix new foods right into the usual food, very finely chopped. A spoon of plain broth helps." },
+    { t: "Meal times only", d: "Pick the bowl up between meals. A dog that grazes all day has no reason to be keen." },
   ],
   weight: [
-    { t: "The rib test", d: "You should feel their ribs easily, like the back of your hand." },
-    { t: "Measure meals", d: "Use a cup or scale, not a guess. Small extras add up fast." },
-    { t: "Make it a hunt", d: "Use part of the meal for sniffing games. They eat slower and move more." },
+    { t: "Chonky isn't cute", d: "Extra weight brings joint, metabolic and inflammation trouble. It's worth acting on, not laughing off.", src: "@whatsinmydogbowl" },
+    { t: "Swap, don't add", d: "Take 10% of their food away and give fresh toppers in its place." },
+    { t: "1% a week", d: "Aim to lose about 1% of body weight a week. Weigh them weekly." },
+    { t: "A shorter window", d: "Feed within 10 hours for two weeks, then 8 hours. Ask your vet to set the target weight." },
   ],
 };
+
+// Fresh garlic per day by weight, from The Forever Dog (converted from pounds).
+// Fresh cloves only: no garlic pills or powders. Onion is never safe.
+export function garlicCloves(kg: number) {
+  if (kg < 4.5) return null;
+  if (kg < 9) return "half a clove";
+  if (kg < 20) return "1 clove";
+  if (kg < 34) return "1½ cloves";
+  if (kg < 45) return "2 cloves";
+  return "2½ cloves";
+}
+
+// The research behind the garlic advice. Summaries are ours, from each
+// paper's abstract on PubMed (read 17 Oct 2026).
+export const GARLIC_RESEARCH = [
+  {
+    title: "Hematologic changes after giving garlic extract to dogs",
+    cite: "Lee, Yamato, Tajima, Kuraoka, Omae & Maede. American Journal of Veterinary Research, 2000",
+    url: "https://doi.org/10.2460/ajvr.2000.61.1446",
+    plain: "4 dogs got a very large dose: garlic extract equal to 5 g of whole garlic per kg of body weight, daily for 7 days. Their red blood cells showed damage, but no dog developed anaemia. The authors still advised against feeding garlic.",
+  },
+  {
+    title: "Garlic and onion compounds on immune cells and platelets in dogs and humans",
+    cite: "Chang, Yamato, Sakai, Yamasaki & Maede. Prostaglandins, Leukotrienes and Essential Fatty Acids, 2004",
+    url: "https://doi.org/10.1016/j.plefa.2003.08.006",
+    plain: "The study The Forever Dog points to. The same team tested garlic's compound on dog and human blood cells in the lab (not in dogs eating garlic) and concluded it may support immune function and heart health.",
+  },
+  {
+    title: "Garlic and onion compounds slow tumour cell growth",
+    cite: "Chang, Yamato, Yamasaki, Ko & Maede. Cancer Letters, 2005",
+    url: "https://doi.org/10.1016/j.canlet.2004.10.008",
+    plain: "A follow-up lab study on human tumour cell lines: garlic's compound slowed their growth. Again a lab study, not a feeding trial.",
+  },
+];
+
+export const GARLIC_CONTEXT =
+  "For scale: the book's amount for a 15 kg dog is about 1 clove (roughly 4 g) a day, around 20 times less than the dose in the 2000 study. No study has fed dogs everyday amounts of fresh garlic for a long time, so stick to the measured amounts and stop if they seem unwell.";
+
+// Roughly how many calories a grown dog needs a day, from weight in kg
+// (resting need; active dogs need more).
+export const dailyCalories = (kg: number) => Math.round((kg * 30 + 70) / 10) * 10;
+
+// Starch in dry food, from the label: 100 minus the rest. Ash is 6% if not listed.
+export function starchPercent(v: { protein: number; fat: number; fibre: number; moisture: number; ash?: number }) {
+  return Math.max(0, Math.round(100 - (v.protein + v.fat + v.fibre + v.moisture + (v.ash ?? 6))));
+}
+export const starchGrade = (pct: number) => (pct < 10 ? "Best" : pct < 15 ? "Better" : pct < 20 ? "Good" : "High in starch");
 
 // Coming soon on the Food tab.
 export const BALANCE = {
@@ -421,7 +574,7 @@ export const BALANCE = {
   line: "Tell us what you feed, and we'll show what's missing. Coming soon.",
 };
 
-export const FOOD_CREDIT = { text: "Our food advice follows Dr. Karen Becker's books The Forever Dog and The Forever Dog Life.", url: "https://drkarenbecker.com" };
+export const FOOD_CREDIT = { text: "Our food advice follows The Forever Dog by Rodney Habib and Dr. Karen Becker.", url: "https://foreverdog.com" };
 
 // The three things to start this week: the first tip from each tab that applies.
 export function weekPlan(groups: Group[], bowl: Bowl | null): (Tip & { group: GroupId })[] {
@@ -431,7 +584,7 @@ export function weekPlan(groups: Group[], bowl: Bowl | null): (Tip & { group: Gr
       g.id === "food"
         ? bowl
           ? BOWL_TIPS[bowl][0]
-          : FOOD_TIPS[0]
+          : TOPPER_TIPS[0]
         : g.id === "toilet"
           ? { t: "Reward the right spot", d: "Every time they go in the right place, a treat and a \"good dog\" straight away." }
           : g.id === "walks"
