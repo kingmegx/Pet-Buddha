@@ -73,7 +73,7 @@ export function Profile({
       <section className="card profile-card">
         <label className="profile-row">
           <span>Name</span>
-          <input type="text" value={name} maxLength={24} autoComplete="off" placeholder="Type a name" onChange={(e) => setName(e.target.value)} />
+          <input type="text" value={name} maxLength={24} autoComplete="off" placeholder="Name, or a nickname" onChange={(e) => setName(e.target.value)} />
         </label>
 
         <div className="profile-row">
@@ -143,7 +143,7 @@ export function Profile({
           <div className="chips chips-left">
             {(["boy", "girl"] as const).map((s) => (
               <button key={s} className="chip" aria-pressed={sex === s} onClick={() => setSex(s)}>
-                {s === "boy" ? "Good boy" : "Good girl"}
+                {s === "boy" ? "Boy" : "Girl"}
               </button>
             ))}
           </div>

@@ -7,9 +7,9 @@ import { motion } from "motion/react";
 // letterbox slot cut in the front and a cat hiding inside. The eyes are
 // bigger than the slot, so its edges crop them: the cat reads as sitting
 // behind the cardboard, not painted on it. The white-and-brown cat is the
-// exception: it has climbed up and peeks over the top of its box instead. The
-// cats are kept calm: they look slowly from side to side and blink. (The arm
-// poses below are left in place in case swiping comes back.)
+// exception: it has climbed up and peeks over the top of its box instead. At
+// rest the cats are calm: they look slowly from side to side and blink.
+// Hovering a box wakes its cat for 3 seconds: it reaches out and bats.
 //
 // Each arm is one thick line that bends between a few poses, so it unfurls
 // and swings like a real limb instead of popping in and out.
@@ -103,6 +103,7 @@ export function CatBox({ coat, brand, delay = 0 }: { coat: CatCoat; brand: BoxBr
   const peek = coat === "spotted";
   const [mode, setMode] = useState<Mode>("idle");
   const firstRun = useRef(true);
+  const lively = useRef(0);
 
   const a = useMemo(() => {
     const wait = firstRun.current ? delay : 0;
@@ -147,6 +148,14 @@ export function CatBox({ coat, brand, delay = 0 }: { coat: CatCoat; brand: BoxBr
       viewBox="0 0 300 250"
       data-pat
       aria-hidden
+      // Hovering wakes the cat for 3 seconds: it reaches out of the box and
+      // bats at the pointer, then settles back. Hovering again wakes it again.
+      onPointerEnter={() => {
+        firstRun.current = false;
+        window.clearTimeout(lively.current);
+        setMode("reach");
+        lively.current = window.setTimeout(() => setMode("settle"), 3000);
+      }}
     >
       <polygon points="40,216 178,236 294,198 252,186" fill="rgba(33,30,28,0.2)" />
       <polygon points="108,62 252,74 232,36 100,28" fill="#f1d9c6" />

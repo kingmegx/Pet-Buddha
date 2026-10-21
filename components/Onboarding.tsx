@@ -78,6 +78,11 @@ export default function Onboarding() {
   const [cheer, setCheer] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [packMood, setPackMood] = useState<PackMood>("idle");
+  // The dogs liven up for 3 seconds each time the pointer arrives on their
+  // side, then calm down until it leaves and comes back.
+  const packArmed = useRef(false);
+  const packUntil = useRef(0);
+  const packTimer = useRef(0);
   const lookFrame = useRef(0);
   const aimFrame = useRef(0);
 
@@ -163,14 +168,14 @@ export default function Onboarding() {
   // Eyebrow, title and the line under the title, per step.
   const titles: Record<Step, [string, string, string]> = {
     landing: ["", "", ""],
-    species: ["Step 1", "Who's your buddy?", ""],
-    name: ["Step 2", "What's their name?", "Only if you want to. It stays on this device."],
-    breed: ["Step 3", "Which one looks like yours?", "Type the breed, or tap a face."],
-    weight: ["Step 4", `How much does ${who} weigh?`, "Weight is how we size a toy safely."],
-    age: ["Step 5", `How old is ${who}?`, "Age decides what is safe, and what they need."],
-    sex: ["Step 6", "Good boy or good girl?", "A few behaviours differ between the two."],
-    needs: ["Step 7", "What do you need help with?", `We ticked what is common at ${formatAge(months)}. Untick anything that isn't true for ${who}.`],
-    food: ["Step 8", `What's in ${who}'s bowl?`, "And tick anything you've noticed about their body."],
+    species: ["Step 1 of 8", "Who are we helping today?", ""],
+    name: ["Step 2 of 8", "What's your dog's name?", "We'll use it to personalise the plan. It stays on this device."],
+    breed: ["Step 3 of 8", `What breed is ${who}?`, "Search, or pick the closest face. Not sure? Choose \"Mixed\" and the plan still works."],
+    weight: ["Step 4 of 8", `How much does ${who} weigh?`, "A rough guess is fine. It helps us size chews and portions safely."],
+    age: ["Step 5 of 8", `How old is ${who}?`, "Age changes what's safe to chew and what they need."],
+    sex: ["Step 6 of 8", `Is ${who} a boy or a girl?`, "A few behaviours differ between the two."],
+    needs: ["Step 7 of 8", "What would you like help with?", `Pick all that apply. We've pre-selected what's common at ${formatAge(months)}.`],
+    food: ["Step 8 of 8", `What does ${who} eat now?`, "Then tick anything you've noticed about their body."],
     curating: ["One moment", `Putting it together for ${who}`, ""],
     done: ["", "", ""],
     profile: ["", "", ""],
@@ -184,11 +189,11 @@ export default function Onboarding() {
   // Where the picked pet sits. It moves up and shrinks on steps with taller
   // controls, so there is always clear space between it and the question.
   const HERO: Partial<Record<Step, { top: string; scale: number }>> = {
-    weight: { top: "36%", scale: 1 },
-    age: { top: "33%", scale: 0.92 },
-    sex: { top: "38%", scale: 1 },
-    needs: { top: "27%", scale: 0.7 },
-    food: { top: "27%", scale: 0.7 },
+    weight: { top: "40%", scale: 1 },
+    age: { top: "37%", scale: 0.92 },
+    sex: { top: "43%", scale: 1 },
+    needs: { top: "31%", scale: 0.7 },
+    food: { top: "31%", scale: 0.7 },
   };
   const hero = HERO[step];
 
@@ -220,7 +225,9 @@ export default function Onboarding() {
 
       {trail.length > 0 && step !== "done" && step !== "curating" && step !== "profile" && (
         <button className="back" onClick={back} aria-label="Back">
-          ←
+          <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden>
+            <path d="M16 10H4M9 5l-5 5 5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </button>
       )}
 
@@ -296,7 +303,7 @@ export default function Onboarding() {
                       <i />
                     </span>
                     <h1 className="logo">Pet Buddha</h1>
-                    <p className="lede">Personalised guidance to help you choose what’s best for your pet.</p>
+                    <p className="lede">A calmer, healthier dog starts with a few questions.</p>
                     <button
                       className="pill"
                       onClick={() => {
@@ -308,8 +315,9 @@ export default function Onboarding() {
                         }, 380);
                       }}
                     >
-                      Get started
+                      Start the 2-minute quiz
                     </button>
+                    <p className="lede-note">8 questions · no sign-up</p>
                   </div>
                   <FunFact />
                 </div>
@@ -324,14 +332,27 @@ export default function Onboarding() {
                 // The dogs notice the hand as it crosses the middle: from 52% of
                 // the way over they point their noses at it, and wag once it is on top of them.
                 const at = e.clientX / window.innerWidth;
-                const next: PackMood = at >= 0.65 ? "wag" : at >= 0.52 ? "sniff" : "idle";
-                if (next !== packMood) setPackMood(next);
                 const sides = e.currentTarget;
+                const onDogs = at >= 0.52;
+                if (onDogs && !packArmed.current) {
+                  packArmed.current = true;
+                  packUntil.current = Date.now() + 3000;
+                  window.clearTimeout(packTimer.current);
+                  packTimer.current = window.setTimeout(() => {
+                    setPackMood("idle");
+                    aimPack(sides, null);
+                  }, 3000);
+                }
+                if (!onDogs) packArmed.current = false;
+                const awake = Date.now() < packUntil.current;
+                const next: PackMood = !awake ? "idle" : at >= 0.65 ? "wag" : onDogs ? "sniff" : "idle";
+                if (next !== packMood) setPackMood(next);
                 const target = next === "idle" ? null : { x: e.clientX, y: e.clientY };
                 cancelAnimationFrame(aimFrame.current);
                 aimFrame.current = requestAnimationFrame(() => aimPack(sides, target));
               }}
               onPointerLeave={(e) => {
+                packArmed.current = false;
                 setPackMood("idle");
                 cancelAnimationFrame(aimFrame.current);
                 aimPack(e.currentTarget, null);
@@ -370,10 +391,10 @@ export default function Onboarding() {
             >
               <label className="field">
                 <span className="sr">Your dog's name</span>
-                <input type="text" value={name} maxLength={24} autoComplete="off" placeholder="Type a name" onChange={(e) => setName(e.target.value)} />
+                <input type="text" value={name} maxLength={24} autoComplete="off" placeholder="Name, or a nickname" onChange={(e) => setName(e.target.value)} />
               </label>
               <button className="pill" type="submit">
-                {name.trim() ? "Next" : "Skip"} <span className="arrow" aria-hidden />
+                Continue <span className="arrow" aria-hidden />
               </button>
             </form>
           )}
@@ -464,7 +485,7 @@ export default function Onboarding() {
                   Not sure
                 </button>
                 <button className="pill" onClick={() => go("age")}>
-                  Next <span className="arrow" aria-hidden />
+                  Continue <span className="arrow" aria-hidden />
                 </button>
               </div>
             </div>
@@ -499,7 +520,7 @@ export default function Onboarding() {
                 />
               </label>
               <button className="pill" onClick={() => go("sex")}>
-                Next <span className="arrow" aria-hidden />
+                Continue <span className="arrow" aria-hidden />
               </button>
             </div>
           )}
@@ -520,7 +541,7 @@ export default function Onboarding() {
                       window.setTimeout(() => go("needs"), 350);
                     }}
                   >
-                    {s === "boy" ? "Good boy" : "Good girl"}
+                    {s === "boy" ? "Boy" : "Girl"}
                   </button>
                 ))}
               </div>
@@ -546,7 +567,7 @@ export default function Onboarding() {
                 ))}
               </div>
               <button className="pill" onClick={() => go("food")}>
-                Next <span className="arrow" aria-hidden />
+                Continue <span className="arrow" aria-hidden />
               </button>
             </div>
           )}
@@ -584,7 +605,7 @@ export default function Onboarding() {
                 ))}
               </div>
               <button className="pill" onClick={() => go("curating")}>
-                Show me <span className="arrow" aria-hidden />
+                {name.trim() ? `See ${cap(name)}'s plan` : "See the plan"} <span className="arrow" aria-hidden />
               </button>
             </div>
           )}

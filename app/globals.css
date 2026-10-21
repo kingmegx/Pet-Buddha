@@ -6189,22 +6189,6 @@ body:has(.stage) {
   transform: rotate(-3deg);
 }
 
-.pack[data-mood="wag"] .p-tail {
-  animation: sway 1.4s var(--d) ease-in-out infinite alternate;
-}
-
-.pack[data-mood="wag"] .p-ear,
-.pack[data-mood="wag"] .p-ear-up {
-  animation: none;
-}
-
-.pack[data-mood="sniff"] .p-nose {
-  animation: nose-twitch 0.5s ease-in-out infinite alternate;
-}
-
-.p-head {
-  transition: transform 0.6s ease-out;
-}
 
 /* The bowing pair sits right beside the name, not out at the edges. */
 .n-left {
@@ -6227,4 +6211,101 @@ body:has(.stage) {
     left: auto;
     right: 4%;
   }
+}
+
+/* The back button: a centred, drawn arrow. */
+.back {
+  display: grid;
+  place-items: center;
+  font-size: 0;
+}
+
+.back svg {
+  display: block;
+}
+
+/* ---- landing: spread across the height, balanced around the name ---- */
+.landing-copy {
+  top: 50%;
+  translate: 0 -54%;
+}
+
+.floater {
+  height: calc(11 * var(--k));
+  margin-bottom: calc(3.4 * var(--k));
+}
+
+.logo {
+  font-size: clamp(44px, 5.6vw, 84px);
+}
+
+.lede {
+  margin: clamp(12px, 2vh, 20px) 0 clamp(24px, 4vh, 40px);
+}
+
+.niche {
+  top: 50%;
+  translate: 0 -50%;
+  width: calc(30 * var(--k));
+  height: calc(44 * var(--k));
+}
+
+.fact {
+  top: auto;
+  bottom: clamp(28px, 8vh, 72px);
+}
+
+/* ---- questions: the content block sits in the middle of the screen ---- */
+.title {
+  top: clamp(32px, 9vh, 88px);
+}
+
+.screen-name .controls { top: 57%; }
+.screen-weight .controls { top: 55%; }
+.screen-sex .controls { top: 56%; }
+.screen-age .controls { top: 51%; }
+.screen-needs .controls,
+.screen-food .controls { top: 42%; }
+.nametag { top: 29%; }
+.breed-pick { inset: 28% 0 0; }
+.sides { inset: 27% 8% 7%; }
+
+.n-left { right: calc(50% + clamp(185px, 17.5vw, 280px)); }
+.n-right { left: calc(50% + clamp(185px, 17.5vw, 280px)); }
+@media (max-width: 760px) {
+  .n-left { right: auto; }
+  .n-right { left: auto; }
+}
+
+/* Under the landing button: what to expect. */
+.lede-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* Buttons on the questions: as wide as the field above, same place each time. */
+.controls > .pill,
+.controls > .row {
+  width: min(420px, 100%);
+}
+
+.controls > .pill {
+  justify-content: center;
+}
+
+.controls > .row > .pill {
+  flex: 1;
+  justify-content: center;
+}
+
+.controls .chips-quiet + .pill,
+.screen-needs .controls > .pill {
+  margin-top: 4px;
+}
+
+.lede {
+  max-width: 44ch;
+  text-wrap: balance;
 }
