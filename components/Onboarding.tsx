@@ -7,7 +7,7 @@ import { BOWLS, PROBLEMS, commonProblems, type Bowl, type ProblemId, type Sex } 
 import { Face } from "./Faces";
 import { CatBust, ProfileBust } from "./Busts";
 import { NicheArt } from "./NicheArt";
-import { FunFact } from "./FunFact";
+import { LandingMore } from "./LandingMore";
 import { NameTag } from "./NameTag";
 import { Pack, aimPack, type PackMood } from "./Pack";
 import { CatBox, type BoxBrand, type CatCoat } from "./CatBox";
@@ -84,6 +84,8 @@ export default function Onboarding() {
   const packUntil = useRef(0);
   const packTimer = useRef(0);
   const lookFrame = useRef(0);
+  // The landing scrolls inside its own sheet; its sections read this.
+  const landingRef = useRef<HTMLDivElement>(null);
   const aimFrame = useRef(0);
 
   const pet = breed;
@@ -101,6 +103,34 @@ export default function Onboarding() {
       setName(cap(localStorage.getItem("petbuddha.name") ?? ""));
     } catch {}
   }, []);
+
+  // On the landing, the bottoms of the two arched windows line up with the
+  // "8 short questions" line under the button.
+  useEffect(() => {
+    if (step !== "landing") return;
+    const align = () => {
+      const hero = landingRef.current?.querySelector<HTMLElement>(".l-hero");
+      const note = hero?.querySelector<HTMLElement>(".lede-note");
+      if (!hero || !note) return;
+      // Layout offsets, not on-screen boxes, so the entrance animations don't skew it.
+      const copy = note.offsetParent as HTMLElement;
+      const bottom = copy.offsetTop + note.offsetTop + note.offsetHeight;
+      hero.style.setProperty("--niche-bottom", `${Math.round(bottom)}px`);
+    };
+    align();
+    document.fonts?.ready.then(align);
+    window.addEventListener("resize", align);
+    return () => window.removeEventListener("resize", align);
+  }, [step]);
+
+  const startQuestions = () => {
+    // Let the dogs leave before the questions come in.
+    setLeaving(true);
+    window.setTimeout(() => {
+      go("species");
+      setLeaving(false);
+    }, 380);
+  };
 
   const go = (next: Step) => {
     setTrail((t) => [...t, step]);
@@ -278,48 +308,59 @@ export default function Onboarding() {
         >
           {step === "landing" && (
             <>
-              {/* A white card on a pale blue page. One dog stands on the card with a
-                  band of colour behind it; another hangs in over the top corner. */}
+              {/* The landing, top to bottom: the name between the two bowing
+                  animals with the way in; three reasons to trust it; and a
+                  "Did you know?" strip along the bottom. */}
               <div className="landing-bg" />
               <div className={`card-page ${leaving ? "is-leaving" : ""}`}>
-                <i className="band" />
-                <div className="paper">
-                  {/* Either side of the name, eyes closed, bowing towards it. */}
-                  <div className="niche n-left reactive" data-pat>
-                    <NicheArt src="/art/pray-dog.png">
-                      <ProfileBust />
-                    </NicheArt>
-                  </div>
-                  <div className="niche n-right reactive" data-pat>
-                    <NicheArt src="/art/pray-cat.png">
-                      <CatBust />
-                    </NicheArt>
-                  </div>
-                  <div className="landing-copy">
-                    {/* The meditating dog floats at the top, above the name. */}
-                    <span className="floater" aria-hidden>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/art/buddha.png" alt="" draggable={false} />
-                      <i />
-                    </span>
-                    <h1 className="logo">Pet Buddha</h1>
-                    <p className="lede">A calmer, healthier dog starts with a few questions.</p>
+                <div className="paper landing" ref={landingRef}>
+                  <div className="l-first">
+                  <section className="l-hero">
+                    {/* Either side of the name, eyes closed, bowing towards it. */}
+                    <div className="niche n-left reactive" data-pat>
+                      <NicheArt src="/art/pray-dog.png">
+                        <ProfileBust />
+                      </NicheArt>
+                    </div>
+                    <div className="niche n-right reactive" data-pat>
+                      <NicheArt src="/art/pray-cat.png">
+                        <CatBust />
+                      </NicheArt>
+                    </div>
+                    <div className="landing-copy">
+                      {/* The meditating dog floats above the name. */}
+                      <span className="floater" aria-hidden>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/art/buddha.png" alt="" draggable={false} />
+                        <i />
+                      </span>
+                      <h1 className="logo">Pet Buddha</h1>
+                      <p className="lede">Tell us about your dog, and we&apos;ll put together advice and products picked for them.</p>
+                      <button className="pill" onClick={startQuestions}>
+                        Personalise my plan <span className="arrow" aria-hidden />
+                      </button>
+                      <p className="lede-note">8 short questions · about 2 minutes · no sign-up</p>
+                    </div>
+                  </section>
+                  <div className="l-bottom">
                     <button
-                      className="pill"
+                      className="l-scroll"
                       onClick={() => {
-                        // Let the dogs leave before the questions come in.
-                        setLeaving(true);
-                        window.setTimeout(() => {
-                          go("species");
-                          setLeaving(false);
-                        }, 380);
+                        const sheet = landingRef.current;
+                        const next = sheet?.querySelector<HTMLElement>(".sw");
+                        if (sheet && next) sheet.scrollTo({ top: next.offsetTop, behavior: "smooth" });
                       }}
                     >
-                      Start the 2-minute quiz
+                      <span>Scroll to see why</span>
+                      <i aria-hidden>
+                        <svg viewBox="0 0 20 20" width="16" height="16">
+                          <path d="M10 4v12M5 11l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </i>
                     </button>
-                    <p className="lede-note">8 questions · no sign-up</p>
                   </div>
-                  <FunFact />
+                  </div>
+                  <LandingMore scroller={landingRef} onStart={startQuestions} />
                 </div>
               </div>
             </>

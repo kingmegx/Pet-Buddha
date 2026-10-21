@@ -6309,3 +6309,1742 @@ body:has(.stage) {
   max-width: 44ch;
   text-wrap: balance;
 }
+
+/* =====================================================================
+   Landing v4: the page is laid out top to bottom instead of everything
+   floating in the middle: a hero (name between the bowing pair, the way
+   in), three reasons, and a "Did you know?" strip along the bottom.
+   ===================================================================== */
+.paper.landing {
+  display: flex;
+  flex-direction: column;
+  padding: 0 clamp(20px, 5vw, 72px);
+  overflow-y: auto;
+}
+
+.l-hero {
+  position: relative;
+  flex: 1;
+  min-height: 380px;
+  display: grid;
+  place-items: center;
+  padding: clamp(40px, 8vh, 96px) 0 clamp(24px, 4vh, 48px);
+}
+
+.landing .landing-copy {
+  position: relative;
+  top: auto;
+  translate: none;
+  padding: 0;
+  max-width: 560px;
+}
+
+.landing .floater {
+  height: clamp(44px, 7vh, 64px);
+  margin-bottom: clamp(14px, 2.4vh, 22px);
+}
+
+.landing .logo {
+  font-size: clamp(48px, 6.4vw, 96px);
+}
+
+.landing .lede {
+  max-width: 40ch;
+  margin: clamp(14px, 2.2vh, 22px) 0 clamp(24px, 4vh, 36px);
+  font-size: clamp(16px, 1.3vw, 18px);
+  line-height: 1.5;
+}
+
+.landing .pill {
+  padding: 14px 26px;
+  font-size: 16px;
+}
+
+.landing .lede-note {
+  margin-top: 14px;
+}
+
+/* The bowing pair frames the hero, a little apart from the words. */
+.landing .niche {
+  top: 50%;
+  translate: 0 -50%;
+  width: clamp(150px, 15vw, 230px);
+  height: clamp(220px, 22vw, 340px);
+}
+
+.landing .n-left {
+  left: auto;
+  right: calc(50% + clamp(250px, 24vw, 380px));
+}
+
+.landing .n-right {
+  right: auto;
+  left: calc(50% + clamp(250px, 24vw, 380px));
+}
+
+/* Three reasons, in a row under the hero. */
+.l-points {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 clamp(24px, 4vw, 56px);
+  width: min(1040px, 100%);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.l-points li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  column-gap: 8px;
+  row-gap: 4px;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+}
+
+.l-points .s-num {
+  grid-row: span 2;
+  padding-top: 2px;
+  font-size: 12px;
+}
+
+.l-points strong {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.l-points span:not(.s-num) {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* Did you know: a quiet strip with its own label, not lost text. */
+.landing .fact {
+  position: relative;
+  top: auto;
+  bottom: auto;
+  left: auto;
+  translate: none;
+  width: min(1040px, 100%);
+  margin: clamp(16px, 3vh, 32px) auto clamp(20px, 4vh, 40px);
+  padding: 16px 22px;
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: center;
+  gap: 20px;
+  border-radius: 14px;
+  background: #f6f5f2;
+  text-align: left;
+}
+
+.landing .fact strong {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--ink);
+}
+
+.fact-timer {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ink);
+  transform-origin: 0 50%;
+  animation: fact-timer 10s linear both;
+}
+
+@keyframes fact-timer {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.landing .fact p {
+  min-height: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.landing .fact p span {
+  display: inline;
+}
+
+@media (max-width: 900px) {
+  .l-points {
+    grid-template-columns: 1fr;
+  }
+
+  .landing .niche {
+    width: 110px;
+    height: 160px;
+  }
+
+  .landing .n-left {
+    right: auto;
+    left: 0;
+    top: 30%;
+  }
+
+  .landing .n-right {
+    left: auto;
+    right: 0;
+    top: 30%;
+  }
+
+  .landing .fact {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fact-timer {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 900px) {
+  /* On a phone the pair sits above the name instead of beside it. */
+  .l-hero {
+    padding-top: 196px;
+    padding-bottom: 32px;
+    min-height: 0;
+  }
+
+  .landing .niche {
+    top: 28px;
+    translate: none;
+    width: 112px;
+    height: 150px;
+  }
+
+  .landing .n-left {
+    left: calc(50% - 124px);
+  }
+
+  .landing .n-right {
+    right: calc(50% - 124px);
+  }
+
+  .landing .floater {
+    display: none;
+  }
+
+  .landing .logo {
+    font-size: 44px;
+  }
+}
+
+/* Never squash the hero; the page scrolls instead. */
+.l-hero,
+.l-points,
+.landing .fact {
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .l-hero {
+    min-height: auto;
+  }
+}
+
+/* =====================================================================
+   Landing v5, after truus.co: the first screen (hero + did you know),
+   then a big sentence that assembles as you scroll, the reasons as
+   tilted sticker cards, and a closing call to action. Heavy lowercase
+   headings with an italic serif accent word.
+   ===================================================================== */
+.paper.landing {
+  display: block;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+.l-first {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0 clamp(20px, 5vw, 72px);
+}
+
+.l-first .l-hero {
+  flex: 1 0 auto;
+}
+
+.landing h2 em,
+.landing .sw-sub em {
+  font-family: var(--font-accent), Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* 1. The scattered sentence */
+.sw {
+  position: relative;
+  padding: clamp(80px, 16vh, 180px) 0 clamp(60px, 12vh, 140px);
+  overflow: hidden;
+}
+
+.sw-line {
+  margin: 0;
+  white-space: nowrap;
+  font-family: var(--font-brand), sans-serif;
+  font-size: clamp(64px, 11vw, 176px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: var(--ink);
+  text-align: center;
+}
+
+.sw-letter {
+  display: inline-block;
+  will-change: transform;
+}
+
+.sw-space {
+  display: inline-block;
+  width: 0.28em;
+}
+
+.sw-sub {
+  max-width: 34ch;
+  margin: clamp(32px, 6vh, 56px) auto 0;
+  padding: 0 20px;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* 2. Reasons as tilted sticker cards */
+.rc {
+  padding: clamp(40px, 8vh, 96px) clamp(20px, 5vw, 72px);
+}
+
+.rc-title {
+  margin: 0 0 clamp(32px, 6vh, 56px);
+  font-family: var(--font-brand), sans-serif;
+  font-size: clamp(40px, 6vw, 88px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  text-align: center;
+}
+
+.rc-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 300px));
+  justify-content: center;
+  gap: clamp(20px, 3vw, 40px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rc-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 14px 22px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(17, 17, 17, 0.06), 0 18px 40px -24px rgba(17, 17, 17, 0.35);
+  transition: box-shadow 0.3s;
+}
+
+.rc-card:hover {
+  animation: wiggle 0.5s ease-in-out;
+  box-shadow: 0 1px 0 rgba(17, 17, 17, 0.06), 0 26px 50px -24px rgba(17, 17, 17, 0.4);
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1.02);
+  }
+  25% {
+    transform: rotate(-3deg) scale(1.02);
+  }
+  50% {
+    transform: rotate(2.5deg) scale(1.02);
+  }
+  75% {
+    transform: rotate(-1.5deg) scale(1.02);
+  }
+}
+
+.rc-art {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+.rc-a .rc-art {
+  background: #f6dccb;
+}
+
+.rc-b .rc-art {
+  background: #dfe7dc;
+}
+
+.rc-c .rc-art {
+  background: #e4ddf1;
+}
+
+.rc-art .face {
+  width: 46%;
+}
+
+/* The sticker: a little tag stuck across the corner of the picture. */
+.rc-tag {
+  position: absolute;
+  top: 24px;
+  right: -10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  rotate: 6deg;
+  box-shadow: 0 4px 10px -6px rgba(17, 17, 17, 0.4);
+}
+
+.rc-a .rc-tag {
+  background: #ee5f3f;
+  color: #fff;
+}
+
+.rc-b .rc-tag {
+  background: #1f8a5b;
+  color: #fff;
+  rotate: -5deg;
+  right: auto;
+  left: -10px;
+}
+
+.rc-c .rc-tag {
+  background: #f5b041;
+  color: var(--ink);
+}
+
+.rc-card strong {
+  padding: 0 6px;
+  font-family: var(--font-brand), sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.rc-text {
+  padding: 0 6px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* 3. Closing call to action */
+.l-end {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding: clamp(60px, 12vh, 140px) 20px clamp(60px, 12vh, 120px);
+  text-align: center;
+}
+
+.l-end h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-brand), sans-serif;
+  font-size: clamp(40px, 6vw, 88px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+}
+
+.l-end .lede-note {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .rc-list {
+    grid-template-columns: minmax(0, 340px);
+  }
+
+  .sw-line {
+    font-size: 15vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rc-card:hover {
+    animation: none;
+  }
+}
+
+.sw-line {
+  font-size: clamp(52px, 8.2vw, 140px);
+}
+
+@media (max-width: 900px) {
+  .rc-art {
+    aspect-ratio: 16 / 8;
+  }
+
+  .rc-art .face {
+    width: 30%;
+  }
+}
+
+/* ---- Landing v6: warm off-white page, pinned sentence, fact card, scroll cue ---- */
+.landing-bg,
+.paper.landing {
+  background: #f0ebe6;
+}
+
+html:has(.paper.landing),
+body:has(.paper.landing) {
+  background: #f0ebe6;
+}
+
+/* The sentence is pinned for a long scroll while it comes together. */
+.sw {
+  height: 320vh;
+  padding: 0;
+  overflow: visible;
+}
+
+.sw-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* The bottom of the first screen: the fact card, then a cue to scroll. */
+.l-bottom {
+  display: grid;
+  justify-items: center;
+  gap: clamp(18px, 3vh, 28px);
+  padding: 0 0 clamp(20px, 4vh, 36px);
+}
+
+.landing .fact {
+  position: relative;
+  inset: auto;
+  translate: none;
+  width: min(520px, 100%);
+  margin: 0;
+  padding: 26px 24px 16px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(17, 17, 17, 0.06), 0 18px 40px -26px rgba(17, 17, 17, 0.35);
+  rotate: -1.2deg;
+  text-align: left;
+}
+
+.landing .fact:hover {
+  animation: wiggle 0.5s ease-in-out;
+}
+
+.fact-tag {
+  position: absolute;
+  top: -12px;
+  left: 18px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: #ee5f3f;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  rotate: -4deg;
+  box-shadow: 0 4px 10px -6px rgba(17, 17, 17, 0.4);
+}
+
+.landing .fact p {
+  margin: 0;
+  min-height: 2.7em;
+  font-family: var(--font-brand), sans-serif;
+  font-size: clamp(17px, 1.5vw, 20px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.fact-foot {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.fact-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.landing .fact-timer {
+  height: 2px;
+  background: rgba(17, 17, 17, 0.12);
+  position: relative;
+  overflow: hidden;
+  animation: none;
+}
+
+.landing .fact-timer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform-origin: 0 50%;
+  animation: fact-timer 10s linear both;
+}
+
+.fact-next {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  transition: background 0.2s, color 0.2s;
+}
+
+.fact-next:hover {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* A clear invitation to scroll, gently bobbing. */
+.l-scroll {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.l-scroll i {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  animation: bob-down 1.6s ease-in-out infinite;
+}
+
+@keyframes bob-down {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+/* White cards stand out on the warm page; the niches keep their colour. */
+.landing .lede,
+.landing .lede-note,
+.sw-sub,
+.rc-text {
+  color: #55504a;
+}
+
+@media (max-width: 900px) {
+  .sw {
+    height: 240vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .l-scroll i {
+    animation: none;
+  }
+}
+
+/* ---- Truus type everywhere: Epilogue 900 headings, tight; DM Sans text ---- */
+h1,
+h2,
+.logo,
+.logo-lockup,
+.title h1,
+.s-top h1,
+.sugg h1,
+.sugg h2,
+.s-panel-head h2 {
+  font-family: var(--font-brand), sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.logo {
+  font-weight: 900;
+  letter-spacing: -0.045em;
+}
+
+/* =====================================================================
+   Landing v7 (truus): sliding sentence, stickers, did-you-know section.
+   ===================================================================== */
+
+/* 1. The sliding sentence: pinned for three screens; the line moves left and
+   letters settle as they pass the middle (positions set in LandingMore). */
+.sw {
+  height: 300vh;
+}
+
+.sw-pin {
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.sw-line {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-brand), sans-serif;
+  font-size: clamp(110px, 15vw, 240px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  white-space: nowrap;
+  text-align: left;
+  will-change: transform;
+}
+
+.sw-letter {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.15);
+  will-change: transform;
+}
+
+.sw-space {
+  display: inline-block;
+  width: 0.26em;
+}
+
+.sw-sub {
+  align-self: center;
+  margin-top: clamp(28px, 5vh, 48px);
+}
+
+/* Stickers: a picture with a thick soft-coloured outline, like a die-cut sticker. */
+.sticker {
+  --tone: #e6f5c9;
+  display: grid;
+  place-items: center;
+  filter: drop-shadow(3px 0 0 var(--tone)) drop-shadow(-3px 0 0 var(--tone)) drop-shadow(0 3px 0 var(--tone)) drop-shadow(0 -3px 0 var(--tone)) drop-shadow(2px 2px 0 var(--tone)) drop-shadow(-2px -2px 0 var(--tone)) drop-shadow(2px -2px 0 var(--tone)) drop-shadow(-2px 2px 0 var(--tone))
+    drop-shadow(0 8px 10px rgba(17, 17, 17, 0.18));
+}
+
+.sw-sticker {
+  position: absolute;
+  left: 50%;
+  width: 0.62em;
+  pointer-events: none;
+  transform: translate(-50%, 0) rotate(var(--tilt)) scale(0);
+  transition: transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.sw-sticker.is-up {
+  bottom: 62%;
+}
+
+.sw-sticker.is-down {
+  top: 72%;
+}
+
+.sw-sticker .face,
+.sw-sticker img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.is-set > .sw-sticker {
+  transform: translate(-50%, 0) rotate(var(--tilt)) scale(1);
+}
+
+/* 2. Text stickers around the cards */
+.rc {
+  position: relative;
+  padding-top: clamp(80px, 14vh, 140px);
+  padding-bottom: clamp(80px, 14vh, 140px);
+}
+
+.text-sticker {
+  position: absolute;
+  z-index: 2;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  box-shadow: 0 6px 14px -8px rgba(17, 17, 17, 0.4);
+}
+
+.ts-lime {
+  background: #e6f5c9;
+  color: #7c2d4a;
+}
+
+.ts-coral {
+  background: #ee5f3f;
+  color: #fff;
+}
+
+.ts-lilac {
+  background: #cfc3f2;
+  color: #2a1f5c;
+}
+
+.ts-sun {
+  background: #f5b041;
+  color: var(--ink);
+}
+
+/* 3. Did you know: a section heading and one big fact, no card. */
+.dyk {
+  display: grid;
+  justify-items: center;
+  gap: clamp(20px, 4vh, 36px);
+  padding: clamp(60px, 12vh, 120px) clamp(20px, 5vw, 72px);
+  text-align: center;
+}
+
+.dyk h2 {
+  margin: 0;
+  font-size: clamp(40px, 6vw, 88px);
+  line-height: 0.95;
+}
+
+.landing .dyk .fact {
+  width: min(820px, 100%);
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  rotate: 0deg;
+  text-align: center;
+  gap: 24px;
+}
+
+.landing .dyk .fact:hover {
+  animation: none;
+}
+
+.landing .dyk .fact p {
+  min-height: 2.4em;
+  font-family: var(--font-brand), sans-serif;
+  font-size: clamp(24px, 3vw, 40px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.landing .dyk .fact-foot {
+  width: min(360px, 100%);
+  margin: 0 auto;
+}
+
+.landing .dyk .fact-next {
+  background: transparent;
+  border-color: rgba(17, 17, 17, 0.2);
+}
+
+.landing .dyk .fact-next:hover {
+  background: var(--ink);
+}
+
+/* The first screen now ends with only the scroll cue. */
+.l-bottom {
+  padding-bottom: clamp(24px, 5vh, 48px);
+}
+
+@media (max-width: 900px) {
+  .sw {
+    height: 260vh;
+  }
+
+  .sw-line {
+    font-size: 26vw;
+  }
+
+  .text-sticker {
+    font-size: 12px;
+  }
+}
+
+/* Letters are positioned every frame from a smoothed scroll value, so they
+   carry no transition of their own (it made them lag and jitter). */
+.sw-letter {
+  transition: none;
+}
+
+/* =====================================================================
+   Truus-style rhythm: only big display headings are heavy; everything else
+   is regular-weight DM Sans with room to breathe.
+   ===================================================================== */
+body {
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Display headings: heavy, but not crushed together. */
+h1,
+h2,
+.logo,
+.title h1,
+.s-top h1,
+.sugg h1,
+.sugg h2,
+.s-panel-head h2,
+.rc-title,
+.dyk h2,
+.l-end h2 {
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+
+.title h1 {
+  font-size: clamp(26px, 3.2vw, 40px);
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+}
+
+.title .sub {
+  margin-top: 12px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.title .eyebrow {
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+/* Running text: regular weight, generous line height. */
+p,
+.lede,
+.lede-note,
+.s-sub,
+.s-lead,
+.s-muted,
+.s-note,
+.sw-sub,
+.rc-text,
+.hint,
+.s-tips li > span:not(.s-num),
+.s-expert-what,
+.s-help-card p,
+.s-panel-head p,
+.s-subhead p,
+.s-check-text > span:last-child,
+.l-points span:not(.s-num) {
+  font-weight: 400 !important;
+  line-height: 1.55 !important;
+}
+
+/* Small headings and labels: medium, not black. */
+.s-tips strong,
+.s-rules strong,
+.s-expert strong,
+.s-help-card h3,
+.s-fold-btn strong,
+.s-subhead h3,
+.l-points strong,
+.s-week h2,
+.s-id strong,
+.product-name strong,
+.s-kind-head h3,
+.breed-name,
+.chip,
+.pill,
+.s-tabs button,
+.linklike,
+.fact-count,
+.text-sticker,
+.rc-tag {
+  font-weight: 600 !important;
+  letter-spacing: -0.005em;
+}
+
+/* Card titles stay in the display face, like truus's project cards. */
+.rc-card strong {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.landing .dyk .fact p {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+/* More air between blocks. */
+.s-tips li {
+  padding: 18px 0;
+  row-gap: 4px;
+}
+
+.s-subhead {
+  margin: 40px 0 12px;
+}
+
+.s-panel-head p {
+  margin-top: 12px !important;
+}
+
+.landing .lede {
+  margin: clamp(20px, 3vh, 28px) 0 clamp(28px, 4.5vh, 40px);
+}
+
+.rc-card {
+  gap: 10px;
+}
+
+.sw-sub {
+  max-width: 38ch;
+}
+
+/* ---- First screen: a little higher, with a bigger floating Buddha ---- */
+.l-first .l-hero {
+  padding-top: clamp(24px, 5vh, 64px);
+  padding-bottom: clamp(56px, 11vh, 120px);
+}
+
+.landing .floater {
+  height: clamp(64px, 10vh, 96px);
+  margin-bottom: clamp(16px, 2.6vh, 26px);
+}
+
+/* =====================================================================
+   Type hierarchy, broken down the truus way:
+   - Epilogue black ONLY for the few display lines (the name, the landing
+     section statements, the plan's headline).
+   - Every other heading is DM Sans: medium for big titles, semibold for
+     small ones. Body text regular. Lots of space between.
+   ===================================================================== */
+
+/* Question titles: big but light. */
+.title h1 {
+  font-family: inherit;
+  font-weight: 500;
+  font-size: clamp(28px, 3.4vw, 42px);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.title .sub {
+  margin-top: 14px;
+  color: var(--muted);
+}
+
+/* Suggestions: headings become DM Sans; only the plan headline stays display. */
+.sugg h2,
+.s-panel-head h2,
+.s-week h2,
+.sugg h3 {
+  font-family: inherit;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em;
+}
+
+.s-panel-head h2 {
+  font-size: clamp(24px, 2.6vw, 32px) !important;
+  font-weight: 500 !important;
+  line-height: 1.15;
+}
+
+.s-top h1 {
+  line-height: 1.02 !important;
+}
+
+.s-sub {
+  margin-top: 20px !important;
+}
+
+.s-top-actions {
+  margin-top: 32px;
+}
+
+.s-tips strong,
+.s-rules strong,
+.s-expert strong,
+.s-help-card h3,
+.s-fold-btn strong {
+  font-size: 16px;
+  font-weight: 600 !important;
+}
+
+.s-tips li {
+  padding: 22px 0;
+  row-gap: 6px;
+}
+
+.s-subhead {
+  margin: 56px 0 16px;
+}
+
+.s-panel {
+  padding-top: clamp(40px, 6vh, 64px);
+}
+
+.s-sec {
+  padding-top: clamp(56px, 9vh, 96px);
+}
+
+.s-week {
+  margin-top: clamp(48px, 8vh, 80px);
+}
+
+/* Landing cards and fact: DM Sans titles, like truus's project cards. */
+.rc-card strong {
+  font-family: inherit;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.landing .dyk .fact p {
+  font-family: inherit;
+  font-size: clamp(22px, 2.6vw, 34px);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+}
+
+.l-points strong {
+  font-family: inherit;
+}
+
+/* The landing display statements keep Epilogue but with air around them. */
+.rc-title,
+.dyk h2,
+.l-end h2 {
+  margin-bottom: 8px;
+}
+
+.dyk {
+  gap: clamp(28px, 5vh, 48px);
+  padding-top: clamp(96px, 16vh, 180px);
+  padding-bottom: clamp(96px, 16vh, 180px);
+}
+
+.rc {
+  padding-top: clamp(120px, 18vh, 200px);
+  padding-bottom: clamp(120px, 18vh, 200px);
+}
+
+.l-end {
+  padding-top: clamp(96px, 16vh, 180px);
+  gap: 24px;
+}
+
+/* Buttons and chips: medium weight. */
+.pill,
+.chip,
+.s-tabs button,
+.linklike {
+  font-weight: 500 !important;
+}
+
+.pill {
+  letter-spacing: -0.01em;
+}
+
+/* Windows centred on the name + line (set from Onboarding). The block also
+   sits higher in the screen. */
+.landing .niche {
+  top: var(--niche-mid, 50%);
+}
+
+.l-first .l-hero {
+  padding-top: clamp(16px, 3vh, 40px);
+  padding-bottom: clamp(80px, 15vh, 160px);
+}
+
+/* ---- Landing first screen: windows sit on the "8 short questions" line;
+   the name and its line move up, away from the button. ---- */
+.landing .niche {
+  top: calc(var(--niche-bottom, 70%) - clamp(220px, 22vw, 340px));
+  translate: none;
+}
+
+.landing .logo {
+  margin-top: 0;
+}
+
+.landing .lede {
+  margin: clamp(10px, 1.6vh, 16px) 0 clamp(48px, 8vh, 88px);
+}
+
+/* ---- More space between every section ---- */
+.sw {
+  margin-top: clamp(80px, 14vh, 160px);
+}
+
+.rc {
+  padding-top: clamp(160px, 24vh, 280px);
+  padding-bottom: clamp(160px, 24vh, 280px);
+}
+
+.dyk {
+  padding-top: clamp(140px, 22vh, 260px);
+  padding-bottom: clamp(140px, 22vh, 260px);
+}
+
+.l-end {
+  padding-top: clamp(140px, 22vh, 260px);
+  padding-bottom: clamp(120px, 18vh, 200px);
+}
+
+/* Suggestions page */
+.s-week {
+  margin-top: clamp(72px, 12vh, 128px);
+}
+
+.s-plan {
+  margin-top: clamp(88px, 14vh, 160px);
+}
+
+.s-sec {
+  padding-top: clamp(96px, 15vh, 168px);
+}
+
+.s-subhead {
+  margin-top: 72px;
+}
+
+.s-careful {
+  margin-top: 56px;
+}
+
+.s-foot {
+  margin-top: clamp(96px, 15vh, 168px);
+}
+
+@media (max-width: 900px) {
+  .landing .niche {
+    top: 28px;
+  }
+}
+
+/* =====================================================================
+   Landing v8: smoother sentence, line-art stickers, underline squiggle,
+   blob + fanned fact cards.
+   ===================================================================== */
+
+/* Stickers on the moving line: plain shapes, no filters, so they cost
+   nothing to move. */
+.sw-sticker {
+  width: 0.5em;
+  filter: none;
+  will-change: transform;
+}
+
+.sw-sticker .line-sticker,
+.around-sticker .line-sticker {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.face-sticker {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 48% 52% 44% 56% / 52% 46% 54% 48%;
+  padding: 10%;
+}
+
+.face-sticker .face {
+  width: 100%;
+}
+
+.sw-letter {
+  backface-visibility: hidden;
+}
+
+/* Picture stickers around the cards */
+.around-sticker {
+  position: absolute;
+  z-index: 2;
+  width: clamp(56px, 6vw, 84px);
+}
+
+/* The squiggle under a heading */
+.rc-head,
+.dyk-head {
+  position: relative;
+  display: grid;
+  justify-items: center;
+}
+
+.squiggle {
+  width: min(520px, 70%);
+  height: 34px;
+  margin-top: 4px;
+  color: var(--ink);
+  overflow: visible;
+}
+
+.squiggle.is-short {
+  width: min(360px, 60%);
+}
+
+/* More room between the heading and the cards */
+.rc-title {
+  margin-bottom: 0;
+}
+
+.rc-head {
+  margin-bottom: clamp(72px, 11vh, 120px);
+}
+
+/* did you know: blob + fanned cards */
+.dyk {
+  display: grid;
+  justify-items: center;
+  gap: clamp(48px, 8vh, 88px);
+}
+
+.dyk-head h2 {
+  margin: 0;
+}
+
+.dyk-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(760px, 100%);
+  height: clamp(420px, 56vh, 520px);
+}
+
+.dyk-blob {
+  position: absolute;
+  left: 4%;
+  top: 0;
+  width: min(440px, 70%);
+  height: auto;
+  animation: blob-drift 9s ease-in-out infinite alternate;
+}
+
+@keyframes blob-drift {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  to {
+    transform: rotate(8deg) scale(1.04);
+  }
+}
+
+.dyk-card {
+  position: absolute;
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  width: min(380px, 78vw);
+  min-height: 250px;
+  padding: 56px 28px 32px;
+  border-radius: 14px;
+  text-align: left;
+  color: var(--ink);
+  box-shadow: 0 1px 0 rgba(17, 17, 17, 0.05), 0 24px 50px -28px rgba(17, 17, 17, 0.45);
+  cursor: pointer;
+}
+
+.dyk-label {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dyk-fact {
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+@media (max-width: 900px) {
+  .around-sticker {
+    width: 48px;
+  }
+
+  .dyk-stage {
+    height: 420px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dyk-blob {
+    animation: none;
+  }
+}
+
+.sw-sticker {
+  width: 0.62em;
+}
+
+.sw-sticker.is-up {
+  bottom: 70%;
+}
+
+.dyk-blob {
+  left: -4%;
+  top: -8%;
+  width: min(480px, 74%);
+}
+
+/* Fanned open on hover: the stage widens so the outer cards stay on screen. */
+.dyk-stage {
+  width: min(1100px, 100%);
+}
+
+
+/* =====================================================================
+   why pet buddha: a hand of cards, after truus's "call us if you need".
+   ===================================================================== */
+.hand-row {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  height: 470px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hand-card {
+  position: absolute;
+  top: 40px;
+  left: calc(50% - 125px);
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  width: 250px;
+  height: 300px;
+  padding: 64px 24px 28px;
+  border-radius: 12px;
+  color: var(--ink);
+  box-shadow: 0 1px 0 rgba(17, 17, 17, 0.04), 0 22px 44px -30px rgba(40, 20, 10, 0.55);
+  cursor: default;
+}
+
+.hc-green { background: #2e6a4c; color: #fbf6ef; }
+.hc-blue { background: #8c9cf5; }
+.hc-orange { background: #ee6a3c; }
+.hc-plum { background: #8e2f50; color: #fbf6ef; }
+.hc-lilac { background: #e9b9f4; }
+
+.hc-sticker {
+  position: absolute;
+  top: -38px;
+  left: 50%;
+  width: 84px;
+  translate: -50% 0;
+  rotate: -8deg;
+}
+
+.hand-card:nth-child(even) .hc-sticker {
+  left: 62%;
+  rotate: 9deg;
+}
+
+.hc-sticker .line-sticker {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.hand-card strong {
+  font-family: var(--font-brand), sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.hc-rule {
+  width: 100%;
+  height: 10px;
+  overflow: visible;
+}
+
+.hand-card ul {
+  display: grid;
+  gap: 8px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hand-card li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.hand-card li::before {
+  content: "✦";
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  font-size: 11px;
+}
+
+@media (max-width: 1180px) and (min-width: 900px) {
+  .hand-row {
+    scale: 0.82;
+  }
+}
+
+@media (max-width: 899px) {
+  .hand-row {
+    height: auto;
+    gap: 56px;
+    padding-top: 40px;
+  }
+
+  .hand-card {
+    position: relative;
+    top: 0;
+    left: auto;
+    width: min(340px, 100%);
+    min-height: 0;
+  }
+}
+
+/* The fanned fact cards poke past the edge on phones; keep the page from scrolling sideways. */
+.dyk {
+  overflow-x: clip;
+}
+
+/* =====================================================================
+   did you know: a fan of tall cards over the blue blob, fact underneath.
+   ===================================================================== */
+.dyk-fan {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(1000px, 100%);
+  height: 470px;
+}
+
+.dyk .dyk-blob {
+  position: absolute;
+  left: auto;
+  right: -4%;
+  top: 30%;
+  width: min(400px, 45%);
+}
+
+.dyk-doodle {
+  position: absolute;
+  left: 8%;
+  top: 4%;
+  width: 90px;
+  color: var(--ink);
+}
+
+.dyk .dyk-card {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  width: 280px;
+  min-height: 0;
+  height: 400px;
+  padding: 0;
+  border: 7px solid #fbf6ef;
+  border-radius: 22px;
+  box-shadow: 0 26px 50px -30px rgba(40, 20, 10, 0.6);
+}
+
+.dyk-art {
+  width: 150px;
+}
+
+.dyk-art .line-sticker {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.dyk .dyk-label {
+  top: auto;
+  left: 50%;
+  bottom: -18px;
+  translate: -50% 0;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: #ee6a3c;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.dyk .dyk-card[data-tone="#ee6a3c"] .dyk-label {
+  background: #e9b9f4;
+}
+
+.dyk-caption {
+  min-height: 3.4em;
+  max-width: 620px;
+  margin-top: -8px;
+  text-align: center;
+}
+
+.dyk-caption p {
+  margin: 0;
+  font-family: var(--font-brand), sans-serif;
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+@media (max-width: 899px) {
+  .dyk-fan {
+    height: 380px;
+  }
+
+  .dyk .dyk-card {
+    width: 210px;
+    height: 300px;
+  }
+
+  .dyk-art {
+    width: 110px;
+  }
+
+  .dyk-doodle {
+    width: 60px;
+    left: 2%;
+  }
+}
+
+/* Flipping fact cards: the fact on the front, the picture on the back. */
+.dyk .dyk-card {
+  border: 0;
+  background: none;
+  border-radius: 22px;
+}
+
+.dyk-flip {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.dyk-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border: 7px solid #fbf6ef;
+  border-radius: 22px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.dyk-back {
+  transform: rotateY(180deg);
+}
+
+.dyk-front {
+  align-content: start;
+  justify-items: start;
+  gap: 22px;
+  padding: 30px 26px;
+  text-align: left;
+  color: var(--ink);
+}
+
+.dyk-card[data-tone="#2e6a4c"] .dyk-front,
+.dyk-card[data-tone="#8e2f50"] .dyk-front {
+  color: #fbf6ef;
+}
+
+.dyk-mini {
+  width: 64px;
+}
+
+.dyk-mini .line-sticker {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.dyk-front .dyk-fact {
+  font-family: var(--font-brand), sans-serif;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.dyk .dyk-label {
+  z-index: 2;
+}
+
+@media (max-width: 899px) {
+  .dyk-front {
+    padding: 22px 18px;
+    gap: 14px;
+  }
+
+  .dyk-front .dyk-fact {
+    font-size: 19px;
+  }
+
+  .dyk-mini {
+    width: 48px;
+  }
+}
