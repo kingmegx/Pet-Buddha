@@ -6,6 +6,7 @@ import { BOWLS, PROBLEMS, type Bowl, type ProblemId, type Sex } from "@/lib/cont
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import Slider from "./Slider";
+import { Squiggle } from "./LandingMore";
 
 // The dog's profile: everything the questions asked, on one page, all of it
 // editable. Changing anything here changes the suggestions. It lives on this
@@ -65,7 +66,18 @@ export function Profile({
           <Face id={breed.face} className="reactive" />
         </div>
         <div>
-          <h1>{name.trim() ? `${name.trim().replace(/^./, (c) => c.toUpperCase())}'s profile` : "Your dog's profile"}</h1>
+          <h1>
+            {name.trim() ? (
+              <>
+                <em>{name.trim().replace(/^./, (c) => c.toUpperCase())}&apos;s</em> profile
+              </>
+            ) : (
+              <>
+                your dog&apos;s <em>profile</em>
+              </>
+            )}
+          </h1>
+          <Squiggle className="s-squiggle" />
           <p>Change anything, tick more, and the suggestions follow. Kept on this device only.</p>
         </div>
       </header>
@@ -143,7 +155,7 @@ export function Profile({
           <div className="chips chips-left">
             {(["boy", "girl"] as const).map((s) => (
               <button key={s} className="chip" aria-pressed={sex === s} onClick={() => setSex(s)}>
-                {s === "boy" ? "Boy" : "Girl"}
+                {s === "boy" ? "Good boy" : "Good girl"}
               </button>
             ))}
           </div>

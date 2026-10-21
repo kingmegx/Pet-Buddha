@@ -7,7 +7,8 @@ import { BOWLS, PROBLEMS, commonProblems, type Bowl, type ProblemId, type Sex } 
 import { Face } from "./Faces";
 import { CatBust, ProfileBust } from "./Busts";
 import { NicheArt } from "./NicheArt";
-import { LandingMore } from "./LandingMore";
+import { HeroDoodles, LandingMore, Squiggle } from "./LandingMore";
+import { BLOB, Sticker, type StickerKind } from "./Stickers";
 import { NameTag } from "./NameTag";
 import { Pack, aimPack, type PackMood } from "./Pack";
 import { CatBox, type BoxBrand, type CatCoat } from "./CatBox";
@@ -42,19 +43,37 @@ const CAT_BOXES: { coat: CatCoat; brand: BoxBrand; delay: number; style: React.C
 const cap = (s: string) => s.trim().replace(/^./, (c) => c.toUpperCase());
 
 // A heading whose words rise into place one after another.
-function Rise({ text }: { text: string }) {
+// The question, word by word. One word (usually the dog's name) is set in the
+// italic accent face, like "why *pet buddha*" on the landing.
+function Rise({ text, accent }: { text: string; accent?: string }) {
+  const bare = (w: string) => w.replace(/[?.,!]+$/, "").replace(/['’]s$/, "");
   return (
     <>
       {text.split(" ").map((word, i) => (
         <Fragment key={i}>
           <span className="rise">
-            <span style={{ "--i": i } as React.CSSProperties}>{word}</span>
+            <span style={{ "--i": i } as React.CSSProperties}>{accent && bare(word) === accent ? <em>{word}</em> : word}</span>
           </span>{" "}
         </Fragment>
       ))}
     </>
   );
 }
+
+// A line-art sticker and a text sticker on each question, in the corners,
+// like the ones scattered around the landing's sections.
+const STEP_STICKERS: Partial<Record<Step, { kind: StickerKind; tone: string; ink: string; text: string; ts: string }>> = {
+  species: { kind: "heart", tone: "#fbe0d2", ink: "#7c2d4a", text: "hi there", ts: "ts-lime" },
+  name: { kind: "sparkle", tone: "#fde3b0", ink: "#6b3a12", text: "good name!", ts: "ts-lilac" },
+  breed: { kind: "nose", tone: "#e6f5c9", ink: "#1f5c43", text: "no two noses alike", ts: "ts-coral" },
+  weight: { kind: "bone", tone: "#c9d3ff", ink: "#3a3f8f", text: "no scales needed", ts: "ts-sun" },
+  age: { kind: "ball", tone: "#fde3b0", ink: "#6b3a12", text: "puppy or wise one?", ts: "ts-lime" },
+  sex: { kind: "paw", tone: "#ecd3f5", ink: "#7c2d4a", text: "noted", ts: "ts-coral" },
+  needs: { kind: "leaf", tone: "#e6f5c9", ink: "#1f5c43", text: "we've got you", ts: "ts-lilac" },
+  food: { kind: "bowl", tone: "#fbe0d2", ink: "#7c2d4a", text: "bowl talk", ts: "ts-sun" },
+};
+const HERO_TONES = ["#c9d3ff", "#e6f5c9", "#fbe0d2", "#ecd3f5", "#fde3b0"];
+const TAG_TONES = ["ts-lime", "ts-coral", "ts-lilac", "ts-sun"];
 
 export default function Onboarding() {
   const [step, setStep] = useState<Step>("landing");
@@ -211,6 +230,9 @@ export default function Onboarding() {
     profile: ["", "", ""],
   };
   const [eyebrow, title, sub] = titles[step];
+  // The word in each question set in the italic accent; the dog's name when
+  // the question has it.
+  const ACCENT: Partial<Record<Step, string>> = { species: "helping", name: "name", needs: "help" };
 
   // How far through the flow we are, for the bar along the top.
   const ORDER: Step[] = ["landing", "species", "name", "breed", "weight", "age", "sex", "needs", "food", "curating", "done"];
@@ -222,8 +244,8 @@ export default function Onboarding() {
     weight: { top: "40%", scale: 1 },
     age: { top: "37%", scale: 0.92 },
     sex: { top: "43%", scale: 1 },
-    needs: { top: "31%", scale: 0.7 },
-    food: { top: "31%", scale: 0.7 },
+    needs: { top: "33%", scale: 0.5 },
+    food: { top: "33%", scale: 0.5 },
   };
   const hero = HERO[step];
 
@@ -271,12 +293,26 @@ export default function Onboarding() {
             exit={{ y: -24, opacity: 0, transition: { duration: 0.16 } }}
             transition={{ duration: 0.2 }}
           >
-            <p className="eyebrow">{eyebrow}</p>
+            <p className={`eyebrow step-tag ${TAG_TONES[ORDER.indexOf(step) % TAG_TONES.length]}`}>{eyebrow}</p>
             <h1>
-              <Rise text={title} />
+              <Rise text={title} accent={ACCENT[step] ?? who} />
             </h1>
+            <Squiggle className="title-squiggle" />
             {sub && <p className="sub">{sub}</p>}
           </motion.header>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence mode="wait">
+        {STEP_STICKERS[step] && (
+          <motion.div key={step} className="step-stickers" aria-hidden initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }}>
+            <motion.span className="step-line" initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: -8 }} transition={{ type: "spring", stiffness: 260, damping: 14, delay: 0.25 }}>
+              <Sticker kind={STEP_STICKERS[step]!.kind} tone={STEP_STICKERS[step]!.tone} ink={STEP_STICKERS[step]!.ink} />
+            </motion.span>
+            <motion.span className={`step-text text-sticker ${STEP_STICKERS[step]!.ts}`} initial={{ scale: 0, rotate: 12 }} animate={{ scale: 1, rotate: 5 }} transition={{ type: "spring", stiffness: 260, damping: 14, delay: 0.35 }}>
+              {STEP_STICKERS[step]!.text}
+            </motion.span>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -290,6 +326,9 @@ export default function Onboarding() {
             exit={{ scale: 0 }}
             transition={pop}
           >
+            <svg className="hero-blob" viewBox="0 0 64 64" aria-hidden>
+              <motion.path d={BLOB} initial={false} animate={{ fill: HERO_TONES[ORDER.indexOf(step) % HERO_TONES.length] }} transition={{ duration: 0.4 }} />
+            </svg>
             <div className="hero-size" style={{ transform: `scale(${growth * girth}, ${growth})` }}>
               <Face id={pet.face} happy={cheer} className="reactive" />
             </div>
@@ -317,12 +356,13 @@ export default function Onboarding() {
                   <div className="l-first">
                   <section className="l-hero">
                     {/* Either side of the name, eyes closed, bowing towards it. */}
-                    <div className="niche n-left reactive" data-pat>
+                    <HeroDoodles />
+                    <div className="niche n-left reactive" data-pat data-say="namaste 🙏">
                       <NicheArt src="/art/pray-dog.png">
                         <ProfileBust />
                       </NicheArt>
                     </div>
-                    <div className="niche n-right reactive" data-pat>
+                    <div className="niche n-right reactive" data-pat data-say="namaste 🙏">
                       <NicheArt src="/art/pray-cat.png">
                         <CatBust />
                       </NicheArt>
@@ -582,7 +622,7 @@ export default function Onboarding() {
                       window.setTimeout(() => go("needs"), 350);
                     }}
                   >
-                    {s === "boy" ? "Boy" : "Girl"}
+                    {s === "boy" ? "Good boy" : "Good girl"}
                   </button>
                 ))}
               </div>

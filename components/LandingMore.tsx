@@ -138,7 +138,7 @@ function ScatterWords({ scroller }: { scroller: React.RefObject<HTMLElement | nu
 }
 
 // A hand-drawn underline with a little loop, like truus's under "from TV to TikTok".
-function Squiggle({ className = "" }: { className?: string }) {
+export function Squiggle({ className = "" }: { className?: string }) {
   return (
     <svg className={`squiggle ${className}`} viewBox="0 0 600 50" preserveAspectRatio="none" aria-hidden>
       <motion.path
@@ -377,5 +377,38 @@ export function LandingMore({ scroller, onStart }: { scroller: React.RefObject<H
         <p className="lede-note">8 short questions · about 2 minutes · no sign-up</p>
       </section>
     </>
+  );
+}
+
+// Hand-drawn bits around the hero, in the truus way: a little burst of
+// lines, a squiggle, a lime star and a blue blob, tucked against the
+// corners of the two windows. The lines draw themselves in; the shapes
+// drift slowly. Purely decorative.
+export function HeroDoodles() {
+  const draw = (delay: number) => ({
+    initial: { pathLength: 0 },
+    animate: { pathLength: 1 },
+    transition: { duration: 0.8, ease: "easeInOut" as const, delay },
+  });
+  return (
+    <div className="doodles" aria-hidden>
+      <svg className="dd dd-burst" viewBox="0 0 60 60">
+        <motion.path d="M30 8v14M12 18l9 9M48 18l-9 9" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" {...draw(0.6)} />
+      </svg>
+      <svg className="dd dd-star" viewBox="0 0 100 100">
+        <path d="M50 4c4 26 20 42 46 46-26 4-42 20-46 46-4-26-20-42-46-46 26-4 42-20 46-46Z" fill="#f4c56e" />
+      </svg>
+      <svg className="dd dd-blob" viewBox="0 0 120 120">
+        <path d="M64 6c26 2 50 22 50 50s-20 58-52 58S6 96 6 66 34 4 64 6Z" fill="#c3d8d2" />
+      </svg>
+      <svg className="dd dd-swirl" viewBox="0 0 110 60">
+        <motion.path d="M4 40c14-20 30-20 34-6s-14 18-12 4 26-30 44-18 14 30 36 20" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" {...draw(0.9)} />
+      </svg>
+      <svg className="dd dd-dots" viewBox="0 0 60 20">
+        <circle cx="6" cy="10" r="4" fill="#5e8b84" />
+        <circle cx="30" cy="10" r="4" fill="#5e8b84" />
+        <circle cx="54" cy="10" r="4" fill="#5e8b84" />
+      </svg>
+    </div>
   );
 }

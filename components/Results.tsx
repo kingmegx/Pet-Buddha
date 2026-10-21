@@ -9,6 +9,140 @@ import { BALANCE, BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
+import { Squiggle } from "./LandingMore";
+import { Sticker, type StickerKind } from "./Stickers";
+
+// The dog's name set in the italic accent face, like "why *pet buddha*".
+function Accent({ text, word }: { text: string; word?: string }) {
+  if (!word || !text.includes(word)) return <>{text}</>;
+  const parts = text.split(word);
+  return (
+    <>
+      {parts.map((p, i) => (
+        <span key={i}>
+          {p}
+          {i < parts.length - 1 && <em>{word}</em>}
+        </span>
+      ))}
+    </>
+  );
+}
+
+// "In this tab": the tab's numbered sections, listed up front so you can see
+// what's coming and jump to any of them. Reads the headings from its own panel.
+function PanelIndex() {
+  const ref = useRef<HTMLElement>(null);
+  const [items, setItems] = useState<string[]>([]);
+  useEffect(() => {
+    const panel = ref.current?.parentElement;
+    if (!panel) return;
+    setItems([...panel.querySelectorAll(".s-subhead h3")].map((h) => h.textContent ?? ""));
+  }, []);
+  if (items.length < 2) return <nav ref={ref} className="s-index is-empty" aria-hidden />;
+  const go = (i: number) => {
+    const heads = ref.current?.parentElement?.querySelectorAll(".s-subhead");
+    heads?.[i]?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  return (
+    <nav ref={ref} className="s-index" aria-label="In this tab">
+      <span className="s-index-label">in this tab</span>
+      <ol>
+        {items.map((t, i) => (
+          <li key={t}>
+            <button onClick={() => go(i)}>
+              <span className="s-index-num">{String(i + 1).padStart(2, "0")}</span>
+              {t}
+            </button>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+}
+
+// Fresh toppers, one soft card per group: a sticker, the group name, and
+// the first few as chips. The rest wait behind "+ more", so it scans.
+const TOPPER_LOOK: Record<string, { kind: StickerKind; tone: string; ink: string; bg: string }> = {
+  Vegetables: { kind: "leaf", tone: "#ffffff", ink: "#1f5c43", bg: "#e6f5c9" },
+  Fruit: { kind: "heart", tone: "#ffffff", ink: "#7c2d4a", bg: "#fbe0d2" },
+  Protein: { kind: "bone", tone: "#ffffff", ink: "#3a3f8f", bg: "#ddd3f7" },
+  "Spice box": { kind: "sparkle", tone: "#ffffff", ink: "#6b3a12", bg: "#fde3b0" },
+};
+
+function ToppersGrid() {
+  const [all, setAll] = useState<string[]>([]);
+  return (
+    <div className="tp-grid">
+      {TOPPERS.map((grp) => {
+        const look = TOPPER_LOOK[grp.group] ?? TOPPER_LOOK.Vegetables;
+        const open = all.includes(grp.group);
+        const shown = open ? grp.items : grp.items.slice(0, 4);
+        const more = grp.items.length - 4;
+        return (
+          <div key={grp.group} className="tp-card" style={{ background: look.bg }}>
+            <span className="tp-sticker" aria-hidden>
+              <Sticker kind={look.kind} tone={look.tone} ink={look.ink} />
+            </span>
+            <h4>{grp.group}</h4>
+            <ul>
+              {shown.map((it) => (
+                <li key={it}>{it}</li>
+              ))}
+            </ul>
+            {more > 0 && (
+              <button className="tp-more" onClick={() => setAll((a) => (open ? a.filter((g) => g !== grp.group) : [...a, grp.group]))}>
+                {open ? "Show less" : `+ ${more} more`}
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// A line-art sticker for each kind of thing to buy.
+const KIND_STICKER: Record<KindId, { kind: StickerKind; tone: string; ink: string }> = {
+  chew: { kind: "bone", tone: "#fbe0d2", ink: "#7c2d4a" },
+  sniff: { kind: "nose", tone: "#e6f5c9", ink: "#1f5c43" },
+  puzzle: { kind: "sparkle", tone: "#ddd3f7", ink: "#3a3f8f" },
+};
+
+// "Start with these three" as a small hand of coloured cards, like the
+// landing's "why pet buddha".
+const WEEK_LOOK: { tone: string; kind: StickerKind; sticker: string; ink: string }[] = [
+  { tone: "green", kind: "paw", sticker: "#e6f5c9", ink: "#1f5c43" },
+  { tone: "blue", kind: "sparkle", sticker: "#fde3b0", ink: "#3a3f8f" },
+  { tone: "orange", kind: "bone", sticker: "#c9d3ff", ink: "#b2431c" },
+];
+
+function WeekCards({ tips }: { tips: Tip[] }) {
+  return (
+    <ol className="wk-cards">
+      {tips.map((tip, i) => {
+        const look = WEEK_LOOK[i % WEEK_LOOK.length];
+        return (
+          <motion.li
+            key={tip.t}
+            className={`wk-card hc-${look.tone}`}
+            style={{ rotate: [-3, 2, -1.5][i % 3] }}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ type: "spring", stiffness: 140, damping: 16, delay: i * 0.08 }}
+          >
+            <span className="wk-sticker">
+              <Sticker kind={look.kind} tone={look.sticker} ink={look.ink} />
+            </span>
+            <span className="wk-num">{String(i + 1).padStart(2, "0")}</span>
+            <strong>{tip.t}</strong>
+            <span className="wk-text">{tip.d}</span>
+          </motion.li>
+        );
+      })}
+    </ol>
+  );
+}
 
 // The suggestions page, built to be scanned, top to bottom:
 //   1. The "aha": one line that reframes the problem, and the dog it is for.
@@ -35,19 +169,49 @@ function Draft(_: { on?: boolean }) {
   return null;
 }
 
-// Short tips: a bold few words, then one line. Numbered, in a grid.
+// Tips, made to act on: the first is a "start here" card with its reason
+// showing; the rest are short rows with just the action, each opening to
+// its reason on a tap. One clear place to start, nothing to wade through.
 function Tips({ tips, start = 0 }: { tips: Tip[]; start?: number }) {
+  const [openAt, setOpenAt] = useState<number | null>(null);
+  if (tips.length === 0) return null;
+  const [first, ...rest] = tips;
   return (
-    <ol className="s-tips">
-      {tips.map((tip, i) => (
-        <li key={tip.t} style={{ "--i": i } as React.CSSProperties}>
-          <span className="s-num">{String(start + i + 1).padStart(2, "0")}</span>
-          <strong>{tip.t}</strong>
-          <span>{tip.d}</span>
-          {tip.src && <em className="s-src">From {tip.src}</em>}
-        </li>
-      ))}
-    </ol>
+    <div className="tl">
+      <div className="tl-first">
+        <span className="tl-start">start here</span>
+        <span className="tl-num">{String(start + 1).padStart(2, "0")}</span>
+        <strong>{first.t}</strong>
+        <p>{first.d}</p>
+        {first.src && <em className="s-src">From {first.src}</em>}
+      </div>
+      {rest.length > 0 && (
+        <ol className="tl-rest">
+          {rest.map((tip, i) => {
+            const open = openAt === i;
+            return (
+              <li key={tip.t} className={open ? "is-open" : ""}>
+                <button onClick={() => setOpenAt(open ? null : i)} aria-expanded={open}>
+                  <span className="tl-num">{String(start + i + 2).padStart(2, "0")}</span>
+                  <strong>{tip.t}</strong>
+                  <span className="tl-plus" aria-hidden />
+                </button>
+                <AnimatePresence initial={false}>
+                  {open && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} style={{ overflow: "hidden" }}>
+                      <div className="tl-why">
+                        <p>{tip.d}</p>
+                        {tip.src && <em className="s-src">From {tip.src}</em>}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+    </div>
   );
 }
 
@@ -209,6 +373,7 @@ function Sub({ children, note }: { children: React.ReactNode; note?: string }) {
   return (
     <div className="s-subhead">
       <h3>{children}</h3>
+      <Squiggle className="is-short" />
       {note && <p>{note}</p>}
     </div>
   );
@@ -238,68 +403,78 @@ function Sock() {
 
 // One product. Closed, it is a photo, a name, a price and one line. Tapping it
 // opens it across the full width with the reason, the first steps and the caution.
-function ProductCard({ p, open, onToggle, who, needs }: { p: Product; open: boolean; onToggle: () => void; who: string; needs: ProblemId[] }) {
+function ProductCard({ p, who, needs, tone }: { p: Product; who: string; needs: ProblemId[]; tone: string }) {
   const warn = p.notFor && needs.includes(p.notFor.problem) ? p.notFor.note : null;
+  // Flips over in place to show how it helps, like the fact cards on the
+  // landing. Both sides share one grid cell, so the card never changes size.
+  const [flipped, setFlipped] = useState(false);
   return (
-    <motion.article layout className={`product ${open ? "is-open" : ""}`} transition={{ type: "spring", stiffness: 200, damping: 26 }}>
-      <motion.button layout="position" className="product-top" onClick={onToggle} aria-expanded={open}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={p.image} alt={`${p.name}, photo from ${STORES[p.store].name}`} loading="lazy" />
-        <span className="product-name">
-          <strong>{p.name}</strong>
-          <span>{p.price}</span>
-        </span>
-        <span className="product-store">{STORES[p.store].name}</span>
-        <span className="product-plain">{p.plain}</span>
-        <span className="product-more">
-          {open ? "Close" : "How it helps"} <i className={`chev ${open ? "chev-up" : ""}`} aria-hidden />
-        </span>
-      </motion.button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div className="product-body" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
-            <div>
-              <h3>
-                Why it helps {who} <Draft on={p.draft} />
-              </h3>
-              <p>{p.why}</p>
-              {warn && (
-                <p className="caution">
-                  <strong>Heads up.</strong> {warn}
-                </p>
-              )}
-            </div>
-            <div>
-              <h3>How to start</h3>
-              <ol className="beats">
-                {p.start.map((line, i) => (
-                  <li key={line} style={{ "--i": i, "--n": p.start.length } as React.CSSProperties}>
-                    {line}
-                  </li>
-                ))}
-              </ol>
-            </div>
-            <p className="caution">
-              <strong>Watch out.</strong> {p.caution}
+    <article className={`pcard pc-${tone} ${flipped ? "is-flipped" : ""} ${warn ? "has-warn" : ""}`}>
+      <motion.div className="pcard-flip" initial={false} animate={{ rotateY: flipped ? 180 : 0 }} transition={{ type: "spring", stiffness: 120, damping: 18 }} style={{ transformPerspective: 1400 }}>
+        <div className="pcard-face pcard-front" aria-hidden={flipped}>
+          <div className="pcard-photo">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={p.image} alt={`${p.name}, photo from ${STORES[p.store].name}`} loading="lazy" />
+            {/* A round button tucked into the photo's corner, on a ring of page colour. */}
+            <span className="pcard-notch">
+              <button className="pcard-more" onClick={() => setFlipped(true)} tabIndex={flipped ? -1 : 0} aria-label={`How ${p.name} helps`}>
+                How it helps
+                <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden>
+                  <path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
+            </span>
+          </div>
+          <div className="pcard-info">
+            <strong>{p.name}</strong>
+            <span className="pcard-plain">{p.plain}</span>
+            <span className="pcard-tags">
+              <span className="pcard-tag pt-price">{p.price}</span>
+              <span className="pcard-tag pt-store">{STORES[p.store].name}</span>
+              {warn && <span className="pcard-tag pt-warn">Read first</span>}
+            </span>
+          </div>
+        </div>
+        <div className="pcard-face pcard-back" aria-hidden={!flipped}>
+          <strong className="pcard-back-title">
+            Why it helps {who} <Draft on={p.draft} />
+          </strong>
+          <p>{p.why}</p>
+          {warn && (
+            <p className="pcard-warn">
+              <strong>Heads up.</strong> {warn}
             </p>
-            <div className="product-links">
-              <a className="pill" href={STORES[p.store].url + p.path} target="_blank" rel="noreferrer">
-                See it at the store <span className="arrow" aria-hidden />
+          )}
+          <span className="pcard-label">How to start</span>
+          <ol className="pcard-steps">
+            {p.start.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ol>
+          <p className="pcard-caution">
+            <strong>Watch out.</strong> {p.caution}
+          </p>
+          <div className="pcard-links">
+            <a className="pill" href={STORES[p.store].url + p.path} target="_blank" rel="noreferrer" tabIndex={flipped ? 0 : -1}>
+              See it at the store <span className="arrow" aria-hidden />
+            </a>
+            {/* The sock trick is a home-made snuffle toy, so only those link to it. */}
+            {p.kind === "sniff" && (
+              <a className="linklike" href="#diy" tabIndex={flipped ? 0 : -1}>
+                Or make one free
               </a>
-              {/* The sock trick is a home-made snuffle toy, so only those link to it. */}
-              {p.kind === "sniff" && (
-                <a className="pill pill-quiet" href="#diy">
-                  Or make one for free
-                </a>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.article>
+            )}
+          </div>
+          <button className="pcard-circle pcard-close" onClick={() => setFlipped(false)} tabIndex={flipped ? 0 : -1} aria-label="Back to the photo">
+            <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden>
+              <path d="M5 5l10 10M15 5 5 15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+      </motion.div>
+    </article>
   );
 }
-
 
 const ICONS: Record<string, () => React.ReactNode> = { walk: WalkIcon, fetch: BallIcon, sniff: SniffIcon, chew: ChewIcon };
 
@@ -379,7 +554,10 @@ function Toilet({ sex, marks }: { sex: Sex | null; marks: boolean }) {
 function WhyWalk() {
   const [open, setOpen] = useState(false);
   return (
-    <div className={`s-fold ${open ? "is-open" : ""}`}>
+    <div className={`s-fold s-fold-feature ${open ? "is-open" : ""}`}>
+      <span className="s-feature-sticker" aria-hidden>
+        <Sticker kind="nose" tone="#fde3b0" ink="#3a3f8f" />
+      </span>
       <button className="s-fold-btn" onClick={() => setOpen(!open)} aria-expanded={open}>
         <span>
           <strong>Why won't a longer walk fix it?</strong>
@@ -423,7 +601,6 @@ export function Results({
   onProfile: () => void;
   onRestart: () => void;
 }) {
-  const [open, setOpen] = useState<string | null>(null);
   const groups = groupsFor(needs);
   const [tab, setTab] = useState<GroupId>(groups[0].id);
   const g = groups.find((x) => x.id === tab) ?? groups[0];
@@ -457,7 +634,6 @@ export function Results({
 
   const showTab = (id: GroupId) => {
     setTab(id);
-    setOpen(null);
     // Bring the start of the tab into view if the reader is further down.
     const top = tabsRef.current?.getBoundingClientRect().top ?? 0;
     if (top < 0 || top > window.innerHeight * 0.6) tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -477,8 +653,11 @@ export function Results({
       {/* 1. The aha */}
       <header className="s-top">
         <div className="s-top-text">
-          <p className="s-kicker">{name ? `${name}'s plan` : "Your plan"}</p>
-          <h1>{fill(lead.aha)}</h1>
+          <p className="s-kicker text-sticker ts-lime">{name ? `${name}'s plan` : "Your plan"}</p>
+          <h1>
+            <Accent text={fill(lead.aha)} word={name || undefined} />
+          </h1>
+          <Squiggle className="s-squiggle" />
           <p className="s-sub">{lead.why}</p>
           <div className="s-top-actions">
             <a className="pill" href="#plan">
@@ -490,6 +669,12 @@ export function Results({
           </div>
         </div>
         <div className="s-id">
+          <span className="s-id-sticker" aria-hidden>
+            <Sticker kind="heart" tone="#fbe0d2" ink="#7c2d4a" />
+          </span>
+          <span className="s-id-tag text-sticker ts-lilac" aria-hidden>
+            good dog
+          </span>
           <div className="s-id-face">
             <Face id={pet.face} />
           </div>
@@ -510,8 +695,13 @@ export function Results({
 
       {/* 2. Three things to start with */}
       <section className="s-week" aria-label="Start with these three">
-        <h2>Start with these three</h2>
-        <Tips tips={week} />
+        <div className="s-head">
+          <h2>
+            start with <em>these three</em>
+          </h2>
+          <Squiggle className="is-short" />
+        </div>
+        <WeekCards tips={week} />
       </section>
 
       {/* 3. The plan, in tabs */}
@@ -540,10 +730,14 @@ export function Results({
             {/* The first tab's aha is already the page headline. */}
             {g.id !== lead.id && (
               <div className="s-panel-head">
-                <h2>{fill(g.aha)}</h2>
+                <h2>
+                  <Accent text={fill(g.aha)} word={name || undefined} />
+                </h2>
+                <Squiggle className="s-squiggle" />
                 <p>{g.why}</p>
               </div>
             )}
+            <PanelIndex />
 
             {g.id === "energy" && (
               <>
@@ -557,9 +751,12 @@ export function Results({
                   const shown = products.filter((p) => p.kind === id);
                   if (shown.length === 0) return null;
                   return (
-                    <div key={id} className="s-kind">
+                    <div key={id} className={`s-kind s-kind-${id}`}>
                       <div className="s-kind-head">
                         <div>
+                          <span className="s-kind-sticker" aria-hidden>
+                            <Sticker kind={KIND_STICKER[id].kind} tone={KIND_STICKER[id].tone} ink={KIND_STICKER[id].ink} />
+                          </span>
                           <h3>{k.label}</h3>
                           <p>{k.lead}</p>
                         </div>
@@ -569,9 +766,9 @@ export function Results({
                           ))}
                         </ul>
                       </div>
-                      <div className="products">
-                        {shown.map((p) => (
-                          <ProductCard key={p.id} p={p} open={open === p.id} onToggle={() => setOpen(open === p.id ? null : p.id)} who={who} needs={needs} />
+                      <div className="pcards">
+                        {shown.map((p, i) => (
+                          <ProductCard key={p.id} p={p} who={who} needs={needs} tone={["lime", "peach", "lilac"][i % 3]} />
                         ))}
                       </div>
                     </div>
@@ -655,18 +852,7 @@ export function Results({
               <>
                 <Sub note="Whatever is in the bowl now, start here.">Step 1 · Fresh toppers, up to 10%</Sub>
                 <Tips tips={TOPPER_TIPS} />
-                <div className="s-toppers">
-                  {TOPPERS.map((grp) => (
-                    <div key={grp.group}>
-                      <h4>{grp.group}</h4>
-                      <ul>
-                        {grp.items.map((it) => (
-                          <li key={it}>{it}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
+                <ToppersGrid />
                 <Fold title="How much of each?" line="Organs, sardines, spices, garlic, and what to do if they're chubby.">
                   <Tips
                     tips={[
@@ -777,7 +963,12 @@ export function Results({
 
       {/* 4. More help */}
       <Scene className="s-sec">
-        <h2>Need more help?</h2>
+        <div className="s-head">
+          <h2>
+            need more <em>help?</em>
+          </h2>
+          <Squiggle className="is-short" />
+        </div>
         <div className="s-help">
           <div className="s-help-card">
             <h3>Something else going on?</h3>

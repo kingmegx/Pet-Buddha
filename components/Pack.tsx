@@ -34,9 +34,9 @@ const HOUNDS: Hound[] = [
   { x: 356, y: 64, scale: 1.45, coat: "#3a3640", ear: "fluffy", earColor: "#5a4640", collar: CORAL, delay: -0.3 },
   { x: 70, y: 150, scale: 1.02, coat: "#d9a06a", ear: "pointy", earColor: "#a8552c", collar: INK, delay: -0.7 },
   { x: 318, y: 212, scale: 1.32, coat: "#a8552c", ear: "floppy", earColor: "#7c3d1f", collar: SUN, delay: -0.15 },
-  { x: 34, y: 286, scale: 1.02, coat: "#f4e9d3", ear: "floppy", earColor: "#a8552c", collar: CORAL, delay: -0.5 },
+  { x: 34, y: 286, scale: 1.02, coat: "#7fa39b", ear: "floppy", earColor: "#a8552c", collar: CORAL, delay: -0.5 },
   { x: 196, y: 306, scale: 0.98, coat: "#e3a44a", ear: "pointy", earColor: "#cf8a30", collar: COBALT, delay: -0.85 },
-  { x: 408, y: 340, scale: 0.9, coat: "#efe3cd", ear: "fluffy", earColor: "#a8552c", collar: SUN, delay: -0.4 },
+  { x: 408, y: 340, scale: 0.9, coat: "#b9ab9c", ear: "fluffy", earColor: "#a8552c", collar: SUN, delay: -0.4 },
 ];
 
 function HoundShape({ h }: { h: Hound }) {

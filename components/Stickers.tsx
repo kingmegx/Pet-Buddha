@@ -50,7 +50,7 @@ const ART: Record<StickerKind, React.ReactNode> = {
 };
 
 // A rounded, slightly lopsided blob behind the drawing.
-const BLOB = "M33 4c13 0 25 8 27 21 2 12-3 23-12 30-9 6-22 7-32 1C6 50 2 38 5 26 8 13 19 4 33 4Z";
+export const BLOB = "M33 4c13 0 25 8 27 21 2 12-3 23-12 30-9 6-22 7-32 1C6 50 2 38 5 26 8 13 19 4 33 4Z";
 
 export function Sticker({ kind, tone = "#e6f5c9", ink = "#7c2d4a", className = "" }: { kind: StickerKind; tone?: string; ink?: string; className?: string }) {
   return (
