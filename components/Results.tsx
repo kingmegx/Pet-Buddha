@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
 import { ACTIVITIES, BOWLS, CALM, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
-import { BALANCE, BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
+import { BALANCE, BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
@@ -717,6 +717,36 @@ function WhyWalk() {
   );
 }
 
+// Questions and answers, one open at a time; the first starts open.
+function Faq({ items }: { items: { q: string; a: string }[] }) {
+  const [openAt, setOpenAt] = useState<number | null>(0);
+  return (
+    <ol className="tl-rest faq">
+      {items.map((it, i) => {
+        const open = openAt === i;
+        return (
+          <li key={it.q} className={open ? "is-open" : ""}>
+            <button onClick={() => setOpenAt(open ? null : i)} aria-expanded={open}>
+              <span className="tl-num">Q</span>
+              <strong>{it.q}</strong>
+              <span className="tl-plus" aria-hidden />
+            </button>
+            <AnimatePresence initial={false}>
+              {open && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} style={{ overflow: "hidden" }}>
+                  <div className="tl-why">
+                    <p>{it.a}</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 // A question worth answering, as a coloured card that opens: the same look
 // as "Why won't a longer walk fix it?".
 function FeatureFold({ title, line, kind, tone, children }: { title: string; line: string; kind: StickerKind; tone: string; children: React.ReactNode }) {
@@ -1020,8 +1050,11 @@ export function Results({
                 <NoLead.Provider value={true}>
                   <Tips tips={PERFECT_BOWL_RULES} />
                 </NoLead.Provider>
-                <FeatureFold title="Can a dog be vegetarian?" line="Short answer: no. Why dal, soya and grains won't cut it." kind="bone" tone="#fbe0d2">
+                <FeatureFold title="Can a dog be vegetarian?" line="Short answer: no. Here's what a dog's body needs that plants can't give." kind="bone" tone="#fbe0d2">
                   <Tips tips={VEG_TIPS} />
+                </FeatureFold>
+                <FeatureFold title="Why not dal, rice and curd?" line="It's what many Indian dogs eat. Here's what each part does, and what goes missing." kind="bowl" tone="#ddd3f7">
+                  <Tips tips={DAL_RICE_CURD} />
                 </FeatureFold>
 
                 {/* 2. One easy first step, depending on the bowl. */}
@@ -1127,6 +1160,9 @@ export function Results({
                 {/* 4. Kitchen rules, in one switchable section. */}
                 <Sub note={`${who === "your dog" ? "A grown dog" : Who} at ${kg} kg needs roughly ${dailyCalories(kg)} calories a day, more if very active.`} short="kitchen rules">Kitchen rules</Sub>
                 <KitchenRules kg={kg} months={months} />
+
+                <Sub short="questions">Questions people ask</Sub>
+                <Faq items={FOOD_FAQ} />
 
                 {/* 5. Their tummy, picky or weight problems, if ticked. */}
                 {(["tummy", "picky", "weight"] as ProblemId[])

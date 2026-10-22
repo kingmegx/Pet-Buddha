@@ -921,12 +921,47 @@ export const PERFECT_BOWL_RULES: Tip[] = [
 // Indian nutritionists.
 export const VEG_TIPS: Tip[] = [
   { t: "Dogs run on protein and fat", d: "They need no carbs at all: the body makes the glucose it needs from protein. Plants can't stand in for meat." },
-  { t: "Dal and soya bring starch", d: "Dal, soya, rajma and grains carry a lot of starch, which turns into sugar. Meat and eggs bring protein without it." },
-  { t: "The wrong building blocks", d: "Egg and meat protein match what a dog's body needs. Plant protein is a poorer fit, so veg bowls fall short over time." },
+  { t: "Dal and soya are mostly starch", d: "Dal, soya, rajma and grains are mostly starch, which the body turns into sugar. It fills a dog up without giving them what their body is built to run on." },
+  { t: "Plant protein is harder to use", d: "Dogs digest plant protein less well than meat. Dal and other legumes carry natural compounds (trypsin inhibitors, phytates) that slow protein digestion and lock up minerals like zinc and iron." },
+  { t: "The heart needs taurine", d: "Taurine keeps the heart muscle strong. Dogs make it from two amino acids, methionine and cysteine, that dal and grains are low in, and plants carry almost none. Diets heavy in lentils and peas have been linked to a heart disease called DCM." },
+  { t: "Where taurine comes from", d: "Meat, especially dark chicken meat, and fish and shellfish like prawns and mussels. A meat-based bowl brings it naturally." },
   { t: "Vets who know food disagree", d: "Dogs can digest some starch, so some say they can be vegan. The Forever Dog's authors, one a vet, disagree. Vegan dog foods also tested highest for weedkiller residue." },
   { t: "Better than a veg-only bowl", d: "A good packaged food is better for a dog than an unbalanced vegetarian home diet.", src: "Indian canine nutritionists" },
   { t: "A vegetarian home?", d: "Cook their eggs or meat separately, or buy fresh dog food. Their bowl doesn't have to follow the family's." },
 ];
+
+// Why dal, rice and curd isn't a dog's diet, piece by piece.
+export const DAL_RICE_CURD: Tip[] = [
+  { t: "Rice: energy, little else", d: "Rice is starch. It turns into sugar and gives quick energy, but dogs need no carbohydrates and get little else from it." },
+  { t: "Dal: the wrong protein", d: "Dal's protein is low in methionine and cysteine, the amino acids dogs use to make taurine for the heart, and it comes with compounds that slow digestion." },
+  { t: "Curd: a topping, not a meal", d: "A spoon of plain curd is a fine extra. As a base it's mostly milk: some protein and calcium, but not the iron, zinc, omega-3 and vitamins a dog needs." },
+  { t: "What goes missing", d: "Bowls like this run short on taurine, omega-3 (EPA and DHA, from fish), iron, zinc, choline and vitamins D and E. A UC Davis study found 95% of 200 home-made dog recipes short on at least one essential nutrient." },
+];
+
+// Questions people ask about food, answered plainly.
+export const FOOD_FAQ: { q: string; a: string }[] = [
+  {
+    q: "My dog is healthy and running around on curd rice. Why change?",
+    a: "Missing nutrients don't show up early. A young body covers the gaps by drawing on its own reserves, so a dog can look perfectly fine for years. The cost tends to arrive with age: skin and coat trouble, weaker muscles and joints, a struggling heart, and slow recovery from illness, when the body has nothing left to draw on.",
+  },
+  {
+    q: "We don't cook meat at home. What can we do?",
+    a: "Eggs are a great start: their protein matches what a dog's body needs. You can also buy fresh dog food from Indian kitchens that deliver, or ask a canine nutritionist for a plan that works for your home.",
+  },
+  {
+    q: "Isn't rice good for an upset tummy?",
+    a: "Plain rice for a day or two of loose motions is fine. As an everyday base, it's mostly starch and leaves too little room for what they need.",
+  },
+  {
+    q: "Is curd good for dogs?",
+    a: "A spoon of plain curd is a fine extra. Skip flavoured or sweetened yoghurt, and don't make it the main part of the bowl.",
+  },
+  {
+    q: "How fast should I change their food?",
+    a: "Slowly. Swap a tenth of the old food for the new on day one, and add more each day only if their poop stays firm. See Kitchen rules, Switching food.",
+  },
+];
+
 
 // Why garlic, and why it isn't onion. From The Forever Dog (chapters 5 and 8).
 export const GARLIC_WHY: Tip[] = [

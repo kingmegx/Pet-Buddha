@@ -11832,3 +11832,31 @@ body:has(.stage),
     max-width: 260px;
   }
 }
+
+/* Questions people ask: the open-row list, a little roomier. */
+.faq {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.faq button {
+  padding: 22px 2px;
+}
+
+.faq strong {
+  font-size: 18px;
+}
+
+.faq .tl-num {
+  background: #fde3b0;
+  font-weight: 700;
+}
+
+.faq .tl-why p {
+  font-size: 16px;
+  color: #3d3833;
+}
+
+.faq li.is-open .tl-why {
+  padding-bottom: 26px;
+}
