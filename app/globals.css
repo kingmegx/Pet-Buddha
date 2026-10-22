@@ -11562,3 +11562,273 @@ body:has(.stage),
 .sugg .s-everyone .s-expert.k-adopt:nth-child(n) {
   background: #fff !important;
 }
+
+/* =====================================================================
+   Food fixes: ladder as step pills, calm folds, link pills, note cards.
+   ===================================================================== */
+
+/* The ladder: four step pills; the one you're on is solid ink. */
+.sugg .s-rungs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 28px;
+  padding: 0;
+  border: 0 !important;
+  border-radius: 0;
+  background: none !important;
+  overflow: visible;
+}
+
+.sugg .s-rungs button,
+.sugg .s-rungs button + button {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  padding: 14px 18px;
+  border: 1.5px solid var(--ink) !important;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+  transition: transform 0.45s var(--spring), box-shadow 0.25s ease, background 0.2s;
+}
+
+.sugg .s-rungs button:hover {
+  transform: translateY(-2px) rotate(-1deg);
+  box-shadow: 0 10px 18px -12px rgba(40, 20, 10, 0.45);
+}
+
+.sugg .s-rungs button[aria-selected="true"] {
+  background: var(--ink);
+  color: #fbf6ef;
+}
+
+.sugg .s-rungs button[aria-selected="true"] strong,
+.sugg .s-rungs button[aria-selected="true"] span {
+  color: #fbf6ef !important;
+}
+
+.sugg .s-rungs strong {
+  font-size: 26px;
+}
+
+.sugg .s-rungs span {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Folds: a calm neutral box with white cards inside. */
+.sugg .s-fold:not(.s-fold-feature):not(.s-everyone),
+.sugg .s-fold:nth-of-type(n):not(.s-fold-feature):not(.s-everyone) {
+  background: #f6f3ef !important;
+}
+
+.sugg .s-fold .tc li {
+  background: #fff;
+}
+
+/* Recipe links: outlined pills with an arrow. */
+.sugg .s-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px !important;
+}
+
+.sugg .s-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.45s var(--spring);
+}
+
+.sugg .s-links a:hover {
+  transform: translateY(-2px) rotate(-1.5deg);
+}
+
+/* Notes: full-width cards with a "good to know" tag, like the please-don't cards. */
+.sugg .s-note,
+.sugg .s-toilet-note {
+  position: relative;
+  max-width: none !important;
+  margin-top: 48px !important;
+  padding: 30px 26px 22px !important;
+  border-radius: 16px;
+  background: #fde3b0;
+}
+
+.sugg .s-toilet-note::before,
+.sugg .kr .s-toilet-note::before {
+  content: "good to know";
+  position: absolute;
+  top: -13px;
+  left: 22px;
+  padding: 5px 11px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: #fbf6ef;
+  font-size: 13px;
+  font-weight: 600;
+  rotate: -3deg;
+}
+
+/* The small credit lines stay quiet: no card. */
+.sugg .s-note {
+  padding: 0 !important;
+  background: none;
+  font-size: 13px !important;
+  color: #8a837c !important;
+}
+
+@media (max-width: 700px) {
+  .sugg .s-rungs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Product cards are as tall as their front; the back fits that size and
+   scrolls if it ever has more to say. Sections sit a little closer. */
+.pcard-back {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.pcard-flip {
+  position: relative;
+}
+
+.sugg .s-kind {
+  margin-top: clamp(64px, 9vh, 96px) !important;
+}
+
+/* Best-fit card: everything readable on the green. */
+.sugg .s-expert.is-pick .s-expert-where {
+  justify-self: start;
+  padding: 4px 10px;
+  border-radius: 7px;
+  background: rgba(251, 246, 239, 0.16);
+  color: #fbf6ef !important;
+  font-size: 13px;
+}
+
+.sugg .s-expert.is-pick .s-expert-links a {
+  color: #fbf6ef !important;
+  text-decoration-color: rgba(251, 246, 239, 0.5) !important;
+  border-color: rgba(251, 246, 239, 0.5) !important;
+}
+
+.sugg .s-expert.is-pick .s-pick-why {
+  background: rgba(251, 246, 239, 0.12);
+  border-left: 3px solid #ee6a3c;
+}
+
+/* =====================================================================
+   The perfect bowl: a bowl from above beside a list of its parts.
+   ===================================================================== */
+.pb {
+  display: grid;
+  grid-template-columns: minmax(220px, 340px) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.pb-art {
+  width: 100%;
+  overflow: visible;
+}
+
+.pb-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pb-list button {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 14px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pb-list button:hover,
+.pb-list button.is-on {
+  background: #f6f3ef;
+}
+
+.pb-dot {
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+}
+
+.pb-name {
+  display: grid;
+  gap: 2px;
+}
+
+.pb-name strong {
+  font-family: var(--font-brand), sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.pb-name span {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #5c5650;
+}
+
+/* Feature cards' open body: white tip cards, padded. */
+.s-feature-body {
+  padding: 0 30px 30px;
+}
+
+.s-feature-body .tc li {
+  background: #fff;
+}
+
+.s-feature-label {
+  margin: 28px 0 8px !important;
+  font-weight: 600;
+}
+
+.s-feature-body .s-papers li {
+  border-color: rgba(17, 17, 17, 0.15) !important;
+}
+
+@media (max-width: 760px) {
+  .pb {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  .pb-art {
+    max-width: 260px;
+  }
+}

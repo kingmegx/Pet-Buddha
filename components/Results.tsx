@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
 import { ACTIVITIES, BOWLS, CALM, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
-import { BALANCE, BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
+import { BALANCE, BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
@@ -13,6 +13,7 @@ import { Squiggle } from "./LandingMore";
 import { Sticker, type StickerKind } from "./Stickers";
 import { ToiletRoad } from "./ToiletRoad";
 import { BowlCompare } from "./BowlCompare";
+import { PerfectBowl } from "./PerfectBowl";
 
 // The dog's name set in the italic accent face, like "why *pet buddha*".
 function Accent({ text, word }: { text: string; word?: string }) {
@@ -233,14 +234,18 @@ function Draft(_: { on?: boolean }) {
 // repeat them further down.
 const SeenTips = createContext<Set<string>>(new Set());
 
+// Inside folds and the ladder, tips are reference: no "start here".
+const NoLead = createContext(false);
+
 // Tips as small open cards: the action and its one line, all visible, no
 // clicking. Anything already in "start with these three" is left out. When
 // nothing was left out, the first card is marked "start here".
 function Tips({ tips, start = 0 }: { tips: Tip[]; start?: number }) {
   const seen = useContext(SeenTips);
+  const noLead = useContext(NoLead);
   const shown = tips.filter((t) => !seen.has(t.t));
   if (shown.length === 0) return null;
-  const lead = shown.length === tips.length && shown.length > 1;
+  const lead = !noLead && shown.length === tips.length && shown.length > 1;
   return (
     <ol className={`tc ${lead ? "has-lead" : ""}`}>
       {shown.map((tip, i) => (
@@ -377,7 +382,6 @@ function Ladder({ start }: { start: string }) {
   return (
     <div className="s-ladder">
       <div className="s-rungs" role="tablist" aria-label="How much fresh food">
-        <motion.span className="s-rung-fill" initial={false} animate={{ width: `${((at + 1) / LADDER.length) * 100}%` }} transition={{ type: "spring", stiffness: 220, damping: 28 }} />
         {LADDER.map((x, i) => (
           <button key={x.id} role="tab" aria-selected={x.id === rung} className={i <= at ? "is-in" : ""} onClick={() => setRung(x.id)}>
             <strong>{x.share}</strong>
@@ -387,7 +391,9 @@ function Ladder({ start }: { start: string }) {
       </div>
       <AnimatePresence mode="wait">
         <motion.div key={rung} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
-          <Tips tips={r.tips} />
+          <NoLead.Provider value={true}>
+            <Tips tips={r.tips} />
+          </NoLead.Provider>
         </motion.div>
       </AnimatePresence>
     </div>
@@ -409,7 +415,9 @@ function Fold({ title, line, open: start = false, children }: { title: string; l
       <AnimatePresence initial={false}>
         {open && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} style={{ overflow: "hidden" }}>
-            <div className="s-fold-body">{children}</div>
+            <div className="s-fold-body">
+              <NoLead.Provider value={true}>{children}</NoLead.Provider>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -709,6 +717,35 @@ function WhyWalk() {
   );
 }
 
+// A question worth answering, as a coloured card that opens: the same look
+// as "Why won't a longer walk fix it?".
+function FeatureFold({ title, line, kind, tone, children }: { title: string; line: string; kind: StickerKind; tone: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`s-fold s-fold-feature ${open ? "is-open" : ""}`} style={{ background: tone }}>
+      <span className="s-feature-sticker" aria-hidden>
+        <Sticker kind={kind} tone="#fbf6ef" ink="#211e1c" />
+      </span>
+      <button className="s-fold-btn" onClick={() => setOpen(!open)} aria-expanded={open}>
+        <span>
+          <strong>{title}</strong>
+          <span>{line}</span>
+        </span>
+        <i className={`chev ${open ? "chev-up" : ""}`} aria-hidden />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} style={{ overflow: "hidden" }}>
+            <div className="s-feature-body">
+              <NoLead.Provider value={true}>{children}</NoLead.Provider>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 const TAB_ICONS: Partial<Record<GroupId, () => React.ReactNode>> = { energy: SniffIcon, walks: WalkIcon };
 
 export function Results({
@@ -977,6 +1014,16 @@ export function Results({
                 <Sub note={`What's in ${who === "your dog" ? "the" : `${Who}'s`} bowl now, next to a fresh one. Tap a row to see why it matters.`} short="why fresh">Why fresh food</Sub>
                 <BowlCompare bowl={bowl} needs={needs} who={Who} />
 
+                {/* 2. What a complete bowl looks like, and why not vegetarian. */}
+                <Sub note="What to aim for, whatever you feed now." short="perfect bowl">The perfect bowl</Sub>
+                <PerfectBowl />
+                <NoLead.Provider value={true}>
+                  <Tips tips={PERFECT_BOWL_RULES} />
+                </NoLead.Provider>
+                <FeatureFold title="Can a dog be vegetarian?" line="Short answer: no. Why dal, soya and grains won't cut it." kind="bone" tone="#fbe0d2">
+                  <Tips tips={VEG_TIPS} />
+                </FeatureFold>
+
                 {/* 2. One easy first step, depending on the bowl. */}
                 {bowl === "home" || bowl === "fresh" ? (
                   <>
@@ -985,7 +1032,7 @@ export function Results({
                     <p className="s-links">
                       {HOMEMADE_LINKS.map((l) => (
                         <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
-                          {l.label} <i className="chev chev-right" aria-hidden />
+                          {l.label} <span aria-hidden>→</span>
                         </a>
                       ))}
                     </p>
@@ -993,6 +1040,33 @@ export function Results({
                       <ToppersGrid />
                       <Tips tips={TOPPER_AMOUNTS} />
                     </Fold>
+                    <FeatureFold title="Why garlic? Isn't it toxic?" line={garlicCloves(kg) ? `It isn't onion. Why we add it, and ${who === "your dog" ? "how much" : `how much for ${Who}`}.` : "It isn't onion. Why we add it, and why very small dogs skip it."} kind="leaf" tone="#e6f5c9">
+                      <Tips
+                        tips={[
+                          ...GARLIC_WHY,
+                          {
+                            t: garlicCloves(kg) ? `For ${Who}: ${garlicCloves(kg)} a day` : "Very small dogs: skip it",
+                            d: garlicCloves(kg)
+                              ? `At ${kg} kg, up to ${garlicCloves(kg)} of fresh garlic a day, chopped into the food. Stop if they seem unwell.`
+                              : "Under 4.5 kg, leave garlic out. Onion is never safe at any size.",
+                            src: "The Forever Dog",
+                          },
+                        ]}
+                      />
+                      <p className="s-feature-label">The research, in plain words</p>
+                      <ul className="s-papers">
+                        {GARLIC_RESEARCH.map((r) => (
+                          <li key={r.url}>
+                            <a href={r.url} target="_blank" rel="noreferrer">
+                              {r.title}
+                            </a>
+                            <span className="s-papers-cite">{r.cite}</span>
+                            <span>{r.plain}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="s-toilet-note">{GARLIC_CONTEXT}</p>
+                    </FeatureFold>
                   </>
                 ) : (
                   <>
@@ -1003,16 +1077,36 @@ export function Results({
                       <Tips
                         tips={[
                           ...TOPPER_AMOUNTS,
-                          {
-                            t: "Garlic: fresh and measured",
-                            d: garlicCloves(kg)
-                              ? `At ${kg} kg, up to ${garlicCloves(kg)} of fresh garlic a day. Fresh only, no pills or powders. Onion is never safe.`
-                              : "Very small dogs: skip garlic. Onion is never safe.",
-                            src: "The Forever Dog, @backintheday.in, @doggiliciouus",
-                          },
                         ]}
                       />
                     </Fold>
+                    <FeatureFold title="Why garlic? Isn't it toxic?" line={garlicCloves(kg) ? `It isn't onion. Why we add it, and ${who === "your dog" ? "how much" : `how much for ${Who}`}.` : "It isn't onion. Why we add it, and why very small dogs skip it."} kind="leaf" tone="#e6f5c9">
+                      <Tips
+                        tips={[
+                          ...GARLIC_WHY,
+                          {
+                            t: garlicCloves(kg) ? `For ${Who}: ${garlicCloves(kg)} a day` : "Very small dogs: skip it",
+                            d: garlicCloves(kg)
+                              ? `At ${kg} kg, up to ${garlicCloves(kg)} of fresh garlic a day, chopped into the food. Stop if they seem unwell.`
+                              : "Under 4.5 kg, leave garlic out. Onion is never safe at any size.",
+                            src: "The Forever Dog",
+                          },
+                        ]}
+                      />
+                      <p className="s-feature-label">The research, in plain words</p>
+                      <ul className="s-papers">
+                        {GARLIC_RESEARCH.map((r) => (
+                          <li key={r.url}>
+                            <a href={r.url} target="_blank" rel="noreferrer">
+                              {r.title}
+                            </a>
+                            <span className="s-papers-cite">{r.cite}</span>
+                            <span>{r.plain}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="s-toilet-note">{GARLIC_CONTEXT}</p>
+                    </FeatureFold>
 
                     {/* 3. How far to go. */}
                     <Sub note={bowl ? BOWL_NOTE[bowl] : "Every bit of fresh food counts. Pick how far you want to go."} short="how far to go">When you're ready for more</Sub>
@@ -1022,7 +1116,7 @@ export function Results({
                       <p className="s-links">
                         {HOMEMADE_LINKS.map((l) => (
                           <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
-                            {l.label} <i className="chev chev-right" aria-hidden />
+                            {l.label} <span aria-hidden>→</span>
                           </a>
                         ))}
                       </p>
@@ -1042,26 +1136,14 @@ export function Results({
                   ))}
 
                 {/* 6. Tools and research, folded away. */}
-                <Sub short="tools">Tools and research</Sub>
                 {bowl !== "home" && bowl !== "fresh" && (
-                  <Fold title="Check the bag" line="How much starch is in their packaged food? Work it out from the label.">
-                    <StarchCheck />
-                  </Fold>
+                  <>
+                    <Sub short="check the bag">Check the bag</Sub>
+                    <Fold title="How much starch is in their food?" line="Work it out from the numbers on the label.">
+                      <StarchCheck />
+                    </Fold>
+                  </>
                 )}
-                <Fold title="Garlic: what the research says" line="The studies behind the garlic advice, in plain words.">
-                  <ul className="s-papers">
-                    {GARLIC_RESEARCH.map((r) => (
-                      <li key={r.url}>
-                        <a href={r.url} target="_blank" rel="noreferrer">
-                          {r.title}
-                        </a>
-                        <span className="s-papers-cite">{r.cite}</span>
-                        <span>{r.plain}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="s-toilet-note">{GARLIC_CONTEXT}</p>
-                </Fold>
 
                 <div className="s-soon">
                   <span className="s-soon-tag">Coming soon</span>

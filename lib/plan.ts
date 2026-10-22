@@ -494,7 +494,7 @@ export const TOPPERS: { group: string; items: string[] }[] = [
 export const TOPPER_AMOUNTS: Tip[] = [
   { t: "Organs: a paw a day", d: "Liver and other organs are rich. About the size of your dog's paw is plenty for a day." },
   { t: "Sardines: 1 per 9 kg", d: "One sardine for every 9 kg of dog, two or three times a week." },
-  { t: "Spices: one shake per 5 kg", d: "One shake of a dried spice for every 5 kg, mixed into the food. Fresh herbs: a quarter teaspoon per 9 kg." },
+  { t: "Spices: a pinch per 5 kg", d: "A pinch (about ⅛ tsp) of a dried spice for every 5 kg, mixed into the food. Fresh herbs: ¼ tsp per 9 kg." },
   { t: "Chubby dog? Swap, don't add", d: "If they need to lose weight, take 10% of their food away and replace it with toppers." },
 ];
 
@@ -896,3 +896,42 @@ export const COMPARE: Record<Bowl, Compare> = {
     note: "You're feeding the gold standard. Just make sure it's complete.",
   },
 };
+
+// ---------- the perfect bowl, vegetarian bowls, and why garlic ----------
+
+// What a complete fresh bowl is made of, by rough share of the bowl. From
+// The Forever Dog: about half the calories from protein and half from fat,
+// starch under 10%, made to a complete recipe. The shares are a picture of
+// the idea, not a recipe.
+export const PERFECT_BOWL: { id: string; label: string; share: number; color: string; line: string }[] = [
+  { id: "meat", label: "Meat and organs", share: 55, color: "#d9654f", line: "The base. Muscle meat with a little liver or heart. This is where most of the protein and fat comes from." },
+  { id: "fish", label: "Eggs and fish", share: 15, color: "#f2b33d", line: "Eggs, sardines or other oily fish. Egg protein matches what a dog's body needs, and fish brings omega-3 fats." },
+  { id: "veg", label: "Vegetables and greens", share: 20, color: "#7fb069", line: "Chopped, lightly cooked or raw: gobhi, palak, beans, pumpkin. Fibre for the gut, without much starch." },
+  { id: "extra", label: "Fruit and toppers", share: 7, color: "#8c9cf5", line: "A few cubes of fruit or berries, and fresh toppers. Part of the 10% extras." },
+  { id: "herbs", label: "Herbs and spices", share: 3, color: "#2e6a4c", line: "A pinch of haldi, jeera or dalchini, fresh coriander, and measured fresh garlic." },
+];
+
+export const PERFECT_BOWL_RULES: Tip[] = [
+  { t: "Half protein, half fat", d: "Roughly half a dog's calories should come from protein and half from fat. That's the diet dogs choose and do best on." },
+  { t: "Starch under 10%", d: "Rice, roti and other grains turn into sugar. Dogs need none; under 10% is natural, up to 20% for very active dogs." },
+  { t: "Made to a recipe", d: "A complete recipe meets a dog's nutrient needs. Rotating ingredients alone still leaves gaps." },
+];
+
+// Can a dog be vegetarian? From The Forever Dog (chapter 5) and our
+// Indian nutritionists.
+export const VEG_TIPS: Tip[] = [
+  { t: "Dogs run on protein and fat", d: "They need no carbs at all: the body makes the glucose it needs from protein. Plants can't stand in for meat." },
+  { t: "Dal and soya bring starch", d: "Dal, soya, rajma and grains carry a lot of starch, which turns into sugar. Meat and eggs bring protein without it." },
+  { t: "The wrong building blocks", d: "Egg and meat protein match what a dog's body needs. Plant protein is a poorer fit, so veg bowls fall short over time." },
+  { t: "Vets who know food disagree", d: "Dogs can digest some starch, so some say they can be vegan. The Forever Dog's authors, one a vet, disagree. Vegan dog foods also tested highest for weedkiller residue." },
+  { t: "Better than a veg-only bowl", d: "A good packaged food is better for a dog than an unbalanced vegetarian home diet.", src: "Indian canine nutritionists" },
+  { t: "A vegetarian home?", d: "Cook their eggs or meat separately, or buy fresh dog food. Their bowl doesn't have to follow the family's." },
+];
+
+// Why garlic, and why it isn't onion. From The Forever Dog (chapters 5 and 8).
+export const GARLIC_WHY: Tip[] = [
+  { t: "It isn't onion", d: "Onions carry about 15 times more of the compound that harms a dog's red blood cells. Fresh garlic in small, measured amounts is a different thing." },
+  { t: "Good for the liver", d: "Garlic's sulfur helps the body make glutathione, which the liver uses to clear out toxins." },
+  { t: "Against mould toxins", d: "Garlic lowered tumours caused by mycotoxins, the mould toxins that can turn up in grain-heavy food." },
+  { t: "Fresh only", d: "Chop it fresh. Skip garlic pills, powders and extracts: Europe's toxic-food list names garlic extract, not fresh garlic." },
+];
