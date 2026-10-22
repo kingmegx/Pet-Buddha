@@ -129,6 +129,8 @@ export const TOILET = {
       id: "pads",
       label: "Pee pads",
       forWho: "For apartments, and for anyone who has to leave their dog alone for long stretches.",
+      // Short names for each step, shown on the road.
+      titles: ["Pad on the spot", "Learn their timing", "Say \"go pee\"", "Treat on the pad", "Move it slowly"],
       steps: [
         "Put a pee pad on the spot where they last peed, so they can sniff it and go there again.",
         "Puppies pee often. In a few days you'll have an idea of how long they go between pees.",
@@ -141,6 +143,7 @@ export const TOILET = {
       id: "outside",
       label: "Going outside",
       forWho: "For anyone who can take their dog out when they need to go.",
+      titles: ["Out after meals", "Go out often", "Reward outside", "Keep at it"],
       steps: [
         "Take them out around the times they're likely to go. Puppies usually poop right after eating.",
         "Go every time you think they might. It takes time, and that's fine.",

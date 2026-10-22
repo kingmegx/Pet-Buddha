@@ -10459,3 +10459,669 @@ body:has(.stage),
 .sugg .s-steps li > :not(.s-num) {
   padding-top: 9px;
 }
+
+/* Chewing house rules: four soft cards, the rule big, the detail small. */
+.sugg .s-rules {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 22px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sugg .s-rules li {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 24px 22px 26px;
+  border: 0 !important;
+  border-radius: 16px;
+  background: #e6f5c9;
+}
+
+.sugg .s-rules li:nth-child(2) { background: #fbe0d2; }
+.sugg .s-rules li:nth-child(3) { background: #ddd3f7; }
+.sugg .s-rules li:nth-child(4) { background: #fde3b0; }
+
+.sugg .s-rules .s-num {
+  display: inline-grid;
+  place-items: center;
+  justify-self: start;
+  width: auto;
+  height: auto;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: #fff !important;
+  color: var(--ink) !important;
+  font-size: 13px;
+  font-weight: 600;
+  rotate: -3deg;
+}
+
+.sugg .s-rules strong {
+  font-family: var(--font-brand), sans-serif;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.sugg .s-rules span:not(.s-num) {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.sugg .s-rules em {
+  margin-top: 4px;
+  font-style: normal;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #5c5650;
+}
+
+@media (max-width: 900px) {
+  .sugg .s-rules {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .sugg .s-rules {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* =====================================================================
+   Tips as open cards: action + one line, all visible.
+   ===================================================================== */
+.tc {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 24px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tc li {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 24px 24px 26px;
+  border-radius: 16px;
+  background: #f6f3ef;
+}
+
+.tc-num {
+  font-size: 13px;
+  font-weight: 600;
+  color: #8a837c;
+}
+
+.tc strong {
+  font-family: var(--font-brand), sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.tc p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #4d4741 !important;
+}
+
+.tc .s-src {
+  font-size: 13px;
+}
+
+/* The first one, when it is the place to start. */
+.tc .tc-lead {
+  padding-top: 34px;
+  background: #2e6a4c;
+  color: #fbf6ef;
+}
+
+.tc .tc-lead .tc-num {
+  color: rgba(251, 246, 239, 0.7);
+}
+
+.tc .tc-lead p {
+  color: #fbf6ef !important;
+}
+
+.tc .tc-lead .s-src {
+  color: rgba(251, 246, 239, 0.75);
+}
+
+@media (max-width: 900px) {
+  .tc {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .tc {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* =====================================================================
+   Toilet guide: steps as a row of tilted cards with hand-drawn arrows.
+   ===================================================================== */
+.gs {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr));
+  gap: clamp(22px, 3vw, 40px);
+  margin: 36px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gs li {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 230px;
+  padding: 22px 20px 24px;
+  border-radius: 14px;
+  background: #e6f5c9;
+  box-shadow: 0 18px 36px -28px rgba(40, 20, 10, 0.55);
+  rotate: -1.5deg;
+  transition: rotate 0.45s var(--spring), translate 0.45s var(--spring);
+}
+
+.gs li:nth-child(5n + 2) { background: #fbe0d2; rotate: 1.5deg; }
+.gs li:nth-child(5n + 3) { background: #ddd3f7; rotate: -1deg; }
+.gs li:nth-child(5n + 4) { background: #fde3b0; rotate: 1.2deg; }
+.gs li:nth-child(5n) { background: #c9d3ff; rotate: -1.2deg; }
+
+.gs li:hover {
+  rotate: 0deg;
+  translate: 0 -6px;
+}
+
+.gs-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #5c5650;
+}
+
+.gs-num {
+  font-family: var(--font-brand), sans-serif;
+  font-size: 46px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.gs li p {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink) !important;
+}
+
+/* The arrow curls across the gap into the next card. */
+.gs-arrow {
+  position: absolute;
+  top: 18px;
+  right: calc(-1 * clamp(22px, 3vw, 40px) - 14px);
+  z-index: 2;
+  width: clamp(40px, 3.6vw, 54px);
+  color: var(--ink);
+  overflow: visible;
+}
+
+@media (max-width: 1000px) {
+  .gs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gs-arrow {
+    display: none;
+  }
+
+  .gs li {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .gs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.gs {
+  --gap: clamp(28px, 3.2vw, 44px);
+  gap: var(--gap);
+}
+
+.gs-arrow {
+  top: 38px;
+  right: calc(-1 * var(--gap) + 4px);
+  width: calc(var(--gap) - 8px);
+}
+
+/* =====================================================================
+   Toilet guide as an illustrated path: a sticker per step, a dotted line
+   winding from one sticker to the next, the step beside it.
+   ===================================================================== */
+.gp {
+  max-width: 760px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gp li {
+  display: grid;
+  grid-template-columns: 140px 56px minmax(0, 1fr);
+  align-items: start;
+  min-height: 132px;
+  padding-bottom: 36px;
+}
+
+.gp-mark {
+  position: relative;
+  align-self: stretch;
+}
+
+.gp-sticker {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 84px;
+  margin-left: 0;
+  rotate: -6deg;
+  transition: rotate 0.45s var(--spring), scale 0.45s var(--spring);
+}
+
+.gp li.is-right .gp-sticker {
+  margin-left: 56px;
+  rotate: 7deg;
+}
+
+.gp li:hover .gp-sticker {
+  rotate: 0deg;
+  scale: 1.06;
+}
+
+.gp-sticker .line-sticker {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* The path runs from under this sticker to the top of the next one. */
+.gp-line {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  width: 140px;
+  height: calc(100% - 70px + 36px + 14px);
+  color: #8a837c;
+  overflow: visible;
+}
+
+.gp-num {
+  padding-top: 14px;
+  font-family: var(--font-brand), sans-serif;
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.gp li p {
+  margin: 0;
+  padding-top: 20px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--ink) !important;
+}
+
+@media (max-width: 560px) {
+  .gp li {
+    grid-template-columns: 96px 36px minmax(0, 1fr);
+  }
+
+  .gp-sticker {
+    width: 60px;
+  }
+
+  .gp li.is-right .gp-sticker {
+    margin-left: 32px;
+  }
+
+  .gp-line {
+    width: 96px;
+    top: 52px;
+  }
+
+  .gp-num {
+    font-size: 30px;
+  }
+
+  .gp li p {
+    font-size: 16px;
+    padding-top: 14px;
+  }
+}
+
+/* =====================================================================
+   Toilet guide road: a winding road with stops, the dog walking it, and a
+   card for the step you're on. Wide screens only; phones keep the path.
+   ===================================================================== */
+.road {
+  margin-top: 36px;
+}
+
+.road-map {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1000 / 380;
+}
+
+.road-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.road-stop {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: 170px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  translate: -50% -100%;
+  margin-top: -24px;
+}
+
+/* Low stops hang below the road instead of sitting on top of it. */
+.road-stop.is-low {
+  translate: -50% 0;
+  margin-top: 26px;
+}
+
+.road-stop.is-low .road-title {
+  order: -1;
+}
+
+.road-art {
+  position: relative;
+  display: block;
+  width: 92px;
+  transition: scale 0.45s var(--spring), rotate 0.45s var(--spring);
+  rotate: -5deg;
+}
+
+.road-stop:nth-child(odd) .road-art {
+  rotate: 6deg;
+}
+
+.road-art .line-sticker {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.road-badge {
+  position: absolute;
+  top: -8px;
+  left: -10px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: #fbf6ef;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 0 0 3px #fff;
+}
+
+.road-title {
+  font-family: var(--font-brand), sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.road-stop:hover .road-art,
+.road-stop.is-on .road-art {
+  scale: 1.14;
+  rotate: 0deg;
+}
+
+.road-stop.is-on .road-title {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+/* The dog on the road. */
+.road-dog {
+  position: absolute;
+  z-index: 3;
+  width: 58px;
+  translate: -50% -60%;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 6px rgba(40, 20, 10, 0.25));
+}
+
+.road-dog .face {
+  width: 100%;
+}
+
+/* The card for the step you're on. */
+.road-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px 40px;
+  align-items: end;
+  max-width: 860px;
+  margin: 56px auto 0;
+  padding: 30px 34px;
+  border-radius: 18px;
+  background: #f6f3ef;
+}
+
+.road-card-body {
+  display: grid;
+  gap: 10px;
+}
+
+.road-card-num {
+  justify-self: start;
+  padding: 4px 10px;
+  border-radius: 8px;
+  color: #fbf6ef;
+  font-size: 13px;
+  font-weight: 600;
+  rotate: -3deg;
+}
+
+.road-card strong {
+  font-family: var(--font-brand), sans-serif;
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.road-card p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink) !important;
+}
+
+.road-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.road-prev {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.road-prev:disabled,
+.road-nav .pill:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.road-nav .pill {
+  color: #fff;
+}
+
+/* Wide screens get the road; phones get the vertical path. */
+.gp {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .road {
+    display: none;
+  }
+
+  .gp {
+    display: block;
+  }
+}
+
+/* Room above the road for the high stops and below it for the low ones. */
+.road-map {
+  margin: 170px 0 150px;
+}
+
+.road-dog {
+  translate: -50% -88%;
+}
+
+.road-stop.is-low {
+  margin-top: 36px;
+}
+
+.road-stop.is-high {
+  margin-top: -68px;
+}
+
+/* =====================================================================
+   Road v2: compact enough that the road and its card fit on one screen;
+   the tab bar no longer sticks over the content; the card's buttons have
+   a fixed width so the words never reflow.
+   ===================================================================== */
+.s-tabs {
+  position: static !important;
+}
+
+.road-map {
+  aspect-ratio: 1000 / 250;
+  margin: 118px 0 104px;
+}
+
+.road-art {
+  width: 66px;
+}
+
+.road-badge {
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+  top: -6px;
+  left: -10px;
+}
+
+.road-title {
+  font-size: 15px;
+}
+
+.road-stop {
+  gap: 6px;
+}
+
+.road-stop.is-high {
+  margin-top: -58px;
+}
+
+.road-stop.is-low {
+  margin-top: 28px;
+}
+
+.road-dog {
+  width: 48px;
+}
+
+.road-svg path:first-child {
+  stroke-width: 22px;
+}
+
+.road-card {
+  grid-template-columns: minmax(0, 1fr) 290px;
+  margin-top: 8px;
+  padding: 24px 30px;
+}
+
+.road-card strong {
+  font-size: clamp(22px, 2.2vw, 28px);
+}
+
+.road-card p {
+  font-size: 16px;
+}
+
+.road-nav {
+  justify-content: flex-end;
+  width: 290px;
+}
+
+.road-nav .pill {
+  white-space: nowrap;
+}
+
+.sugg .s-subhead {
+  scroll-margin-top: 96px;
+}
+
+.road-stop.is-low {
+  margin-top: 34px;
+}
+
+/* Low stops: sticker first, title under it, so the badge never covers the words. */
+.road-stop.is-low .road-title {
+  order: 0;
+}
+
+.road-stop.is-low {
+  margin-top: 30px;
+}

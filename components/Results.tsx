@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
 import { ACTIVITIES, BOWLS, CALM, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
-import { BALANCE, BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, weekPlan, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
+import { BALANCE, BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
 import { Squiggle } from "./LandingMore";
 import { Sticker, type StickerKind } from "./Stickers";
+import { ToiletRoad } from "./ToiletRoad";
 
 // The dog's name set in the italic accent face, like "why *pet buddha*".
 function Accent({ text, word }: { text: string; word?: string }) {
@@ -36,7 +37,7 @@ function PanelIndex() {
   useEffect(() => {
     const panel = ref.current?.parentElement;
     if (!panel) return;
-    setItems([...panel.querySelectorAll(".s-subhead h3")].map((h) => h.textContent ?? ""));
+    setItems([...panel.querySelectorAll<HTMLElement>(".s-subhead h3")].map((h) => h.dataset.short || h.textContent || ""));
   }, []);
   if (items.length < 2) return <nav ref={ref} className="s-index is-empty" aria-hidden />;
   const go = (i: number) => {
@@ -100,6 +101,23 @@ function ToppersGrid() {
     </div>
   );
 }
+
+// A line-art sticker for each step of the toilet guides.
+const PATH_LOOK: Record<string, { kind: StickerKind; tone: string; ink: string }[]> = {
+  pads: [
+    { kind: "nose", tone: "#e6f5c9", ink: "#1f5c43" },
+    { kind: "sparkle", tone: "#fde3b0", ink: "#6b3a12" },
+    { kind: "paw", tone: "#ddd3f7", ink: "#3a3f8f" },
+    { kind: "bone", tone: "#fbe0d2", ink: "#7c2d4a" },
+    { kind: "heart", tone: "#c9d3ff", ink: "#3a3f8f" },
+  ],
+  outside: [
+    { kind: "bowl", tone: "#fde3b0", ink: "#6b3a12" },
+    { kind: "leaf", tone: "#e6f5c9", ink: "#1f5c43" },
+    { kind: "bone", tone: "#fbe0d2", ink: "#7c2d4a" },
+    { kind: "heart", tone: "#ddd3f7", ink: "#3a3f8f" },
+  ],
+};
 
 // A line-art sticker for each kind of thing to buy.
 const KIND_STICKER: Record<KindId, { kind: StickerKind; tone: string; ink: string }> = {
@@ -169,49 +187,44 @@ function Draft(_: { on?: boolean }) {
   return null;
 }
 
-// Tips, made to act on: the first is a "start here" card with its reason
-// showing; the rest are short rows with just the action, each opening to
-// its reason on a tap. One clear place to start, nothing to wade through.
+// The tips already shown in "start with these three", so a tab doesn't
+// repeat them further down.
+const SeenTips = createContext<Set<string>>(new Set());
+
+// Tips as small open cards: the action and its one line, all visible, no
+// clicking. Anything already in "start with these three" is left out. When
+// nothing was left out, the first card is marked "start here".
 function Tips({ tips, start = 0 }: { tips: Tip[]; start?: number }) {
-  const [openAt, setOpenAt] = useState<number | null>(null);
-  if (tips.length === 0) return null;
-  const [first, ...rest] = tips;
+  const seen = useContext(SeenTips);
+  const shown = tips.filter((t) => !seen.has(t.t));
+  if (shown.length === 0) return null;
+  const lead = shown.length === tips.length && shown.length > 1;
   return (
-    <div className="tl">
-      <div className="tl-first">
-        <span className="tl-start">start here</span>
-        <span className="tl-num">{String(start + 1).padStart(2, "0")}</span>
-        <strong>{first.t}</strong>
-        <p>{first.d}</p>
-        {first.src && <em className="s-src">From {first.src}</em>}
-      </div>
-      {rest.length > 0 && (
-        <ol className="tl-rest">
-          {rest.map((tip, i) => {
-            const open = openAt === i;
-            return (
-              <li key={tip.t} className={open ? "is-open" : ""}>
-                <button onClick={() => setOpenAt(open ? null : i)} aria-expanded={open}>
-                  <span className="tl-num">{String(start + i + 2).padStart(2, "0")}</span>
-                  <strong>{tip.t}</strong>
-                  <span className="tl-plus" aria-hidden />
-                </button>
-                <AnimatePresence initial={false}>
-                  {open && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} style={{ overflow: "hidden" }}>
-                      <div className="tl-why">
-                        <p>{tip.d}</p>
-                        {tip.src && <em className="s-src">From {tip.src}</em>}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </li>
-            );
-          })}
-        </ol>
-      )}
-    </div>
+    <ol className={`tc ${lead ? "has-lead" : ""}`}>
+      {shown.map((tip, i) => (
+        <li key={tip.t} className={lead && i === 0 ? "tc-lead" : ""}>
+          {lead && i === 0 && <span className="tl-start">start here</span>}
+          <span className="tc-num">{String(start + i + 1).padStart(2, "0")}</span>
+          <strong>{tip.t}</strong>
+          <p>{tip.d}</p>
+          {tip.src && <em className="s-src">From {tip.src}</em>}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+// A section of tips with its heading. Called "More to try" when some of its
+// tips are already up top, and left out entirely if all of them are.
+function TipSection({ tips, title = "First steps" }: { tips: Tip[]; title?: string }) {
+  const seen = useContext(SeenTips);
+  const left = tips.filter((t) => !seen.has(t.t)).length;
+  if (left === 0) return null;
+  return (
+    <>
+      <Sub>{left < tips.length ? "More to try" : title}</Sub>
+      <Tips tips={tips} />
+    </>
   );
 }
 
@@ -369,10 +382,11 @@ function StarchCheck() {
 }
 
 // A heading inside a tab.
-function Sub({ children, note }: { children: React.ReactNode; note?: string }) {
+// `short` is the label used for it in the tab's index, when the heading is long.
+function Sub({ children, note, short }: { children: React.ReactNode; note?: string; short?: string }) {
   return (
     <div className="s-subhead">
-      <h3>{children}</h3>
+      <h3 data-short={short}>{children}</h3>
       <Squiggle className="is-short" />
       {note && <p>{note}</p>}
     </div>
@@ -520,7 +534,7 @@ function Compare() {
 }
 
 // Toilet training: two ways in, picked with a switch, each a short numbered list.
-function Toilet({ sex, marks }: { sex: Sex | null; marks: boolean }) {
+function Toilet({ sex, face }: { sex: Sex | null; face: string }) {
   const [path, setPath] = useState(TOILET.paths[0].id);
   const chosen = TOILET.paths.find((p) => p.id === path)!;
   // "good boy" or "good girl" in the steps becomes just the right one when we know.
@@ -536,16 +550,55 @@ function Toilet({ sex, marks }: { sex: Sex | null; marks: boolean }) {
       </div>
       <p className="s-muted">{chosen.forWho}</p>
       <AnimatePresence mode="wait">
-        <motion.ol key={path} className="s-steps" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-          {chosen.steps.map((line, i) => (
-            <li key={line}>
-              <span className="s-num">0{i + 1}</span>
-              <span>{praise(line)}</span>
-            </li>
-          ))}
+        {/* Wide screens: the road, with the dog walking it. */}
+        <ToiletRoad key={`road-${path}`} titles={chosen.titles} steps={chosen.steps} looks={PATH_LOOK[path] ?? PATH_LOOK.pads} face={face} word={praise} />
+        {/* Phones: the steps as a little illustrated path: a sticker for each step, a
+            dotted line winding from one to the next. */}
+        <motion.ol key={path} className="gp" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }}>
+          {chosen.steps.map((line, i) => {
+            const look = PATH_LOOK[path]?.[i] ?? PATH_LOOK.pads[i % 5];
+            const right = i % 2 === 1;
+            return (
+              <motion.li
+                key={line}
+                className={right ? "is-right" : ""}
+                initial="hide"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.5 }}
+                variants={{ hide: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }}
+                transition={{ type: "spring", stiffness: 140, damping: 18 }}
+              >
+                <span className="gp-mark">
+                  <span className="gp-sticker">
+                    <Sticker kind={look.kind} tone={look.tone} ink={look.ink} />
+                  </span>
+                  {i < chosen.steps.length - 1 && (
+                    <motion.svg
+                      className="gp-line"
+                      viewBox="0 0 140 100"
+                      preserveAspectRatio="none"
+                      aria-hidden
+                      variants={{ hide: { clipPath: "inset(0 0 100% 0)" }, show: { clipPath: "inset(0 0 0% 0)", transition: { duration: 0.7, ease: "easeInOut", delay: 0.25 } } }}
+                    >
+                      <path
+                        d={right ? "M98 0 C98 55 42 45 42 100" : "M42 0 C42 55 98 45 98 100"}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeDasharray="0.5 9"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    </motion.svg>
+                  )}
+                </span>
+                <span className="gp-num">{i + 1}</span>
+                <p>{praise(line)}</p>
+              </motion.li>
+            );
+          })}
         </motion.ol>
       </AnimatePresence>
-      {marks && <p className="s-toilet-note">{TOILET.mark.text}</p>}
     </div>
   );
 }
@@ -621,7 +674,7 @@ export function Results({
   const order: KindId[] = needs.includes("chew") || needs.includes("nip") ? ["chew", "sniff", "puzzle"] : ["sniff", "puzzle", "chew"];
   const rules = needs.includes("chew") || needs.includes("nip");
 
-  const week = weekPlan(groups, bowl);
+  const week = weekPlan(groups, needs);
 
   // Keep the chosen tab visible in the tab row when it scrolls sideways (phones).
   useEffect(() => {
@@ -642,6 +695,7 @@ export function Results({
   const told = chosen.map((p) => p.label.toLowerCase());
 
   return (
+    <SeenTips.Provider value={new Set(week.map((t) => t.t))}>
     <div className="results sugg">
       <div className="results-bar">
         <Logo />
@@ -655,10 +709,10 @@ export function Results({
         <div className="s-top-text">
           <p className="s-kicker text-sticker ts-lime">{name ? `${name}'s plan` : "Your plan"}</p>
           <h1>
-            <Accent text={fill(lead.aha)} word={name || undefined} />
+            <Accent text={fill(headlineFor(lead, needs).aha)} word={name || undefined} />
           </h1>
           <Squiggle className="s-squiggle" />
-          <p className="s-sub">{lead.why}</p>
+          <p className="s-sub">{headlineFor(lead, needs).why}</p>
           <div className="s-top-actions">
             <a className="pill" href="#plan">
               See the plan <span className="arrow arrow-down" aria-hidden />
@@ -731,21 +785,36 @@ export function Results({
             {g.id !== lead.id && (
               <div className="s-panel-head">
                 <h2>
-                  <Accent text={fill(g.aha)} word={name || undefined} />
+                  <Accent text={fill(headlineFor(g, needs).aha)} word={name || undefined} />
                 </h2>
                 <Squiggle className="s-squiggle" />
-                <p>{g.why}</p>
+                <p>{headlineFor(g, needs).why}</p>
               </div>
             )}
             <PanelIndex />
 
             {g.id === "energy" && (
               <>
-                <Sub>Do this</Sub>
-                <Tips tips={g.tips} />
+                <TipSection tips={tipsFor(g.tips, needs)} />
+                {/* For chewers, the house rules come straight after the first steps. */}
+                {rules && (
+                  <>
+                    <Sub note={HOUSE_RULES.lead} short="chewing rules">{HOUSE_RULES.title}</Sub>
+                    <ol className="s-rules">
+                      {HOUSE_RULES.rules.map((r, i) => (
+                        <li key={r.word}>
+                          <span className="s-num">0{i + 1}</span>
+                          <strong>{r.word}</strong>
+                          <span>{r.line}</span>
+                          {"note" in r && r.note && <em>{r.note}</em>}
+                        </li>
+                      ))}
+                    </ol>
+                  </>
+                )}
                 <WhyWalk />
 
-                <Sub note="You don't need all of them. Start with one.">What to get</Sub>
+                <Sub note="You don't need all of them. Start with one." short="chews and toys">Chews and toys that help</Sub>
                 {order.map((id) => {
                   const k = KINDS.find((x) => x.id === id)!;
                   const shown = products.filter((p) => p.kind === id);
@@ -792,28 +861,14 @@ export function Results({
                   <Sock />
                 </div>
 
-                {rules && (
-                  <>
-                    <Sub note={HOUSE_RULES.lead}>{HOUSE_RULES.title}</Sub>
-                    <ol className="s-rules">
-                      {HOUSE_RULES.rules.map((r, i) => (
-                        <li key={r.word}>
-                          <span className="s-num">0{i + 1}</span>
-                          <strong>{r.word}</strong>
-                          <span>{r.line}</span>
-                          {"note" in r && r.note && <em>{r.note}</em>}
-                        </li>
-                      ))}
-                    </ol>
-                  </>
-                )}
               </>
             )}
 
             {g.id === "toilet" && (
               <>
-                <Sub note={TOILET.lead}>Pick your way</Sub>
-                <Toilet sex={sex} marks={needs.includes("mark")} />
+                <Sub note={TOILET.lead} short="step-by-step guide">Pee pads or going outside</Sub>
+                <Toilet sex={sex} face={pet.face} />
+                <TipSection tips={tipsFor(g.tips, needs)} />
               </>
             )}
 
@@ -836,15 +891,13 @@ export function Results({
 
             {g.id === "alone" && (
               <>
-                <Sub>Do this</Sub>
-                <Tips tips={WALK_TIPS.alone!} />
+                <TipSection tips={tipsFor(WALK_TIPS.alone!, needs)} />
               </>
             )}
 
             {g.id === "skin" && (
               <>
-                <Sub>Do this</Sub>
-                <Tips tips={g.tips} />
+                <TipSection tips={tipsFor(g.tips, needs)} />
               </>
             )}
 
@@ -951,7 +1004,7 @@ export function Results({
 
             <Careful g={g} />
 
-            <Sub note="People we trust for this. Follow them, or book them if you need a hand.">Learn from</Sub>
+            <Sub note="People we trust for this. Follow them, or book them if you need a hand." short="who to follow">People to learn from</Sub>
             <Experts ids={g.experts} />
 
             {groups.length > 1 && (
@@ -1008,6 +1061,7 @@ export function Results({
         </button>
       </footer>
     </div>
+    </SeenTips.Provider>
   );
 }
 

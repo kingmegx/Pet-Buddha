@@ -13,7 +13,8 @@ import type { Bowl, ProblemId } from "./content";
 export type GroupId = "energy" | "toilet" | "walks" | "alone" | "food" | "skin";
 
 // `src` credits the account a tip comes from (shown small under the tip).
-export type Tip = { t: string; d: string; src?: string };
+// `for`: the problems a tip answers, so a plan can lead with what was asked.
+export type Tip = { t: string; d: string; src?: string; for?: ProblemId[] };
 
 export type Expert = {
   id: string;
@@ -216,6 +217,8 @@ export type Group = {
   aha: string;
   // One line under it.
   why: string;
+  // A sharper aha when this is the main thing they asked about.
+  ahaFor?: Partial<Record<ProblemId, { aha: string; why: string }>>;
   tips: Tip[];
   avoid: string;
   help?: string;
@@ -229,12 +232,31 @@ export const GROUPS: Group[] = [
     problems: ["chew", "busy", "settle", "nip", "night"],
     aha: "{who} needs more work for the mind, not more exercise.",
     why: "Chewing, nipping and not settling are a busy brain looking for a job. Sniffing and chewing give it one, and a calm dog follows.",
+    ahaFor: {
+      chew: {
+        aha: "{who} isn't being naughty. Chewing is how dogs explore and calm down.",
+        why: "You can't switch the urge off, but you can choose what gets chewed. Give it a better target every day and the furniture gets a rest.",
+      },
+      nip: {
+        aha: "{who}'s teeth need a better target than your hands.",
+        why: "Mouthing is how dogs play and explore. Swap hands for a toy every time, and they learn what's allowed.",
+      },
+      settle: {
+        aha: "Settling is a skill {who} can learn.",
+        why: "A dog who can't settle usually has a busy brain. A task with a clear end, like finding every last treat, makes switching off easier.",
+      },
+      night: {
+        aha: "Calm evenings make for quiet nights.",
+        why: "Rough play late on winds dogs up. A sniffy walk and a chew in the evening help them wind down for bed.",
+      },
+    },
     tips: [
-      { t: "Slow the walk", d: "Let them stop and sniff. Ten minutes of their choosing beats thirty at your pace." },
-      { t: "Make food a job", d: "Scatter part of a meal, or use a snuffle mat, instead of a bowl." },
-      { t: "Give a chew", d: "Something safe to work on, lying down, when you need them to switch off." },
-      { t: "Let them sleep", d: "Grown dogs need 12 to 15 hours of sleep a day, puppies 16 to 18. A tired, rested dog is calmer.", src: "@kaninenutrition" },
-      { t: "Swap, don't scold", d: "When teeth land on hands or furniture, swap in a toy, then praise them for taking it." },
+      { t: "Slow the walk", d: "Let them stop and sniff. Ten minutes of their choosing beats thirty at your pace.", for: ["busy", "settle"] },
+      { t: "Make food a job", d: "Scatter part of a meal, or use a snuffle mat, instead of a bowl.", for: ["busy", "chew"] },
+      { t: "Give a chew", d: "Something safe to work on, lying down, when you need them to switch off.", for: ["chew", "settle"] },
+      { t: "Let them sleep", d: "Grown dogs need 12 to 15 hours of sleep a day, puppies 16 to 18. A tired, rested dog is calmer.", src: "@kaninenutrition", for: ["settle", "night"] },
+      { t: "Wind down at night", d: "A slow, sniffy evening walk and a chew on their bed, then lights down. No rough play in the last hour.", for: ["night"] },
+      { t: "Swap, don't scold", d: "When teeth land on hands or furniture, swap in a toy, then praise them for taking it.", for: ["nip", "chew"] },
     ],
     avoid: "Don't add more fetch or running to tire them out. It builds fitness and excitement, not calm.",
     help: "If they guard food or toys, snap, or chew until they hurt themselves, talk to a vet or a qualified trainer.",
@@ -246,7 +268,21 @@ export const GROUPS: Group[] = [
     problems: ["toilet", "mark"],
     aha: "{who} will learn where to go when the right spot is rewarded.",
     why: "Dogs go where it smells right and where it pays. Reward the right spot every time, and the habit forms.",
-    tips: [],
+    ahaFor: {
+      mark: {
+        aha: "Marking is about smell, not stubbornness.",
+        why: "Dogs mark to leave their scent where others have. Take the old smell away, catch it in the act, and reward the right spot.",
+      },
+    },
+    tips: [
+      { t: "Reward the right spot", d: "Every time they go in the right place, a treat and a \"good dog\" straight away.", for: ["toilet"] },
+      { t: "Learn their timing", d: "Puppies pee often. Note when they go for a few days and you'll know when they're due.", for: ["toilet"] },
+      { t: "Out after naps and meals", d: "Take them to the spot after sleeping, eating and playing. That's when most accidents happen.", for: ["toilet"] },
+      { t: "Clean old spots well", d: "Ordinary cleaners leave a smell they'll go on again. Use an enzyme cleaner on every old spot.", for: ["mark", "toilet"] },
+      { t: "Catch it in the act", d: "A firm \"No\" as they start, then straight to the right spot and praise them there. Never scold later.", for: ["mark", "toilet"] },
+      { t: "Less space at first", d: "Until they're reliable, keep them in a smaller area when you can't watch. Fewer rooms, fewer mistakes.", for: ["toilet"] },
+      { t: "Accidents? Go back a step", d: "Go out more often, or move the pad closer again. Progress isn't a straight line.", for: ["toilet"] },
+    ],
     avoid: "Don't scold accidents you find later, or rub their nose in it. They can't link it to what they did.",
     help: "If an older, trained dog starts having accidents, or pees very often, see a vet. It can be an infection.",
     experts: ["zak", "woof"],
@@ -280,17 +316,17 @@ export const GROUPS: Group[] = [
     aha: "Itchy skin usually starts inside, not on the surface.",
     why: "Skin is where diet, gut health and what you wash them with all show up. Fix it from the inside and the outside.",
     tips: [
-      { t: "Feed the skin", d: "Skin shows what's happening in the gut and immune system. Animal protein first, grains and dal down.", src: "@backintheday.in" },
-      { t: "Bath less, gently", d: "Once every 3 to 4 weeks is plenty, with a mild dog shampoo. Human shampoo is too harsh." },
-      { t: "Dry them fully", d: "Monsoon damp breeds fungus. Dry between the toes, in the ears and under the collar.", src: "@backintheday.in" },
-      { t: "Check after walks", d: "Clean paws after every walk. Run your fingers over ears, neck, armpits and between toes for ticks.", src: "@kaninenutrition" },
-      { t: "Part the fur", d: "Brush short fur against the grain and part long fur, so you see the skin, not just the coat.", src: "@backintheday.in" },
-      { t: "Apple cider vinegar, maybe", d: "Some owners add a splash of raw apple cider vinegar to food daily to make them less tasty to ticks. Not proven, but harmless. Don't skip real tick checks.", src: "@backintheday.in" },
-      { t: "Treat the home too", d: "Ticks and fleas live in bedding and corners. Wash bedding hot; food-grade diatomaceous earth helps in the home.", src: "@backintheday.in" },
-      { t: "Allergic to chicken?", d: "Try quail, turkey, duck, mutton, buffalo or pork, rotating every few days. Retry chicken from a better source later.", src: "@carnikitchen" },
-      { t: "Add good fats", d: "Omega-3 from fish such as salmon or sardines helps calm itchy, inflamed skin.", src: "@canine_india" },
-      { t: "Deworm properly", d: "Herbal dewormers aren't enough on their own, especially in India. Test and treat with your vet.", src: "@happypuppyorganics" },
-      { t: "Itching isn't a personality", d: "Recurring itching, ear or paw trouble means something needs support. Look into it.", src: "@happypuppyorganics" },
+      { t: "Feed the skin", d: "Skin shows what's happening in the gut and immune system. Animal protein first, grains and dal down.", src: "@backintheday.in", for: ["itch", "coat"] },
+      { t: "Bath less, gently", d: "Once every 3 to 4 weeks is plenty, with a mild dog shampoo. Human shampoo is too harsh.", for: ["coat", "itch"] },
+      { t: "Dry them fully", d: "Monsoon damp breeds fungus. Dry between the toes, in the ears and under the collar.", src: "@backintheday.in", for: ["itch", "coat"] },
+      { t: "Check after walks", d: "Clean paws after every walk. Run your fingers over ears, neck, armpits and between toes for ticks.", src: "@kaninenutrition", for: ["ticks"] },
+      { t: "Part the fur", d: "Brush short fur against the grain and part long fur, so you see the skin, not just the coat.", src: "@backintheday.in", for: ["ticks", "coat"] },
+      { t: "Apple cider vinegar, maybe", d: "Some owners add a splash of raw apple cider vinegar to food daily to make them less tasty to ticks. Not proven, but harmless. Don't skip real tick checks.", src: "@backintheday.in", for: ["ticks"] },
+      { t: "Treat the home too", d: "Ticks and fleas live in bedding and corners. Wash bedding hot; food-grade diatomaceous earth helps in the home.", src: "@backintheday.in", for: ["ticks"] },
+      { t: "Allergic to chicken?", d: "Try quail, turkey, duck, mutton, buffalo or pork, rotating every few days. Retry chicken from a better source later.", src: "@carnikitchen", for: ["itch"] },
+      { t: "Add good fats", d: "Omega-3 from fish such as salmon or sardines helps calm itchy, inflamed skin.", src: "@canine_india", for: ["itch", "coat"] },
+      { t: "Deworm properly", d: "Herbal dewormers aren't enough on their own, especially in India. Test and treat with your vet.", src: "@happypuppyorganics", for: ["itch"] },
+      { t: "Itching isn't a personality", d: "Recurring itching, ear or paw trouble means something needs support. Look into it.", src: "@happypuppyorganics", for: ["itch"] },
     ],
     avoid: "Don't put human products or neat essential oils on their skin. Don't shave them: dogs sweat through their paws, and the coat protects them from heat.",
     help: "Raw red patches, hair loss, a smelly ear, or scratching that keeps them awake needs a vet. Hot spots can spread in a day.",
@@ -577,31 +613,55 @@ export const BALANCE = {
 export const FOOD_CREDIT = { text: "Our food advice follows The Forever Dog by Rodney Habib and Dr. Karen Becker.", url: "https://foreverdog.com" };
 
 // The three things to start this week: the first tip from each tab that applies.
-export function weekPlan(groups: Group[], bowl: Bowl | null): (Tip & { group: GroupId })[] {
+// The first thing to do for problems whose tips live outside their tab.
+const FIRST_STEP: Partial<Record<ProblemId, Tip>> = {
+  pull: { t: "Tight lead, stop", d: "The moment the lead goes tight, stand still. Walk on when it's slack." },
+};
+
+// "Start with these three": one first step for each problem the owner asked
+// about, in the order they appear in the questions. If they asked about
+// fewer than three, the next most useful tips for those same problems fill
+// in. Nothing they didn't ask about.
+export function weekPlan(groups: Group[], needs: ProblemId[]): (Tip & { group: GroupId })[] {
   const out: (Tip & { group: GroupId })[] = [];
-  for (const g of groups) {
-    const first =
-      g.id === "food"
-        ? bowl
-          ? BOWL_TIPS[bowl][0]
-          : TOPPER_TIPS[0]
-        : g.id === "toilet"
-          ? { t: "Reward the right spot", d: "Every time they go in the right place, a treat and a \"good dog\" straight away." }
-          : g.id === "walks"
-            ? { t: "Tight lead, stop", d: "The moment the lead goes tight, stand still. Walk on when it's slack." }
-            : g.id === "alone"
-              ? WALK_TIPS.alone![0]
-              : g.tips[0];
-    if (first) out.push({ ...first, group: g.id });
-    if (out.length === 3) break;
-  }
-  // Fewer than three tabs: fill up with the next food tips.
-  const more = [...(bowl ? BOWL_TIPS[bowl].slice(1) : []), ...FOOD_TIPS];
-  for (const tip of more) {
-    if (out.length === 3) break;
-    if (!out.some((o) => o.t === tip.t)) out.push({ ...tip, group: "food" });
+  const asked = needs.filter((p) => p !== ("" as ProblemId));
+  const groupOf = (p: ProblemId): GroupId => groups.find((g) => g.problems.includes(p))?.id ?? "food";
+  // Every tip that answers a problem, best first.
+  const forProblem = (p: ProblemId): Tip[] => {
+    const g = groups.find((x) => x.problems.includes(p));
+    // Tips mainly about this problem (named first in `for`) come first.
+    const tagged = (g?.tips ?? []).filter((t) => t.for?.includes(p)).sort((a, b) => a.for!.indexOf(p) - b.for!.indexOf(p));
+    // Then anything else in the same tab, so a problem with few tips still fills up.
+    return [...(FIRST_STEP[p] ? [FIRST_STEP[p]!] : []), ...tagged, ...(WALK_TIPS[p] ?? []), ...(BODY_TIPS[p] ?? []), ...(g?.tips ?? [])];
+  };
+  const add = (tip: Tip, p: ProblemId) => {
+    if (out.length < 3 && !out.some((o) => o.t === tip.t)) out.push({ ...tip, group: groupOf(p) });
+  };
+  // One each, then a second each, and so on, until there are three.
+  for (let round = 0; round < 4 && out.length < 3; round++) {
+    for (const p of asked) {
+      const tip = forProblem(p).filter((t) => !out.some((o) => o.t === t.t))[0];
+      if (tip) add(tip, p);
+    }
   }
   return out;
+}
+
+// A tab's tips with the ones for the asked-about problems first.
+export function tipsFor(tips: Tip[], needs: ProblemId[]): Tip[] {
+  // By the first asked problem it answers, then by how central that
+  // problem is to the tip.
+  const score = (t: Tip) => {
+    const i = needs.findIndex((p) => t.for?.includes(p));
+    return i === -1 ? 99 : i * 10 + t.for!.indexOf(needs[i]);
+  };
+  return [...tips].sort((a, b) => score(a) - score(b));
+}
+
+// The tab's headline and line under it, sharpened to the main problem asked.
+export function headlineFor(g: Group, needs: ProblemId[]): { aha: string; why: string } {
+  const p = needs.find((x) => g.ahaFor?.[x]);
+  return p ? g.ahaFor![p]! : { aha: g.aha, why: g.why };
 }
 
 // Which tabs this dog gets, in order. Food is always there.
