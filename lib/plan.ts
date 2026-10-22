@@ -23,7 +23,7 @@ export type Expert = {
   // What they offer, in a line.
   what: string;
   // What kind of help: shown as a small label on the card.
-  kind: "Nutritionist" | "Fresh food" | "Supplements" | "Skin and bath" | "Treats" | "Holistic care" | "Vet" | "Trainer" | "Adoption";
+  kind: "Nutritionist" | "Fresh food" | "Supplements" | "Skin and bath" | "Treats" | "Holistic care" | "Vet" | "Book" | "Trainer" | "Adoption";
   site?: string;
   insta?: string;
   where?: string;
@@ -180,10 +180,10 @@ export const EXPERTS: Expert[] = [
   },
   {
     id: "becker",
-    name: "Dr. Karen Becker",
+    name: "The Forever Dog, by Dr. Karen Becker",
     handle: "@drkarenbecker",
-    what: "Vet and co-author of The Forever Dog. Get the book: our food advice follows it. Her own supplements are sold as Proactive Paws.",
-    kind: "Vet",
+    what: "The book our food advice follows, by vet Dr. Karen Becker and Rodney Habib. Her own supplements are sold as Proactive Paws.",
+    kind: "Book",
     insta: "https://www.instagram.com/drkarenbecker/",
     groups: ["food"],
   },

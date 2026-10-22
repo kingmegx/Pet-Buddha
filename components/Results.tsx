@@ -279,6 +279,7 @@ const KIND_CLASS: Record<string, string> = {
   "Fresh food": "k-food",
   Supplements: "k-food",
   Vet: "k-food",
+  Book: "k-book",
   Treats: "k-food",
   Trainer: "k-trainer",
   "Skin and bath": "k-care",
@@ -1159,8 +1160,14 @@ function Everyone() {
   const [open, setOpen] = useState(false);
   // Food people sit together under one heading; the rest by their kind.
   const FOOD_KINDS = ["Nutritionist", "Fresh food", "Supplements", "Vet"];
-  const groupOf = (e: Expert) => (FOOD_KINDS.includes(e.kind) ? "Fresh food and supplements" : e.kind);
-  const kinds = [...new Set(EXPERTS.map(groupOf))];
+  const groupOf = (e: Expert) => (e.kind === "Book" ? "Nutrition books to read" : FOOD_KINDS.includes(e.kind) ? "Fresh food and supplements" : e.kind);
+  // Food first, then the books, then everyone else in list order.
+  const FIRST = ["Fresh food and supplements", "Nutrition books to read"];
+  const kinds = [...new Set(EXPERTS.map(groupOf))].sort((a, b) => {
+    const i = FIRST.indexOf(a);
+    const j = FIRST.indexOf(b);
+    return (i === -1 ? 99 : i) - (j === -1 ? 99 : j);
+  });
   return (
     <div className={`s-fold s-everyone ${open ? "is-open" : ""}`}>
       <button className="s-fold-btn" onClick={() => setOpen(!open)} aria-expanded={open}>
@@ -1180,8 +1187,6 @@ function Everyone() {
                 <h3>{k}</h3>
                 <div className="s-experts">
                   {EXPERTS.filter((e) => groupOf(e) === k)
-                    // Dr. Becker first: the food advice is built on her book.
-                    .sort((a, b) => Number(b.id === "becker") - Number(a.id === "becker"))
                     .map((e) => (
                     <ExpertCard key={e.id} e={e} hideKind={e.kind === k} />
                   ))}

@@ -11537,3 +11537,28 @@ body:has(.stage),
 .kr .s-toilet-note {
   margin-top: 24px !important;
 }
+
+/* Kind tags: on the coloured cards in a tab the tag is white; on the white
+   cards in the everyone list the tag takes its kind's colour instead. */
+.sugg .s-expert.k-book,
+.sugg .s-expert.k-book:nth-child(n) { background: #fde3b0 !important; }
+
+.sugg .s-expert-kind {
+  padding: 4px 10px !important;
+  border-radius: 7px;
+  font-weight: 600;
+}
+
+.sugg .s-everyone .s-expert.k-food .s-expert-kind { background: #e6f5c9 !important; }
+.sugg .s-everyone .s-expert.k-book .s-expert-kind { background: #fde3b0 !important; }
+.sugg .s-everyone .s-expert.k-trainer .s-expert-kind { background: #ddd3f7 !important; }
+.sugg .s-everyone .s-expert.k-care .s-expert-kind { background: #fbe0d2 !important; }
+.sugg .s-everyone .s-expert.k-adopt .s-expert-kind { background: #fde3b0 !important; }
+
+.sugg .s-everyone .s-expert.k-book:nth-child(n),
+.sugg .s-everyone .s-expert.k-food:nth-child(n),
+.sugg .s-everyone .s-expert.k-trainer:nth-child(n),
+.sugg .s-everyone .s-expert.k-care:nth-child(n),
+.sugg .s-everyone .s-expert.k-adopt:nth-child(n) {
+  background: #fff !important;
+}
