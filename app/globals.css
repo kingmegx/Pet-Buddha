@@ -11331,3 +11331,209 @@ body:has(.stage),
   width: 100%;
   height: auto;
 }
+
+/* =====================================================================
+   Why fresh: their bowl next to a fresh one, then one row per difference.
+   ===================================================================== */
+.bc {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.bc-head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.bc-side {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+.bc-bowl {
+  width: clamp(140px, 16vw, 200px);
+  overflow: visible;
+}
+
+.bc-label {
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: #f6f3ef;
+  font-size: 14px;
+  font-weight: 600;
+  rotate: -2deg;
+}
+
+.bc-side.is-fresh .bc-label {
+  background: #2e6a4c;
+  color: #fbf6ef;
+  rotate: 2deg;
+}
+
+.bc-arrow {
+  width: 80px;
+  margin-bottom: 40px;
+  color: var(--ink);
+}
+
+.bc-note {
+  max-width: 640px;
+  margin: 0 auto 24px !important;
+  text-align: center;
+  font-size: 16px;
+  color: #5c5650 !important;
+}
+
+.bc-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bc-rows li {
+  border-top: 1px solid rgba(17, 17, 17, 0.12);
+}
+
+.bc-rows li:last-child {
+  border-bottom: 1px solid rgba(17, 17, 17, 0.12);
+}
+
+.bc-row {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr) 28px minmax(0, 1fr) 32px;
+  gap: 18px;
+  align-items: center;
+  width: 100%;
+  padding: 18px 4px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bc-topic {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-family: var(--font-brand), sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.bc-sticker {
+  width: 34px;
+}
+
+.bc-sticker .line-sticker {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.bc-rows li:nth-child(5n + 1) .bc-sticker .line-sticker path:first-child { fill: #e6f5c9; }
+.bc-rows li:nth-child(5n + 2) .bc-sticker .line-sticker path:first-child { fill: #fbe0d2; }
+.bc-rows li:nth-child(5n + 3) .bc-sticker .line-sticker path:first-child { fill: #ddd3f7; }
+.bc-rows li:nth-child(5n + 4) .bc-sticker .line-sticker path:first-child { fill: #fde3b0; }
+.bc-rows li:nth-child(5n) .bc-sticker .line-sticker path:first-child { fill: #c9d3ff; }
+
+.bc-mine {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #ee6a3c;
+  font-family: var(--font-body, inherit), sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  rotate: -3deg;
+}
+
+.bc-now {
+  font-size: 15px;
+  line-height: 1.45;
+  color: #6b655f;
+}
+
+.bc-to {
+  font-size: 20px;
+  text-align: center;
+}
+
+.bc-fresh {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #2e6a4c;
+}
+
+.bc-row:hover .tl-plus {
+  background: #e6f5c9;
+}
+
+.bc-rows li.is-open .tl-plus {
+  rotate: 45deg;
+  background: var(--ink);
+  color: #fbf6ef;
+}
+
+.bc-why {
+  margin: 0 0 20px !important;
+  padding: 16px 20px !important;
+  border-radius: 14px;
+  background: #f6f3ef;
+  font-size: 15px !important;
+  line-height: 1.55;
+  color: var(--ink) !important;
+}
+
+.bc-src {
+  margin-top: 14px !important;
+  font-size: 13px !important;
+  color: #8a837c !important;
+}
+
+@media (max-width: 760px) {
+  .bc-row {
+    grid-template-columns: minmax(0, 1fr) 32px;
+    row-gap: 8px;
+  }
+
+  .bc-topic {
+    grid-column: 1;
+  }
+
+  .bc-now,
+  .bc-fresh {
+    grid-column: 1 / -1;
+  }
+
+  .bc-to {
+    display: none;
+  }
+
+  .bc-row .tl-plus {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  .bc-arrow {
+    width: 48px;
+  }
+}
+
+/* Kitchen rules: the switch, then the cards for that part. */
+.kr .s-switch {
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.kr .s-toilet-note {
+  margin-top: 24px !important;
+}

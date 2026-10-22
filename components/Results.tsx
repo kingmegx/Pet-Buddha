@@ -12,6 +12,7 @@ import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
 import { Squiggle } from "./LandingMore";
 import { Sticker, type StickerKind } from "./Stickers";
 import { ToiletRoad } from "./ToiletRoad";
+import { BowlCompare } from "./BowlCompare";
 
 // The dog's name set in the italic accent face, like "why *pet buddha*".
 function Accent({ text, word }: { text: string; word?: string }) {
@@ -98,6 +99,47 @@ function ToppersGrid() {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// Kitchen rules: the everyday food habits in one place, switched by topic
+// so only a handful show at once. Puppy, older-dog and big-dog notes sit
+// where they belong.
+const ADULT_ONLY = ["An 8-hour window", "One or two meals", "A skipped meal is fine"];
+
+function KitchenRules({ kg, months }: { kg: number; months: number }) {
+  const parts = [
+    {
+      id: "when",
+      label: "When and how much",
+      tips: [
+        // Feeding windows, fewer meals and skipped meals are for grown dogs; puppies get the puppy note instead.
+        ...WHEN_TIPS.filter((t) => !BIG_DOG_TIPS.some((b) => b.t === t.t)).filter((t) => months >= 12 || !ADULT_ONLY.includes(t.t)),
+        ...(kg >= 25 ? BIG_DOG_TIPS : []),
+      ],
+    },
+    { id: "switch", label: "Switching food", tips: SWITCH_TIPS },
+    { id: "india", label: "Indian kitchen", tips: INDIAN_KITCHEN },
+    { id: "every", label: "Every bowl", tips: [...FOOD_TIPS, ...(months >= 84 ? SENIOR_TIPS : [])] },
+  ];
+  const [at, setAt] = useState(parts[0].id);
+  const part = parts.find((x) => x.id === at)!;
+  return (
+    <div className="kr">
+      <div className="s-switch" role="tablist" aria-label="Kitchen rules">
+        {parts.map((x) => (
+          <button key={x.id} role="tab" aria-selected={x.id === at} onClick={() => setAt(x.id)}>
+            {x.label}
+          </button>
+        ))}
+      </div>
+      <AnimatePresence mode="wait">
+        <motion.div key={at} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2 }}>
+          <Tips tips={part.tips} />
+          {at === "when" && months < 12 && <p className="s-toilet-note">{PUPPY_NOTE}</p>}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
@@ -930,24 +972,81 @@ export function Results({
 
             {g.id === "food" && (
               <>
-                <Sub note="Whatever is in the bowl now, start here.">Step 1 · Fresh toppers, up to 10%</Sub>
-                <Tips tips={TOPPER_TIPS} />
-                <ToppersGrid />
-                <Fold title="How much of each?" line="Organs, sardines, spices, garlic, and what to do if they're chubby.">
-                  <Tips
-                    tips={[
-                      ...TOPPER_AMOUNTS,
-                      {
-                        t: "Garlic: fresh and measured",
-                        d: garlicCloves(kg)
-                          ? `At ${kg} kg, up to ${garlicCloves(kg)} of fresh garlic a day. Fresh only, no pills or powders. Onion is never safe.`
-                          : "Very small dogs: skip garlic. Onion is never safe.",
-                        src: "The Forever Dog, @backintheday.in, @doggiliciouus",
-                      },
-                    ]}
-                  />
-                </Fold>
+                {/* 1. Why: their bowl next to a fresh one. */}
+                <Sub note={`What's in ${who === "your dog" ? "the" : `${Who}'s`} bowl now, next to a fresh one. Tap a row to see why it matters.`} short="why fresh">Why fresh food</Sub>
+                <BowlCompare bowl={bowl} needs={needs} who={Who} />
 
+                {/* 2. One easy first step, depending on the bowl. */}
+                {bowl === "home" || bowl === "fresh" ? (
+                  <>
+                    <Sub note={bowl ? BOWL_NOTE[bowl] : undefined} short="first step">Your first step: make it complete</Sub>
+                    <Tips tips={HOMEMADE_TIPS} />
+                    <p className="s-links">
+                      {HOMEMADE_LINKS.map((l) => (
+                        <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
+                          {l.label} <i className="chev chev-right" aria-hidden />
+                        </a>
+                      ))}
+                    </p>
+                    <Fold title="Fresh toppers to add" line="Easy fresh extras from your own kitchen, and how much of each.">
+                      <ToppersGrid />
+                      <Tips tips={TOPPER_AMOUNTS} />
+                    </Fold>
+                  </>
+                ) : (
+                  <>
+                    <Sub note="Keep their usual food. Add fresh bites, up to a tenth of the day's food." short="first step">Your first step: 10% fresh</Sub>
+                    <Tips tips={TOPPER_TIPS} />
+                    <ToppersGrid />
+                    <Fold title="How much of each?" line="Organs, sardines, spices, and what to do if they're chubby.">
+                      <Tips
+                        tips={[
+                          ...TOPPER_AMOUNTS,
+                          {
+                            t: "Garlic: fresh and measured",
+                            d: garlicCloves(kg)
+                              ? `At ${kg} kg, up to ${garlicCloves(kg)} of fresh garlic a day. Fresh only, no pills or powders. Onion is never safe.`
+                              : "Very small dogs: skip garlic. Onion is never safe.",
+                            src: "The Forever Dog, @backintheday.in, @doggiliciouus",
+                          },
+                        ]}
+                      />
+                    </Fold>
+
+                    {/* 3. How far to go. */}
+                    <Sub note={bowl ? BOWL_NOTE[bowl] : "Every bit of fresh food counts. Pick how far you want to go."} short="how far to go">When you're ready for more</Sub>
+                    <Ladder start={bowl ? LADDER_START[bowl] : LADDER[0].id} />
+                    <Fold title="Making it at home" line="What makes a home-made bowl complete, not just fresh.">
+                      <Tips tips={HOMEMADE_TIPS} />
+                      <p className="s-links">
+                        {HOMEMADE_LINKS.map((l) => (
+                          <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
+                            {l.label} <i className="chev chev-right" aria-hidden />
+                          </a>
+                        ))}
+                      </p>
+                    </Fold>
+                  </>
+                )}
+
+                {/* 4. Kitchen rules, in one switchable section. */}
+                <Sub note={`${who === "your dog" ? "A grown dog" : Who} at ${kg} kg needs roughly ${dailyCalories(kg)} calories a day, more if very active.`} short="kitchen rules">Kitchen rules</Sub>
+                <KitchenRules kg={kg} months={months} />
+
+                {/* 5. Their tummy, picky or weight problems, if ticked. */}
+                {(["tummy", "picky", "weight"] as ProblemId[])
+                  .filter((p) => needs.includes(p))
+                  .map((p) => (
+                    <TipSection key={p} tips={BODY_TIPS[p]!} title={PROBLEMS.find((x) => x.id === p)!.label} keep />
+                  ))}
+
+                {/* 6. Tools and research, folded away. */}
+                <Sub short="tools">Tools and research</Sub>
+                {bowl !== "home" && bowl !== "fresh" && (
+                  <Fold title="Check the bag" line="How much starch is in their packaged food? Work it out from the label.">
+                    <StarchCheck />
+                  </Fold>
+                )}
                 <Fold title="Garlic: what the research says" line="The studies behind the garlic advice, in plain words.">
                   <ul className="s-papers">
                     {GARLIC_RESEARCH.map((r) => (
@@ -962,58 +1061,6 @@ export function Results({
                   </ul>
                   <p className="s-toilet-note">{GARLIC_CONTEXT}</p>
                 </Fold>
-
-                <Sub note={bowl ? BOWL_NOTE[bowl] : "Every bit of fresh food counts. Pick how far you want to go."}>Step 2 · How much of the bowl fresh?</Sub>
-                <Ladder start={bowl ? LADDER_START[bowl] : LADDER[0].id} />
-                <Fold title="Making it at home" line="What makes a home-made bowl complete, not just fresh." open={bowl === "home" || bowl === "fresh"}>
-                  <Tips tips={HOMEMADE_TIPS} />
-                  <p className="s-links">
-                    {HOMEMADE_LINKS.map((l) => (
-                      <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
-                        {l.label} <i className="chev chev-right" aria-hidden />
-                      </a>
-                    ))}
-                  </p>
-                </Fold>
-                {bowl !== "home" && bowl !== "fresh" && (
-                  <Fold title="Check the bag" line="How much starch is in their packaged food? Work it out from the label.">
-                    <StarchCheck />
-                  </Fold>
-                )}
-
-                <Sub note={`${who === "your dog" ? "A grown dog" : Who} at ${kg} kg needs roughly ${dailyCalories(kg)} calories a day, more if very active.`}>When and how much</Sub>
-                <Tips tips={WHEN_TIPS} />
-                {kg >= 25 && (
-                  <div className="s-space">
-                    <Tips tips={BIG_DOG_TIPS} />
-                  </div>
-                )}
-                {months < 12 && <p className="s-toilet-note">{PUPPY_NOTE}</p>}
-
-                {months >= 84 && (
-                  <>
-                    <Sub>For an older dog</Sub>
-                    <Tips tips={SENIOR_TIPS} />
-                  </>
-                )}
-
-                <Sub>Switching food</Sub>
-                <Tips tips={SWITCH_TIPS} />
-
-                <Sub note="The habits that most often go wrong at home.">From an Indian kitchen</Sub>
-                <Tips tips={INDIAN_KITCHEN} />
-
-                {(["tummy", "picky", "weight"] as ProblemId[])
-                  .filter((p) => needs.includes(p))
-                  .map((p) => (
-                    <div key={p}>
-                      <Sub>{PROBLEMS.find((x) => x.id === p)!.label}</Sub>
-                      <Tips tips={BODY_TIPS[p]!} />
-                    </div>
-                  ))}
-
-                <Sub>For every bowl</Sub>
-                <Tips tips={FOOD_TIPS} />
 
                 <div className="s-soon">
                   <span className="s-soon-tag">Coming soon</span>

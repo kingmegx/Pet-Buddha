@@ -769,3 +769,130 @@ export function headlineFor(g: Group, needs: ProblemId[]): { aha: string; why: s
 export function groupsFor(needs: ProblemId[]) {
   return GROUPS.filter((g) => g.id === "food" || g.problems.some((p) => needs.includes(p)));
 }
+
+// ---------- why fresh: the bowl comparison ----------
+
+// The opening of the Food tab: the bowl they feed now next to a fresh one,
+// one difference per row, each with why it matters. From The Forever Dog
+// (chapters 2, 5 and 8), in our own words. `for` marks the rows that speak
+// to a problem the owner ticked, so those can be pointed out.
+export type CompareRow = { topic: string; sticker: string; now: string; fresh: string; why: string; for?: ProblemId[] };
+export type Compare = { now: string; fresh: string; rows: CompareRow[]; note?: string };
+
+const KIBBLE_ROWS: CompareRow[] = [
+  {
+    topic: "Water",
+    sticker: "bowl",
+    now: "Dry: only about a tenth water.",
+    fresh: "Mostly water, like real meat and veg.",
+    why: "Dogs aren't designed to live on low-moisture, dried food. Fresh food hydrates with every bite.",
+  },
+  {
+    topic: "Starch",
+    sticker: "leaf",
+    now: "Often 30 to 60% starch, which turns into sugar.",
+    fresh: "Little starch. Under 10% is natural for dogs.",
+    why: "Dogs need no starch. A carby meal can keep insulin raised for up to eight hours, meal after meal.",
+    for: ["weight"],
+  },
+  {
+    topic: "Cooking",
+    sticker: "sparkle",
+    now: "Extruded: cooked under pressure at very high heat.",
+    fresh: "Lightly cooked, or raw.",
+    why: "High heat creates harmful by-products. One study found dogs take in up to 122 times more of them than people do.",
+  },
+  {
+    topic: "Skin",
+    sticker: "paw",
+    now: "Ultra-processed, carb-heavy food is a risk factor for allergies.",
+    fresh: "Fresh, meat-based food is linked to fewer itchy-skin allergies.",
+    why: "A Finnish study found a fresh, meat-based diet early in life protects against itchy skin, while a processed, carb-heavy one is a risk.",
+    for: ["itch", "coat"],
+  },
+  {
+    topic: "Gut",
+    sticker: "heart",
+    now: "Heat-processed food feeds a less varied gut.",
+    fresh: "A richer, more varied gut.",
+    why: "Researchers comparing diets found raw food fosters a much richer gut community, and heat by-products can feed harmful bacteria.",
+    for: ["tummy"],
+  },
+  {
+    topic: "Weight",
+    sticker: "ball",
+    now: "The more kibble dogs eat, the likelier they are to be overweight.",
+    fresh: "Easier to keep lean on real food.",
+    why: "Starch is quick fuel the body stores as fat when it isn't burned.",
+    for: ["weight"],
+  },
+];
+
+export const COMPARE: Record<Bowl, Compare> = {
+  kibble: { now: "Packaged food", fresh: "A fresh bowl", rows: KIBBLE_ROWS },
+  mix: {
+    now: "The packaged part",
+    fresh: "A fresh bowl",
+    rows: KIBBLE_ROWS,
+    note: "You're already part way there. The packaged half is where the starch and the heat damage come from, so every bit you swap counts.",
+  },
+  home: {
+    now: "A typical home bowl",
+    fresh: "A complete fresh bowl",
+    rows: [
+      {
+        topic: "Base",
+        sticker: "bowl",
+        now: "Mostly rice or roti, with some dal or meat.",
+        fresh: "Meat and organs first, vegetables second, little grain.",
+        why: "Dogs do best getting their energy from protein and fat. Rice and roti are starch, which turns into sugar.",
+        for: ["weight"],
+      },
+      {
+        topic: "Balance",
+        sticker: "sparkle",
+        now: "Rotating meat, rice and veg over the week.",
+        fresh: "A recipe made to meet a dog's nutrient needs.",
+        why: "Rotating still misses zinc, vitamins D and E, iodine, manganese and selenium. A complete recipe covers them.",
+        for: ["itch", "coat"],
+      },
+      {
+        topic: "Cooking",
+        sticker: "leaf",
+        now: "Often pressure-cooked, fried or browned.",
+        fresh: "Gently poached until just done, or raw.",
+        why: "Browning food creates harmful by-products. Gentle cooking keeps more of the good stuff.",
+        for: ["tummy"],
+      },
+    ],
+    note: "Home-cooked is the freshest food there is. A few changes make it complete.",
+  },
+  fresh: {
+    now: "Fresh, unchecked",
+    fresh: "Fresh and complete",
+    rows: [
+      {
+        topic: "Balance",
+        sticker: "sparkle",
+        now: "Rotating meats and veg, hoping it evens out.",
+        fresh: "A recipe made to a nutrient standard.",
+        why: "Rotation alone misses zinc, vitamins D and E, iodine, manganese and selenium.",
+      },
+      {
+        topic: "Organs",
+        sticker: "heart",
+        now: "Mostly muscle meat.",
+        fresh: "Organs like liver and heart in the mix.",
+        why: "Organs carry vitamins and minerals muscle meat doesn't. A little goes a long way.",
+      },
+      {
+        topic: "Cooking",
+        sticker: "leaf",
+        now: "Browned or fried.",
+        fresh: "Gently poached, or raw.",
+        why: "Browning creates harmful by-products. Gentle cooking keeps more of the good stuff.",
+      },
+    ],
+    note: "You're feeding the gold standard. Just make sure it's complete.",
+  },
+};
