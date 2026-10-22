@@ -28,6 +28,8 @@ export type Expert = {
   insta?: string;
   where?: string;
   groups: GroupId[];
+  // Why they're a good fit for a particular problem, shown on a highlighted card.
+  goodFor?: Partial<Record<ProblemId, string>>;
 };
 
 // ---------- the people we point to ----------
@@ -103,6 +105,9 @@ export const EXPERTS: Expert[] = [
     site: "https://canineindia.in",
     where: "Ships across India",
     groups: ["food", "energy", "skin"],
+    goodFor: {
+      chew: "Natural chews that last, made in India.",
+    },
   },
   {
     id: "caninecraving",
@@ -114,6 +119,9 @@ export const EXPERTS: Expert[] = [
     site: "https://www.caninecraving.com",
     where: "Fresh meat delivery: check your pincode on their site",
     groups: ["food", "energy"],
+    goodFor: {
+      chew: "Natural chews, from a canine nutritionist's kitchen.",
+    },
   },
   {
     id: "woof",
@@ -134,6 +142,11 @@ export const EXPERTS: Expert[] = [
     insta: "https://www.instagram.com/backintheday.in/",
     site: "https://backintheday.in",
     groups: ["skin"],
+    goodFor: {
+      itch: "Their highlights cover hotspots, dry skin and fungal infections.",
+      ticks: "Their highlights cover ticks and monsoon care.",
+      coat: "Gentle shampoos, and highlights on shedding.",
+    },
   },
   {
     id: "happypuppy",
@@ -144,6 +157,11 @@ export const EXPERTS: Expert[] = [
     insta: "https://www.instagram.com/happypuppyorganics/",
     site: "https://happypuppyorganics.com",
     groups: ["skin", "alone"],
+    goodFor: {
+      ticks: "A natural anti-tick spray.",
+      itch: "Gentle natural skin care and an ear cleaner.",
+      alone: "Calming mists for the days you're out.",
+    },
   },
   {
     id: "nutkit",
@@ -154,27 +172,20 @@ export const EXPERTS: Expert[] = [
     insta: "https://www.instagram.com/nutkit.co/",
     site: "https://www.nutkit.co.in",
     groups: ["skin", "alone", "walks"],
+    goodFor: {
+      alone: "A calming spray for fireworks and stressful days.",
+      bark: "Calming help, if the barking comes from fear.",
+      itch: "Clays for hot spots and consults on skin.",
+    },
   },
   {
     id: "becker",
     name: "Dr. Karen Becker",
     handle: "@drkarenbecker",
-    what: "Vet and co-author of The Forever Dog and The Forever Dog Life (balanced fresh-food recipes). Our food advice follows her approach.",
+    what: "Vet and co-author of The Forever Dog. Get the book: our food advice follows it. Her own supplements are sold as Proactive Paws.",
     kind: "Vet",
     insta: "https://www.instagram.com/drkarenbecker/",
-    site: "https://drkarenbecker.com",
     groups: ["food"],
-  },
-  {
-    id: "proactive",
-    name: "Proactive Paws",
-    handle: "@proactivepawsproducts",
-    what: "Dr. Becker's supplements: probiotics, digestive enzymes, liver support, omega-3 and joint care.",
-    kind: "Supplements",
-    insta: "https://www.instagram.com/proactivepawsproducts/",
-    site: "https://www.proactivepaws.com",
-    where: "US-based; check shipping to India",
-    groups: ["food", "skin"],
   },
   {
     id: "zak",
@@ -184,6 +195,31 @@ export const EXPERTS: Expert[] = [
     kind: "Trainer",
     site: "https://www.youtube.com/@zakgeorge",
     groups: ["toilet", "walks", "alone", "energy"],
+    goodFor: {
+      toilet: "His free videos take you through toilet training step by step.",
+      pull: "Free, clear videos on loose-lead walking.",
+      chew: "Free videos on chewing, and what to give them instead.",
+      nip: "Free videos on puppy biting and what to do instead.",
+      bark: "Free videos on why dogs bark and how to calm it.",
+      alone: "Free videos on teaching a dog to be alone.",
+    },
+  },
+  {
+    id: "tara",
+    name: "Tara James · Canine Synergy",
+    handle: "@canine_synergy",
+    what: "Dog trainer behind Canine Synergy: customised board-and-trains, workshops and events. She also runs Anarchy K9s, Bangalore's working dog club.",
+    kind: "Trainer",
+    insta: "https://www.instagram.com/canine_synergy/",
+    site: "https://www.caninesynergy.com",
+    where: "Bengaluru",
+    groups: ["toilet", "walks", "alone", "energy"],
+    goodFor: {
+      pull: "In Bengaluru and walks feel like a tug of war? Book hands-on help.",
+      bark: "In Bengaluru? A trainer can find what sets the barking off.",
+      toilet: "In Bengaluru and accidents keep happening? Get hands-on help.",
+      alone: "In Bengaluru? Workshops and board-and-trains if you want hands-on help.",
+    },
   },
   {
     id: "freagles",
@@ -201,6 +237,43 @@ export const EXPERTS: Expert[] = [
     what: "Runs Back in the Day and Freagles of India. Her highlights cover senior dog care, neutering, and why not to buy puppies.",
     kind: "Adoption",
     insta: "https://www.instagram.com/chinthanagopinath/",
+    groups: [],
+  },
+  {
+    id: "secondchance",
+    name: "Second Chance Sanctuary",
+    handle: "@secondchancesanctuaryindia",
+    what: "A Bengaluru trust that rescues, rehabilitates and rehomes dogs. Adopt, foster, volunteer or donate.",
+    kind: "Adoption",
+    insta: "https://www.instagram.com/secondchancesanctuaryindia/",
+    groups: [],
+  },
+  {
+    id: "sanjana",
+    name: "Sanjana Madappa",
+    handle: "@sanjana_madappa",
+    what: "Co-founder of Second Chance Sanctuary and a long-time animal welfare volunteer in Bengaluru.",
+    kind: "Adoption",
+    insta: "https://www.instagram.com/sanjana_madappa/",
+    groups: [],
+  },
+  {
+    id: "forpawssake",
+    name: "For Paws Sake",
+    handle: "@forpawssake_",
+    what: "Arsshleen Kaur's page for rescue, adoption and sterilisation. Dogs looking for homes turn up in her posts.",
+    where: "Bengaluru",
+    kind: "Adoption",
+    insta: "https://www.instagram.com/forpawssake_/",
+    groups: [],
+  },
+  {
+    id: "goodoo",
+    name: "Goodoo Animal Welfare",
+    handle: "@goodoo.animal.welfare",
+    what: "Goodoo Rescue and Rehab Centre, and Serene's Home for Senior Dogs. Closed for new intake until November 2026; donations help.",
+    kind: "Adoption",
+    insta: "https://www.instagram.com/goodoo.animal.welfare/",
     groups: [],
   },
 ];
@@ -260,7 +333,7 @@ export const GROUPS: Group[] = [
     ],
     avoid: "Don't add more fetch or running to tire them out. It builds fitness and excitement, not calm.",
     help: "If they guard food or toys, snap, or chew until they hurt themselves, talk to a vet or a qualified trainer.",
-    experts: ["canineindia", "caninecraving", "zak"],
+    experts: ["canineindia", "caninecraving", "zak", "tara"],
   },
   {
     id: "toilet",
@@ -285,7 +358,7 @@ export const GROUPS: Group[] = [
     ],
     avoid: "Don't scold accidents you find later, or rub their nose in it. They can't link it to what they did.",
     help: "If an older, trained dog starts having accidents, or pees very often, see a vet. It can be an infection.",
-    experts: ["zak", "woof"],
+    experts: ["zak", "tara"],
   },
   {
     id: "walks",
@@ -293,10 +366,20 @@ export const GROUPS: Group[] = [
     problems: ["pull", "bark"],
     aha: "Pulling and barking continue because they get results.",
     why: "Pulling gets them there faster. Barking gets your attention. Make the calm choice the one that pays instead.",
+    ahaFor: {
+      pull: {
+        aha: "{who} pulls because pulling works.",
+        why: "Every step forward on a tight lead teaches them that pulling gets them there. Make a loose lead the only way to move.",
+      },
+      bark: {
+        aha: "Barking is {who} talking. Find out what they're saying.",
+        why: "Doorbell, window, boredom or wanting you: each bark has a reason, and each reason has its own fix.",
+      },
+    },
     tips: [],
     avoid: "Don't yank the lead or shout back. Skip choke, prong and shock collars.",
     help: "If barking comes with shaking, hiding or snapping, they may be scared. Talk to a vet or a qualified trainer.",
-    experts: ["zak", "nutkit", "woof"],
+    experts: ["zak", "tara", "nutkit"],
   },
   {
     id: "alone",
@@ -307,7 +390,7 @@ export const GROUPS: Group[] = [
     tips: [],
     avoid: "Don't scold for what happened while you were out. They can't link it to what they did.",
     help: "Long howling, drooling, scratching at doors or hurting themselves trying to get out can be separation anxiety. Talk to your vet or a qualified trainer.",
-    experts: ["zak", "nutkit", "happypuppy"],
+    experts: ["zak", "tara", "nutkit", "happypuppy"],
   },
   {
     id: "skin",
@@ -315,14 +398,24 @@ export const GROUPS: Group[] = [
     problems: ["itch", "ticks", "coat"],
     aha: "Itchy skin usually starts inside, not on the surface.",
     why: "Skin is where diet, gut health and what you wash them with all show up. Fix it from the inside and the outside.",
+    ahaFor: {
+      ticks: {
+        aha: "Ticks are a two-minute, every-day check.",
+        why: "Heat and monsoon bring ticks everywhere. A quick check after walks and a clean home keep them off {who}.",
+      },
+      coat: {
+        aha: "A shiny, fresh-smelling coat starts in the bowl.",
+        why: "Heavy shedding and a doggy smell usually mean the skin wants better fats and gentler washing, not more baths.",
+      },
+    },
     tips: [
       { t: "Feed the skin", d: "Skin shows what's happening in the gut and immune system. Animal protein first, grains and dal down.", src: "@backintheday.in", for: ["itch", "coat"] },
       { t: "Bath less, gently", d: "Once every 3 to 4 weeks is plenty, with a mild dog shampoo. Human shampoo is too harsh.", for: ["coat", "itch"] },
       { t: "Dry them fully", d: "Monsoon damp breeds fungus. Dry between the toes, in the ears and under the collar.", src: "@backintheday.in", for: ["itch", "coat"] },
       { t: "Check after walks", d: "Clean paws after every walk. Run your fingers over ears, neck, armpits and between toes for ticks.", src: "@kaninenutrition", for: ["ticks"] },
       { t: "Part the fur", d: "Brush short fur against the grain and part long fur, so you see the skin, not just the coat.", src: "@backintheday.in", for: ["ticks", "coat"] },
-      { t: "Apple cider vinegar, maybe", d: "Some owners add a splash of raw apple cider vinegar to food daily to make them less tasty to ticks. Not proven, but harmless. Don't skip real tick checks.", src: "@backintheday.in", for: ["ticks"] },
       { t: "Treat the home too", d: "Ticks and fleas live in bedding and corners. Wash bedding hot; food-grade diatomaceous earth helps in the home.", src: "@backintheday.in", for: ["ticks"] },
+      { t: "Apple cider vinegar, maybe", d: "Some owners add a splash of raw apple cider vinegar to food daily to make them less tasty to ticks. Not proven, but harmless. Don't skip real tick checks.", src: "@backintheday.in", for: ["ticks"] },
       { t: "Allergic to chicken?", d: "Try quail, turkey, duck, mutton, buffalo or pork, rotating every few days. Retry chicken from a better source later.", src: "@carnikitchen", for: ["itch"] },
       { t: "Add good fats", d: "Omega-3 from fish such as salmon or sardines helps calm itchy, inflamed skin.", src: "@canine_india", for: ["itch", "coat"] },
       { t: "Deworm properly", d: "Herbal dewormers aren't enough on their own, especially in India. Test and treat with your vet.", src: "@happypuppyorganics", for: ["itch"] },
@@ -341,7 +434,7 @@ export const GROUPS: Group[] = [
     tips: [],
     avoid: "Never feed grapes or raisins, onion (or chives), chocolate, macadamia nuts, nutmeg, xylitol (in sugar-free sweets and some peanut butter) or cooked bones.",
     help: "Vomiting or diarrhoea for more than a day, blood, or sudden weight change needs a vet. For a dog with a medical condition, ask a vet nutritionist to formulate the diet.",
-    experts: ["becker", "canineindia", "caninecraving", "doggiliciouus", "georgina", "carni", "kanine", "bowl", "woof", "proactive"],
+    experts: ["becker", "canineindia", "caninecraving", "doggiliciouus", "georgina", "carni", "kanine", "bowl", "woof"],
   },
 ];
 
@@ -352,12 +445,16 @@ export const WALK_TIPS: Partial<Record<ProblemId, Tip[]>> = {
     { t: "Slack lead, go", d: "When it loosens, say \"yes\" and walk on." },
     { t: "Pay at your side", d: "Treat by your leg when they walk next to you." },
     { t: "Sniff breaks", d: "Say \"go sniff\" and let them explore. Pulling stops being the only way." },
+    { t: "A front-clip harness", d: "A harness that clips at the chest turns them gently back towards you when they pull. Kinder on the neck than a collar." },
+    { t: "Sniff before you set off", d: "A few minutes of nosing around outside the door takes the edge off before the walk starts." },
   ],
   bark: [
     { t: "Find the why", d: "Doorbell, window, boredom or attention: each has its own fix." },
     { t: "Block the view", d: "A curtain or frosted film on the window means less to shout at." },
     { t: "Reward the quiet", d: "Ignore attention barking. The second they stop, treat." },
     { t: "Teach \"quiet\"", d: "Let them bark twice, say \"quiet\", treat by the nose when they stop." },
+    { t: "Make the doorbell mean bed", d: "Have someone ring the bell, then treat them on their bed. Repeat until the bell sends them there." },
+    { t: "Give the brain a job", d: "Bored dogs bark to fill the time. A sniff game or a chew every day leaves less to shout about." },
   ],
   alone: [
     { t: "Start with seconds", d: "Step out and come back before they fuss. Build up slowly." },
@@ -649,6 +746,8 @@ export function weekPlan(groups: Group[], needs: ProblemId[]): (Tip & { group: G
 
 // A tab's tips with the ones for the asked-about problems first.
 export function tipsFor(tips: Tip[], needs: ProblemId[]): Tip[] {
+  // Only tips for what was asked, plus general ones that aren't tied to a problem.
+  tips = tips.filter((t) => !t.for || t.for.some((p) => needs.includes(p)));
   // By the first asked problem it answers, then by how central that
   // problem is to the tip.
   const score = (t: Tip) => {
@@ -660,8 +759,10 @@ export function tipsFor(tips: Tip[], needs: ProblemId[]): Tip[] {
 
 // The tab's headline and line under it, sharpened to the main problem asked.
 export function headlineFor(g: Group, needs: ProblemId[]): { aha: string; why: string } {
-  const p = needs.find((x) => g.ahaFor?.[x]);
-  return p ? g.ahaFor![p]! : { aha: g.aha, why: g.why };
+  // The first problem asked about in this tab decides; if it has no sharper
+  // line of its own, the tab's general one is used.
+  const p = needs.find((x) => g.problems.includes(x));
+  return p && g.ahaFor?.[p] ? g.ahaFor[p]! : { aha: g.aha, why: g.why };
 }
 
 // Which tabs this dog gets, in order. Food is always there.

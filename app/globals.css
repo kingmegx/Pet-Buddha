@@ -11125,3 +11125,209 @@ body:has(.stage),
 .road-stop.is-low {
   margin-top: 30px;
 }
+
+/* Don't / when to get help: two soft cards with a tilted tag. */
+.sugg .s-careful {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 24px);
+  margin-top: clamp(80px, 12vh, 120px) !important;
+}
+
+.cf {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 34px 26px 26px;
+  border-radius: 16px;
+}
+
+.cf-avoid { background: #fbe0d2; }
+.cf-help { background: #ddd3f7; }
+
+.cf-tag {
+  position: absolute;
+  top: -13px;
+  left: 22px;
+  padding: 5px 11px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: #fbf6ef;
+  font-size: 13px;
+  font-weight: 600;
+  rotate: -3deg;
+}
+
+.cf p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink) !important;
+}
+
+@media (max-width: 700px) {
+  .sugg .s-careful {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 36px;
+  }
+}
+
+/* =====================================================================
+   People cards: one calm, uniform style. Neutral cards, a small coloured
+   tag for the kind, a gentle lift on hover, no tilt.
+   ===================================================================== */
+.sugg .s-expert,
+.sugg .s-expert:nth-child(n) {
+  background: #f6f3ef !important;
+  transform: none;
+  transition: translate 0.35s var(--spring), box-shadow 0.25s ease;
+}
+
+.sugg .s-expert:hover {
+  transform: none !important;
+  translate: 0 -3px;
+  box-shadow: 0 14px 24px -20px rgba(40, 20, 10, 0.5);
+}
+
+.sugg .s-expert-kind,
+.sugg .s-expert:nth-child(n) .s-expert-kind {
+  rotate: 0deg;
+  background: #e6f5c9 !important;
+}
+
+.sugg .s-expert-what {
+  color: #4d4741;
+}
+
+/* Everyone we recommend: a neutral box, white cards inside, grouped under
+   their kind, so the per-card tag is left out. */
+.sugg .s-everyone,
+.sugg .s-fold.s-everyone {
+  background: #f6f3ef !important;
+}
+
+.sugg .s-everyone .s-expert,
+.sugg .s-everyone .s-expert:nth-child(n) {
+  background: #fff !important;
+}
+
+
+.sugg .s-everyone h3 {
+  margin: 28px 0 14px !important;
+  font-size: 20px !important;
+  color: var(--ink) !important;
+}
+
+.sugg .s-everyone h3:first-child {
+  margin-top: 4px !important;
+}
+
+.sugg .s-everyone-group {
+  padding: 0 22px;
+}
+
+.sugg .s-everyone-group:last-child {
+  padding-bottom: 24px;
+}
+
+.sugg .s-everyone-group + .s-everyone-group h3 {
+  margin-top: 36px !important;
+}
+
+/* =====================================================================
+   People cards v3: colour by kind, a highlighted best fit.
+   ===================================================================== */
+.sugg .s-expert.k-food,
+.sugg .s-expert.k-food:nth-child(n) { background: #eef6e1 !important; }
+.sugg .s-expert.k-trainer,
+.sugg .s-expert.k-trainer:nth-child(n) { background: #ece7fa !important; }
+.sugg .s-expert.k-care,
+.sugg .s-expert.k-care:nth-child(n) { background: #fbece3 !important; }
+.sugg .s-expert.k-adopt,
+.sugg .s-expert.k-adopt:nth-child(n) { background: #fdf0d3 !important; }
+
+/* Inside the everyone list the cards stay white; the box is the colour. */
+.sugg .s-everyone .s-expert:nth-child(n) {
+  background: #fff !important;
+}
+
+.sugg .s-expert-kind,
+.sugg .s-expert:nth-child(n) .s-expert-kind {
+  background: #fff !important;
+}
+
+/* The best fit: an ink outline, a tag, and the reason in its own line. */
+.sugg .s-expert.is-pick {
+  position: relative;
+  padding-top: 34px !important;
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+.s-pick-tag {
+  position: absolute;
+  top: -13px;
+  left: 22px;
+  padding: 5px 11px;
+  border-radius: 8px;
+  background: #ee6a3c;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  rotate: -3deg;
+}
+
+.s-pick-why {
+  margin-top: 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.sugg .s-experts {
+  padding-top: 14px;
+}
+
+/* Best fit, in the site's highlight style: solid green like "start here",
+   a tilted tag, a sticker in the corner. No outline. */
+.sugg .s-expert.is-pick,
+.sugg .s-expert.is-pick:nth-child(n) {
+  background: #2e6a4c !important;
+  color: #fbf6ef;
+  box-shadow: 0 22px 44px -30px rgba(40, 20, 10, 0.55);
+}
+
+.sugg .s-expert.is-pick strong,
+.sugg .s-expert.is-pick a {
+  color: #fbf6ef;
+}
+
+.sugg .s-expert.is-pick .s-expert-what {
+  color: rgba(251, 246, 239, 0.85);
+}
+
+.sugg .s-expert.is-pick .s-expert-kind {
+  background: rgba(251, 246, 239, 0.16) !important;
+  color: #fbf6ef;
+}
+
+.sugg .s-expert.is-pick .s-pick-why {
+  background: rgba(251, 246, 239, 0.14);
+  color: #fbf6ef;
+}
+
+.s-pick-sticker {
+  position: absolute;
+  top: -24px;
+  right: 22px;
+  width: 54px;
+  rotate: 10deg;
+}
+
+.s-pick-sticker .line-sticker {
+  display: block;
+  width: 100%;
+  height: auto;
+}

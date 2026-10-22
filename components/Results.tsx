@@ -216,25 +216,47 @@ function Tips({ tips, start = 0 }: { tips: Tip[]; start?: number }) {
 
 // A section of tips with its heading. Called "More to try" when some of its
 // tips are already up top, and left out entirely if all of them are.
-function TipSection({ tips, title = "First steps" }: { tips: Tip[]; title?: string }) {
+// `keep` keeps the given title (a topic like "Barking") even when some tips
+// are already up top.
+function TipSection({ tips, title = "First steps", keep = false }: { tips: Tip[]; title?: string; keep?: boolean }) {
   const seen = useContext(SeenTips);
   const left = tips.filter((t) => !seen.has(t.t)).length;
   if (left === 0) return null;
   return (
     <>
-      <Sub>{left < tips.length ? "More to try" : title}</Sub>
+      <Sub>{left < tips.length && !keep ? "More to try" : title}</Sub>
       <Tips tips={tips} />
     </>
   );
 }
 
 // One person or brand we recommend: who, what they offer, and where to find them.
-function ExpertCard({ e }: { e: Expert }) {
+// Each kind of person has its own soft colour.
+const KIND_CLASS: Record<string, string> = {
+  Nutritionist: "k-food",
+  "Fresh food": "k-food",
+  Supplements: "k-food",
+  Vet: "k-food",
+  Treats: "k-food",
+  Trainer: "k-trainer",
+  "Skin and bath": "k-care",
+  "Holistic care": "k-care",
+  Adoption: "k-adopt",
+};
+
+function ExpertCard({ e, hideKind = false, pick = null }: { e: Expert; hideKind?: boolean; pick?: string | null }) {
   return (
-    <article className="s-expert">
-      <span className="s-expert-kind">{e.kind}</span>
+    <article className={`s-expert ${KIND_CLASS[e.kind] ?? ""} ${pick ? "is-pick" : ""}`}>
+      {pick && <span className="s-pick-tag">good fit for you</span>}
+      {pick && (
+        <span className="s-pick-sticker" aria-hidden>
+          <Sticker kind="heart" tone="#fbe0d2" ink="#7c2d4a" />
+        </span>
+      )}
+      {!hideKind && <span className="s-expert-kind">{e.kind}</span>}
       <strong>{e.name}</strong>
       <span className="s-expert-what">{e.what}</span>
+      {pick && <span className="s-pick-why">{pick}</span>}
       {e.where && <span className="s-expert-where">{e.where}</span>}
       <span className="s-expert-links">
         {e.insta && (
@@ -253,19 +275,32 @@ function ExpertCard({ e }: { e: Expert }) {
 }
 
 // A tab's people: four at first, the rest on request, so the list stays scannable.
-function Experts({ ids }: { ids: string[] }) {
+// The tab's people, best fit first. The first one with a reason for the
+// owner's first problem is highlighted, with that reason on the card.
+function Experts({ ids, needs }: { ids: string[]; needs: ProblemId[] }) {
   const [all, setAll] = useState(false);
-  const shown = all ? ids : ids.slice(0, 4);
+  const reason = (id: string) => {
+    const e = expert(id);
+    const p = needs.find((x) => e.goodFor?.[x]);
+    return p ? e.goodFor![p]! : null;
+  };
+  const rank = (id: string) => {
+    const i = needs.findIndex((x) => expert(id).goodFor?.[x]);
+    return i === -1 ? 99 : i;
+  };
+  const ordered = [...ids].sort((a, b) => rank(a) - rank(b));
+  const pick = ordered.find((id) => reason(id));
+  const shown = all ? ordered : ordered.slice(0, 4);
   return (
     <>
       <div className="s-experts">
         {shown.map((id) => (
-          <ExpertCard key={id} e={expert(id)} />
+          <ExpertCard key={id} e={expert(id)} pick={id === pick ? reason(id) : null} />
         ))}
       </div>
-      {ids.length > 4 && (
+      {ordered.length > 4 && (
         <button className="linklike s-more" onClick={() => setAll(!all)}>
-          {all ? "Show fewer" : `Show ${ids.length - 4} more`} <i className={`chev ${all ? "chev-up" : ""}`} aria-hidden />
+          {all ? "Show fewer" : `Show ${ordered.length - 4} more`} <i className={`chev ${all ? "chev-up" : ""}`} aria-hidden />
         </button>
       )}
     </>
@@ -276,13 +311,15 @@ function Experts({ ids }: { ids: string[] }) {
 function Careful({ g }: { g: Group }) {
   return (
     <div className="s-careful">
-      <p className="s-avoid">
-        <strong>Don't.</strong> {g.avoid}
-      </p>
+      <div className="cf cf-avoid">
+        <span className="cf-tag">please don&apos;t</span>
+        <p>{g.avoid}</p>
+      </div>
       {g.help && (
-        <p className="s-gethelp">
-          <strong>When to get help.</strong> {g.help}
-        </p>
+        <div className="cf cf-help">
+          <span className="cf-tag">see a vet or trainer if</span>
+          <p>{g.help}</p>
+        </div>
       )}
     </div>
   );
@@ -874,18 +911,8 @@ export function Results({
 
             {g.id === "walks" && (
               <>
-                {needs.includes("pull") && (
-                  <>
-                    <Sub>Pulling on the lead</Sub>
-                    <Tips tips={WALK_TIPS.pull!} />
-                  </>
-                )}
-                {needs.includes("bark") && (
-                  <>
-                    <Sub>Barking</Sub>
-                    <Tips tips={WALK_TIPS.bark!} />
-                  </>
-                )}
+                {needs.includes("pull") && <TipSection tips={WALK_TIPS.pull!} title="Pulling on the lead" keep />}
+                {needs.includes("bark") && <TipSection tips={WALK_TIPS.bark!} title="Barking" keep />}
               </>
             )}
 
@@ -1005,7 +1032,7 @@ export function Results({
             <Careful g={g} />
 
             <Sub note="People we trust for this. Follow them, or book them if you need a hand." short="who to follow">People to learn from</Sub>
-            <Experts ids={g.experts} />
+            <Experts ids={g.experts} needs={needs} />
 
             {groups.length > 1 && (
               <NextTab groups={groups} current={g.id} onGo={showTab} />
@@ -1083,7 +1110,10 @@ function NextTab({ groups, current, onGo }: { groups: Group[]; current: GroupId;
 // Everyone we recommend, folded away, sorted by what they help with.
 function Everyone() {
   const [open, setOpen] = useState(false);
-  const kinds = [...new Set(EXPERTS.map((e) => e.kind))];
+  // Food people sit together under one heading; the rest by their kind.
+  const FOOD_KINDS = ["Nutritionist", "Fresh food", "Supplements", "Vet"];
+  const groupOf = (e: Expert) => (FOOD_KINDS.includes(e.kind) ? "Fresh food and supplements" : e.kind);
+  const kinds = [...new Set(EXPERTS.map(groupOf))];
   return (
     <div className={`s-fold s-everyone ${open ? "is-open" : ""}`}>
       <button className="s-fold-btn" onClick={() => setOpen(!open)} aria-expanded={open}>
@@ -1102,8 +1132,11 @@ function Everyone() {
               <div key={k} className="s-everyone-group">
                 <h3>{k}</h3>
                 <div className="s-experts">
-                  {EXPERTS.filter((e) => e.kind === k).map((e) => (
-                    <ExpertCard key={e.id} e={e} />
+                  {EXPERTS.filter((e) => groupOf(e) === k)
+                    // Dr. Becker first: the food advice is built on her book.
+                    .sort((a, b) => Number(b.id === "becker") - Number(a.id === "becker"))
+                    .map((e) => (
+                    <ExpertCard key={e.id} e={e} hideKind={e.kind === k} />
                   ))}
                 </div>
               </div>
