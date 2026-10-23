@@ -238,9 +238,14 @@ export const STORES = {
   ftlod: { name: "For the Love of Dog", url: "https://fortheloveofdog.co.in", shops: "" },
   huft: { name: "Heads Up For Tails", url: "https://headsupfortails.com", shops: "https://headsupfortails.com/pages/stores" },
   cc: { name: "Canine Craving", url: "https://www.caninecraving.com", shops: "" },
+  bitd: { name: "Back in the Day", url: "https://backintheday.in", shops: "" },
+  hpo: { name: "Happy Puppy Organics", url: "https://happypuppyorganics.com", shops: "" },
+  nutkit: { name: "Nutkit", url: "https://www.nutkit.co.in", shops: "" },
 };
 
-export type KindId = "sniff" | "puzzle" | "chew";
+// sniff, puzzle and chew are brain toys; soothe, wash, inside and ticks are
+// for skin and coat.
+export type KindId = "sniff" | "puzzle" | "chew" | "soothe" | "wash" | "inside" | "ticks";
 
 export const KINDS: { id: KindId; label: string; lead: string; lookFor: string[]; skip: string; draft?: boolean }[] = [
   {
@@ -267,6 +272,34 @@ export const KINDS: { id: KindId; label: string; lead: string; lookFor: string[]
     skip: "Leaving them alone with it. Take away the last small piece before they can gulp it.",
     draft: true,
   },
+  {
+    id: "soothe",
+    label: "For hot spots and small wounds",
+    lead: "Something to calm angry, itchy patches and help small scrapes heal.",
+    lookFor: ["Plant-based, with nothing harsh or perfumed.", "Safe if they lick a little of it.", "Easy to dab on a small patch."],
+    skip: "Anything for deep, oozing or spreading wounds: that's a vet visit.",
+  },
+  {
+    id: "wash",
+    label: "Gentle washes",
+    lead: "A bath that cleans without stripping the skin's own oils.",
+    lookFor: ["No harsh detergents, colours or perfume.", "Made for dogs, not people.", "Rinses out fully."],
+    skip: "Human shampoo, and bathing more than every 3 to 4 weeks.",
+  },
+  {
+    id: "inside",
+    label: "From the inside",
+    lead: "Small daily extras that support the skin through food.",
+    lookFor: ["One plain ingredient you recognise.", "A clear amount to start with.", "Added to food, not forced."],
+    skip: "Starting several at once: you won't know what helped.",
+  },
+  {
+    id: "ticks",
+    label: "For ticks",
+    lead: "A natural spray to make your dog less inviting to ticks.",
+    lookFor: ["Plant-based, with no synthetic pesticides.", "Light enough to use before every walk."],
+    skip: "Relying on a spray alone. Check for ticks after every walk.",
+  },
 ];
 
 export type Product = {
@@ -289,6 +322,8 @@ export type Product = {
   untilMonths?: number;
   // Shown as a warning, and moved to the end, when the owner ticked this problem.
   notFor?: { problem: ProblemId; note: string };
+  // Shown as a small tag when the store had it out of stock when we checked.
+  soldOut?: boolean;
   draft?: boolean;
 };
 
@@ -445,6 +480,122 @@ export const PRODUCTS: Product[] = [
     fromMonths: 12,
     untilMonths: 84,
     draft: true,
+  },
+
+  // ---- skin and coat: from each store's own product page, read 23 Oct 2026 ----
+  {
+    id: "hemp-balm",
+    kind: "soothe",
+    store: "hpo",
+    name: "Hemp Healing Balm",
+    price: "Rs. 650 (50 g)",
+    image: "https://happypuppyorganics.com/cdn/shop/files/hemp_healing_balm.png?v=1759682931&width=800",
+    path: "/products/hemp-healing-balm-50gm",
+    plain: "A balm of hemp, neem and sea buckthorn oils with kokum butter, for itchy, raw or dry patches.",
+    why: "It forms a soothing barrier over hot spots, licked patches, bug bites and minor scrapes, and softens dry noses and paw pads.",
+    start: ["Part the fur so you can see the skin.", "Smooth a thin layer onto the patch.", "Use as often as needed until it settles."],
+    caution: "For small, surface problems. A deep, oozing or spreading wound needs a vet.",
+    soldOut: true,
+  },
+  {
+    id: "scooby-dub-dub",
+    kind: "soothe",
+    store: "bitd",
+    name: "Scooby-dub-dub",
+    price: "Rs. 890 + GST (100 g)",
+    image: "https://backintheday.in/wp-content/uploads/2020/07/BITD-Scooby-Dub-Dub-.png",
+    path: "/shop/scooby-dub-dub/",
+    plain: "Five Ayurvedic herbs in a pre-bath pack: think of it as a marinade before bath time.",
+    why: "A green, hariyali-kabab-style coat before a bath brings down redness and leaves the skin noticeably better. It helps with hot spots, rashes, fungal patches, eczema, flea dermatitis and heavy shedding, with ticks and fleas, and even with mange and scabies.",
+    start: [
+      "Mix it with cold-pressed coconut oil (or aloe vera gel) into a paste.",
+      "Massage it into the skin: yes, they'll look like a hariyali kabab for a bit.",
+      "Let it marinate for about 30 minutes (anywhere from 15 minutes to an hour).",
+      "Wash it off the way you usually bathe them, with a mild shampoo or natural soap.",
+      "Between baths, dust a little dry powder on the skin for itching and ticks. It's safe daily and doesn't need washing off.",
+    ],
+    caution: "Licking it is harmless, but the more they lick off, the less is left working on the skin. Keep it out of their eyes.",
+  },
+  {
+    id: "french-clay",
+    kind: "soothe",
+    store: "nutkit",
+    name: "French Green Clay",
+    price: "Rs. 450 (100 g)",
+    image: "https://static.wixstatic.com/media/6ac0a7_52482eda559c4dba816602fa10a889c2~mv2.jpg/v1/fit/w_500,h_500,q_90/file.jpg",
+    path: "/product-page/french-green-clay",
+    plain: "A mineral-rich clay you sprinkle straight onto hot spots.",
+    why: "It soaks up moisture and dries out angry, weepy hot spots, and helps with insect bites and small wounds.",
+    start: ["Part the fur around the hot spot.", "Sprinkle a little clay directly over it.", "Repeat as needed until it dries up and settles."],
+    caution: "See a vet for wounds that are deep, spreading or don't heal.",
+  },
+  {
+    id: "quicky-clean",
+    kind: "wash",
+    store: "bitd",
+    name: "Quicky Clean",
+    price: "Rs. 570 + GST (150 g)",
+    image: "https://backintheday.in/wp-content/uploads/2020/07/Quicky-Clean-Label-4.25-X-4.5-inch-On-Sticker-5000-Sets-8-ups-pdf.jpg",
+    path: "/shop/quicky-clean/",
+    plain: "A no-lather herbal bath powder of reetha, shikakai, amla and chamomile.",
+    why: "It cleans without stripping the skin's natural oils, so itchy, dry skin isn't made worse by bath day.",
+    start: ["Mix the powder with boiling water and let it cool.", "Use it instead of shampoo, working it in gently.", "Rinse well and dry them fully, including between the toes."],
+    caution: "For very sensitive or allergic skin, skip the essential oils and vinegar; add aloe vera and a spoon of Scooby-dub-dub instead.",
+  },
+  {
+    id: "bitd-shampoo",
+    kind: "wash",
+    store: "bitd",
+    name: "Shampoo and Conditioner",
+    price: "Rs. 640 + GST (300 ml)",
+    image: "https://backintheday.in/wp-content/uploads/2023/04/shamopoo-scaled.jpg",
+    path: "/shop/shampoo-and-conditioner/",
+    plain: "A plant-based shampoo and conditioner with soap nuts, aloe, amla and hibiscus.",
+    why: "It cleans the coat and conditions it soft and shiny without harsh chemicals, colour or fragrance.",
+    start: ["Wet the coat through.", "Work a little into a light lather and massage it into the skin, avoiding the eyes.", "Leave it on for 5 minutes, then rinse thoroughly.", "Towel dry, then brush out dead fur."],
+    caution: "Bathe once every 3 to 4 weeks at most, and rinse it all out.",
+  },
+  {
+    id: "nettle",
+    kind: "inside",
+    store: "hpo",
+    name: "Stinging Nettle Leaves",
+    price: "Rs. 250",
+    image: "https://happypuppyorganics.com/cdn/shop/files/nettle_a53b33c3-b840-4598-8c48-a1f84d77771f.png?v=1762848328&width=800",
+    path: "/products/wild-harvested-nettle-leaves",
+    plain: "Dried wild nettle leaves, added to food, traditionally used for itching and seasonal allergies.",
+    why: "Nettle is a traditional herb for itchy skin, paw licking and seasonal allergies, given in small amounts with food.",
+    start: ["Start with a small pinch on their food.", "Give it daily for a few weeks before judging.", "Ask the store or your vet for the right amount for their size."],
+    caution: "The store doesn't give a dose. Check with your vet first if your dog is on medication or has a health condition.",
+    soldOut: true,
+  },
+  {
+    id: "hemp-oil",
+    kind: "inside",
+    store: "hpo",
+    name: "Hemp Seed Oil",
+    price: "Rs. 600 (100 ml)",
+    image: "https://happypuppyorganics.com/cdn/shop/files/hemp_seed_oil_1.png?v=1762705362&width=800",
+    path: "/products/happy-puppy-organics-hemp-seed-oil-100-ml",
+    plain: "Cold-pressed hemp seed oil with omega-3 and omega-6 fats.",
+    why: "Its fats support soft skin and a shiny coat, and can cut down on shedding. It can also be massaged into itchy patches before a bath.",
+    start: ["Drizzle a little over their food each day.", "Or massage it into itchy patches before a bath.", "Keep at it for a few weeks; skin takes time."],
+    caution: "Oily fish like sardines are the stronger omega-3 source. The store doesn't give a dose, so start small.",
+    soldOut: true,
+  },
+  {
+    id: "tick-bomb",
+    kind: "ticks",
+    store: "hpo",
+    name: "Tick Bomb Spray",
+    price: "Rs. 699 (100 ml)",
+    image: "https://happypuppyorganics.com/cdn/shop/files/tick_bomb_front.png?v=1762693212&width=800",
+    path: "/products/natural-anti-tick-spray",
+    plain: "A natural spray of aloe, neem, cedarwood and lemongrass.",
+    why: "A light mist before walks makes your dog less inviting to ticks and fleas, without synthetic pesticides.",
+    start: ["Shake well.", "Mist lightly over the coat before walks or outdoor play.", "Reapply regularly, and still check for ticks after every walk."],
+    caution: "Keep it away from their eyes and nose.",
+    soldOut: true,
   },
 ];
 

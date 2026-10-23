@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
 import { ACTIVITIES, BOWLS, CALM, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
-import { BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
+import { BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
@@ -168,6 +168,10 @@ const KIND_STICKER: Record<KindId, { kind: StickerKind; tone: string; ink: strin
   chew: { kind: "bone", tone: "#fbe0d2", ink: "#7c2d4a" },
   sniff: { kind: "nose", tone: "#e6f5c9", ink: "#1f5c43" },
   puzzle: { kind: "sparkle", tone: "#ddd3f7", ink: "#3a3f8f" },
+  soothe: { kind: "heart", tone: "#fbe0d2", ink: "#7c2d4a" },
+  wash: { kind: "sparkle", tone: "#c9d3ff", ink: "#3a3f8f" },
+  inside: { kind: "leaf", tone: "#e6f5c9", ink: "#1f5c43" },
+  ticks: { kind: "paw", tone: "#fde3b0", ink: "#6b3a12" },
 };
 
 // "Start with these three" as a small hand of coloured cards, like the
@@ -199,6 +203,7 @@ function WeekCards({ tips }: { tips: Tip[] }) {
             <span className="wk-num">{String(i + 1).padStart(2, "0")}</span>
             <strong>{tip.t}</strong>
             <span className="wk-text">{tip.d}</span>
+            {tip.go === "toys" && <ToysLink />}
           </motion.li>
         );
       })}
@@ -235,6 +240,18 @@ function Draft(_: { on?: boolean }) {
 // repeat them further down.
 const SeenTips = createContext<Set<string>>(new Set());
 
+// Opens the toy shelf from any tip that points to it.
+const OpenToys = createContext<() => void>(() => {});
+
+function ToysLink() {
+  const open = useContext(OpenToys);
+  return (
+    <button className="toys-link" onClick={open}>
+      Check out brain toys <span aria-hidden>→</span>
+    </button>
+  );
+}
+
 // Inside folds and the ladder, tips are reference: no "start here".
 const NoLead = createContext(false);
 
@@ -256,6 +273,7 @@ function Tips({ tips, start = 0 }: { tips: Tip[]; start?: number }) {
           <strong>{tip.t}</strong>
           <p>{tip.d}</p>
           {tip.src && <em className="s-src">From {tip.src}</em>}
+          {tip.go === "toys" && <ToysLink />}
         </li>
       ))}
     </ol>
@@ -535,6 +553,7 @@ function ProductCard({ p, who, needs, tone }: { p: Product; who: string; needs: 
               <span className="pcard-tag pt-price">{p.price}</span>
               <span className="pcard-tag pt-store">{STORES[p.store].name}</span>
               {warn && <span className="pcard-tag pt-warn">Read first</span>}
+              {p.soldOut && <span className="pcard-tag pt-out">Was sold out; check stock</span>}
             </span>
           </div>
         </div>
@@ -819,6 +838,14 @@ export function Results({
 
   // Energy tab: the three kinds of things, chews first for chewers.
   const products = pickProducts(needs, months);
+  const [toys, setToys] = useState(false);
+  // Escape closes the toy shelf.
+  useEffect(() => {
+    if (!toys) return;
+    const close = (e: KeyboardEvent) => e.key === "Escape" && setToys(false);
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, [toys]);
   const order: KindId[] = needs.includes("chew") || needs.includes("nip") ? ["chew", "sniff", "puzzle"] : ["sniff", "puzzle", "chew"];
   const rules = needs.includes("chew") || needs.includes("nip");
 
@@ -840,9 +867,26 @@ export function Results({
     if (top < 0 || top > window.innerHeight * 0.6) tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // Jump to a part of the Food tab from another tab.
+  const goFood = (selector: string) => {
+    setTab("food");
+    // The Food tab animates in; wait until the section is there, then go to it.
+    let tries = 0;
+    const find = () => {
+      const el = document.querySelector<HTMLElement>(selector);
+      if (el) {
+        const head = el.closest(".s-panel")?.querySelectorAll(".s-subhead") ?? [];
+        const sub = [...head].reverse().find((h) => h.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING);
+        (sub ?? el).scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (tries++ < 30) window.setTimeout(find, 100);
+    };
+    window.setTimeout(find, 300);
+  };
+
   const told = chosen.map((p) => p.label.toLowerCase());
 
   return (
+    <OpenToys.Provider value={() => setToys(true)}>
     <SeenTips.Provider value={new Set(week.map((t) => t.t))}>
     <div className="results sugg">
       <div className="results-bar">
@@ -1035,7 +1079,73 @@ export function Results({
 
             {g.id === "skin" && (
               <>
+                {/* Start with the bowl: itching usually starts there. */}
+                <div className="skin-food">
+                  <span className="s-feature-sticker" aria-hidden>
+                    <Sticker kind="bowl" tone="#fbf6ef" ink="#211e1c" />
+                  </span>
+                  <strong>Start with the bowl.</strong>
+                  <p>
+                    Itchy skin usually starts in the gut, not on the surface, and a starchy, processed diet is a known risk factor for skin allergies. Creams and baths calm it; food is what fixes it. See what {who === "your dog" ? "your dog" : Who} eats now and how to balance it.
+                  </p>
+                  <div className="skin-food-go">
+                    <button className="pill" onClick={() => goFood(".bc")}>
+                      See what&apos;s in the bowl <span className="arrow" aria-hidden />
+                    </button>
+                    <button className="skin-food-link" onClick={() => goFood(".bb")}>
+                      Balance the bowl <span aria-hidden>→</span>
+                    </button>
+                  </div>
+                </div>
+
                 <TipSection tips={tipsFor(g.tips, needs)} />
+
+                {(needs.includes("itch") || needs.includes("coat")) && (
+                  <>
+                    <Sub note="Small changes to the bowl that calm itchy skin from the inside." short="food for skin">Food that calms itchy skin</Sub>
+                    <Tips tips={SKIN_FOOD} />
+                  </>
+                )}
+
+                <Sub note="Picked for what you told us. You don't need all of them; start with one." short="things that help">Things that help</Sub>
+                {(
+                  [
+                    ["soothe", ["itch"]],
+                    ["wash", ["itch", "coat"]],
+                    ["inside", ["itch", "coat"]],
+                    ["ticks", ["ticks"]],
+                  ] as [KindId, ProblemId[]][]
+                )
+                  .filter(([, forP]) => forP.some((x) => needs.includes(x)))
+                  .map(([id]) => {
+                    const k = KINDS.find((x) => x.id === id)!;
+                    const shown = products.filter((p) => p.kind === id);
+                    if (shown.length === 0) return null;
+                    return (
+                      <div key={id} className={`s-kind s-kind-${id}`}>
+                        <div className="s-kind-head">
+                          <div>
+                            <span className="s-kind-sticker" aria-hidden>
+                              <Sticker kind={KIND_STICKER[id].kind} tone={KIND_STICKER[id].tone} ink={KIND_STICKER[id].ink} />
+                            </span>
+                            <h3>{k.label}</h3>
+                            <p>{k.lead}</p>
+                          </div>
+                          <ul className="s-look">
+                            {k.lookFor.map((line) => (
+                              <li key={line}>{line}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="pcards">
+                          {shown.map((p, i) => (
+                            <ProductCard key={p.id} p={p} who={who} needs={needs} tone={["lime", "peach", "lilac"][i % 3]} />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                <p className="s-note">Photos, prices and directions from each store&apos;s own product page, read on 23 Oct 2026. Check the store before you buy.</p>
               </>
             )}
 
@@ -1266,6 +1376,52 @@ export function Results({
       </footer>
     </div>
     </SeenTips.Provider>
+      {/* The toy shelf: every brain toy and chew for this dog, from anywhere on the page. */}
+      <AnimatePresence>
+        {toys && (
+          <motion.div className="toys" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setToys(false)}>
+            <motion.div
+              className="toys-sheet"
+              role="dialog"
+              aria-label="Brain toys and chews"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 220, damping: 30 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="toys-head">
+                <h2>
+                  brain toys <em>and chews</em>
+                </h2>
+                <button className="pcard-circle toys-close" onClick={() => setToys(false)} aria-label="Close">
+                  <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden>
+                    <path d="M5 5l10 10M15 5 5 15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </div>
+              <p className="toys-lead">Picked for {who === "your dog" ? "your dog's" : `${Who}'s`} age and habits. You don&apos;t need all of them; start with one.</p>
+              {order.map((id) => {
+                const k = KINDS.find((x) => x.id === id)!;
+                const shown = products.filter((p) => p.kind === id);
+                if (shown.length === 0) return null;
+                return (
+                  <div key={id} className="toys-kind">
+                    <h3>{k.label}</h3>
+                    <p>{k.lead}</p>
+                    <div className="pcards">
+                      {shown.map((p, i) => (
+                        <ProductCard key={p.id} p={p} who={who} needs={needs} tone={["lime", "peach", "lilac"][i % 3]} />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </OpenToys.Provider>
   );
 }
 

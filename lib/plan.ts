@@ -14,7 +14,8 @@ export type GroupId = "energy" | "toilet" | "walks" | "alone" | "food" | "skin";
 
 // `src` credits the account a tip comes from (shown small under the tip).
 // `for`: the problems a tip answers, so a plan can lead with what was asked.
-export type Tip = { t: string; d: string; src?: string; for?: ProblemId[] };
+// `go: "toys"` adds a "Check out brain toys" link that opens the toy shelf.
+export type Tip = { t: string; d: string; src?: string; for?: ProblemId[]; go?: "toys" };
 
 export type Expert = {
   id: string;
@@ -325,8 +326,8 @@ export const GROUPS: Group[] = [
     },
     tips: [
       { t: "Slow the walk", d: "Let them stop and sniff. Ten minutes of their choosing beats thirty at your pace.", for: ["busy", "settle"] },
-      { t: "Make food a job", d: "Scatter part of a meal, or use a snuffle mat, instead of a bowl.", for: ["busy", "chew"] },
-      { t: "Give a chew", d: "Something safe to work on, lying down, when you need them to switch off.", for: ["chew", "settle"] },
+      { t: "Make food a job", d: "Scatter part of a meal, or use a snuffle mat, instead of a bowl.", for: ["busy", "chew"], go: "toys" },
+      { t: "Give a chew", d: "Something safe to work on, lying down, when you need them to switch off.", for: ["chew", "settle"], go: "toys" },
       { t: "Let them sleep", d: "Grown dogs need 12 to 15 hours of sleep a day, puppies 16 to 18. A tired, rested dog is calmer.", src: "@kaninenutrition", for: ["settle", "night"] },
       { t: "Wind down at night", d: "A slow, sniffy evening walk and a chew on their bed, then lights down. No rough play in the last hour.", for: ["night"] },
       { t: "Swap, don't scold", d: "When teeth land on hands or furniture, swap in a toy, then praise them for taking it.", for: ["nip", "chew"] },
@@ -454,13 +455,13 @@ export const WALK_TIPS: Partial<Record<ProblemId, Tip[]>> = {
     { t: "Reward the quiet", d: "Ignore attention barking. The second they stop, treat." },
     { t: "Teach \"quiet\"", d: "Let them bark twice, say \"quiet\", treat by the nose when they stop." },
     { t: "Make the doorbell mean bed", d: "Have someone ring the bell, then treat them on their bed. Repeat until the bell sends them there." },
-    { t: "Give the brain a job", d: "Bored dogs bark to fill the time. A sniff game or a chew every day leaves less to shout about." },
+    { t: "Give the brain a job", d: "Bored dogs bark to fill the time. A sniff game or a chew every day leaves less to shout about.", go: "toys" },
   ],
   alone: [
     { t: "Start with seconds", d: "Step out and come back before they fuss. Build up slowly." },
     { t: "Boring goodbyes", d: "No big farewell, no big hello. Greet them once they are calm." },
-    { t: "A leaving-only treat", d: "A stuffed chew or lick mat they only get when you go." },
-    { t: "Sniff before you go", d: "A short sniffing game tires the mind so they rest." },
+    { t: "A leaving-only treat", d: "A stuffed chew or lick mat they only get when you go.", go: "toys" },
+    { t: "Sniff before you go", d: "A short sniffing game tires the mind so they rest.", go: "toys" },
     { t: "A cosy spot", d: "A bed with something that smells of you." },
     { t: "Diwali and crackers", d: "Close doors and windows, draw curtains early, play calm music. Skip walks in peak cracker hours (6 to 11 pm). Keep their ID tag on.", src: "@kaninenutrition" },
     { t: "Calming smells", d: "A calming spray goes on a cloth near them, never on the dog, so they can move away from it.", src: "@doggiliciouus" },
@@ -973,4 +974,15 @@ export const GARLIC_WHY: Tip[] = [
   { t: "Good for the liver", d: "Garlic's sulfur helps the body make glutathione, which the liver uses to clear out toxins." },
   { t: "Against mould toxins", d: "Garlic lowered tumours caused by mycotoxins, the mould toxins that can turn up in grain-heavy food." },
   { t: "Fresh only", d: "Chop it fresh. Skip garlic pills, powders and extracts: Europe's toxic-food list names garlic extract, not fresh garlic." },
+];
+
+// Food that calms itchy skin. From The Forever Dog (chapters 5 and 8) and
+// our Indian nutritionists.
+export const SKIN_FOOD: Tip[] = [
+  { t: "Cut the starch", d: "A processed, carb-heavy diet is a known risk factor for itchy-skin allergies. Less rice, roti and kibble, more meat.", src: "The Forever Dog" },
+  { t: "Sardines, two or three times a week", d: "Oily fish brings omega-3 fats that calm inflamed, itchy skin. One sardine per 9 kg is plenty.", src: "The Forever Dog" },
+  { t: "Quercetin foods", d: "A few blueberries, a slice of apple or a floret of broccoli. These carry quercetin, a plant compound that calms inflammation.", src: "The Forever Dog" },
+  { t: "Feed the gut", d: "Most of the immune system sits in the gut. A spoon of plain curd or kefir, or a little fermented veg, if they'll eat it.", src: "The Forever Dog" },
+  { t: "Animal protein first", d: "Itchy dogs are often on bowls heavy in rice, roti, dal or soya. Make meat the base.", src: "@backintheday.in" },
+  { t: "Allergic to chicken?", d: "Try mutton, buffalo, duck or fish for a few weeks and see if the itching eases.", src: "@carnikitchen" },
 ];
