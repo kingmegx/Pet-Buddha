@@ -247,7 +247,7 @@ function ToysLink() {
   const open = useContext(OpenToys);
   return (
     <button className="toys-link" onClick={open}>
-      Check out brain toys <span aria-hidden>→</span>
+      <span className="link-words">Check out brain toys</span> <span aria-hidden>→</span>
     </button>
   );
 }
@@ -1093,7 +1093,7 @@ export function Results({
                       See what&apos;s in the bowl <span className="arrow" aria-hidden />
                     </button>
                     <button className="skin-food-link" onClick={() => goFood(".bb")}>
-                      Balance the bowl <span aria-hidden>→</span>
+                      <span className="link-words">Balance the bowl</span> <span aria-hidden>→</span>
                     </button>
                   </div>
                 </div>

@@ -1,5 +1,12 @@
-// The "curating" loading scene: a white card with a line of beagles walking
-// over a black zebra crossing that fans out in perspective. Hovering it makes
+"use client";
+
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { Sticker, type StickerKind } from "./Stickers";
+
+// The "curating" loading scene: a line of beagles walking over an ink zebra
+// crossing drawn on the page, with stickers floating around and a text
+// sticker saying what's being put together. Hovering it makes
 // the hand cursor say "The Beagles" (see data-say and HandCursor).
 //
 // The beagles match the beagle head used everywhere else on the site: flat
@@ -106,26 +113,64 @@ const PACK = [
   { size: 1.04, head: -2, tail: -22 },
 ];
 
-export function Walkers() {
+// What's happening, shown under the crossing while the plan is put together.
+const STEPS = (who: string) => [`reading ${who}'s answers`, "picking chews and toys", "balancing the bowl", "asking the experts"];
+
+const FLOATS: { kind: StickerKind; tone: string; ink: string; style: React.CSSProperties }[] = [
+  { kind: "sparkle", tone: "#fde3b0", ink: "#6b3a12", style: { left: "6%", top: "4%", "--r": "-10deg" } as React.CSSProperties },
+  { kind: "heart", tone: "#fbe0d2", ink: "#7c2d4a", style: { right: "8%", top: "0%", "--r": "8deg" } as React.CSSProperties },
+  { kind: "bowl", tone: "#e6f5c9", ink: "#1f5c43", style: { left: "14%", bottom: "-6%", "--r": "6deg" } as React.CSSProperties },
+  { kind: "bone", tone: "#ddd3f7", ink: "#3a3f8f", style: { right: "14%", bottom: "-4%", "--r": "-12deg" } as React.CSSProperties },
+];
+
+export function Walkers({ name = "" }: { name?: string }) {
+  const steps = STEPS(name || "your dog");
+  const [at, setAt] = useState(0);
+  useEffect(() => {
+    const t = window.setInterval(() => setAt((v) => Math.min(v + 1, steps.length - 1)), 1100);
+    return () => window.clearInterval(t);
+  }, [steps.length]);
+
   return (
-    <div className="poster" data-say="The Beagles">
-      <svg className="zebra" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden>
-        <polygon points="21,0 28,0 12,30 -2,30" />
-        <polygon points="34,0 41,0 34,30 20,30" />
-        <polygon points="46.5,0 53.5,0 57,30 43,30" />
-        <polygon points="59,0 66,0 80,30 66,30" />
-        <polygon points="72,0 79,0 102,30 88,30" />
-      </svg>
-      <div className="walk-line">
-        {PACK.map((dog, i) => (
-          <span
-            key={i}
-            className="walk-spot"
-            style={{ "--size": dog.size, "--head": `${dog.head}deg`, "--tail": `${dog.tail}deg`, "--lap": `${(-12.8 * i) / PACK.length}s` } as React.CSSProperties}
+    <div className="walk-scene">
+      {FLOATS.map((f, i) => (
+        <span key={f.kind} className="walk-float" style={{ ...f.style, animationDelay: `${i * 0.4}s` }} aria-hidden>
+          <Sticker kind={f.kind} tone={f.tone} ink={f.ink} />
+        </span>
+      ))}
+      <div className="poster" data-say="The Beagles">
+        <svg className="zebra" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden>
+          <polygon points="21,0 28,0 12,30 -2,30" />
+          <polygon points="34,0 41,0 34,30 20,30" />
+          <polygon points="46.5,0 53.5,0 57,30 43,30" />
+          <polygon points="59,0 66,0 80,30 66,30" />
+          <polygon points="72,0 79,0 102,30 88,30" />
+        </svg>
+        <div className="walk-line">
+          {PACK.map((dog, i) => (
+            <span
+              key={i}
+              className="walk-spot"
+              style={{ "--size": dog.size, "--head": `${dog.head}deg`, "--tail": `${dog.tail}deg`, "--lap": `${(-12.8 * i) / PACK.length}s` } as React.CSSProperties}
+            >
+              <WalkingBeagle />
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="walk-status" aria-live="polite">
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={at}
+            className={`text-sticker ${["ts-lime", "ts-coral", "ts-lilac", "ts-sun"][at % 4]}`}
+            initial={{ opacity: 0, y: 10, rotate: -6 }}
+            animate={{ opacity: 1, y: 0, rotate: -3 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ type: "spring", stiffness: 260, damping: 18 }}
           >
-            <WalkingBeagle />
-          </span>
-        ))}
+            {steps[at]}
+          </motion.span>
+        </AnimatePresence>
       </div>
     </div>
   );

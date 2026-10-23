@@ -16,6 +16,7 @@ import { Walkers } from "./Walkers";
 import { Results } from "./Results";
 import { Profile } from "./Profile";
 import Slider from "./Slider";
+import { DobInput } from "./DobInput";
 import HandCursor from "./HandCursor";
 
 type Step = "landing" | "species" | "name" | "breed" | "weight" | "age" | "sex" | "needs" | "food" | "curating" | "done" | "profile";
@@ -587,19 +588,19 @@ export default function Onboarding() {
                 valueText={formatAge(months)}
                 steps={AGE_STOPS.length - 1}
               />
-              <label className="dob">
+              <div className="dob">
                 <span>or enter the date of birth</span>
-                <input
-                  type="date"
+                {/* Clears when the slider is moved instead (dob goes back to ""). */}
+                <DobInput
+                  key={dob ? "set" : "empty"}
                   value={dob}
-                  max={new Date().toLocaleDateString("en-CA")}
-                  onChange={(e) => {
-                    setDob(e.target.value);
-                    const m = monthsSince(e.target.value);
+                  onChange={(iso) => {
+                    setDob(iso);
+                    const m = monthsSince(iso);
                     if (m !== null) setAge(sliderPosition(m));
                   }}
                 />
-              </label>
+              </div>
               <button className="pill" onClick={() => go("sex")}>
                 Continue <span className="arrow" aria-hidden />
               </button>
@@ -691,7 +692,7 @@ export default function Onboarding() {
             </div>
           )}
 
-          {step === "curating" && <Walkers />}
+          {step === "curating" && <Walkers name={name.trim()} />}
 
           {step === "profile" && pet && (
             <Profile

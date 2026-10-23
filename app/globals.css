@@ -12469,3 +12469,149 @@ body:has(.stage),
   background: #f6f3ef;
   color: #6b655f;
 }
+
+/* =====================================================================
+   Loading scene: no card, the crossing drawn on the page, edges fading,
+   stickers floating around, a status sticker underneath.
+   ===================================================================== */
+.walk-scene {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: min(96vw, 1100px);
+  transform: translateX(-50%);
+  animation: settle 0.8s 0.1s var(--spring) both;
+}
+
+.walk-scene .poster {
+  position: relative;
+  left: auto;
+  top: auto;
+  width: 100%;
+  transform: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  animation: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.walk-scene .zebra polygon {
+  fill: #211e1c;
+}
+
+.walk-float {
+  position: absolute;
+  z-index: 2;
+  width: clamp(48px, 5vw, 70px);
+  rotate: var(--r, 0deg);
+  animation: walk-float 3.2s ease-in-out infinite alternate;
+}
+
+.walk-float .line-sticker {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@keyframes walk-float {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 -10px;
+  }
+}
+
+.walk-status {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  margin-top: 28px;
+}
+
+.walk-status .text-sticker {
+  position: static;
+  padding: 8px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .walk-float {
+    animation: none;
+  }
+}
+
+/* The crossing sits on a soft periwinkle panel so the cream beagles stand
+   out, with the gentle card shadow used elsewhere. The scene sits higher so
+   the status sticker stays on screen. */
+.walk-scene {
+  top: 24%;
+  width: min(92vw, 960px);
+}
+
+.walk-scene .poster {
+  border-radius: 24px;
+  background: #dde3fb;
+  box-shadow: 0 22px 44px -30px rgba(40, 20, 10, 0.45);
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.walk-float {
+  z-index: 3;
+}
+
+/* Text links with an arrow: only the words are underlined. */
+.toys-link,
+.skin-food-link {
+  text-decoration: none !important;
+}
+
+.link-words {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+/* Date of birth: three boxes inside one rounded field. */
+.dob-boxes {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 18px;
+  border: 1.5px solid rgba(17, 17, 17, 0.75);
+  border-radius: 999px;
+  background: #fbf6ef;
+}
+
+.dob-boxes:focus-within {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 4px rgba(138, 164, 255, 0.35);
+}
+
+.dob .dob-boxes input {
+  width: 2.4ch;
+  height: auto;
+  padding: 2px 0;
+  border: 0 !important;
+  border-radius: 0;
+  background: none !important;
+  box-shadow: none !important;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+}
+
+.dob .dob-boxes .dob-year {
+  width: 4.6ch;
+}
+
+.dob-boxes > span {
+  color: #8a837c;
+}

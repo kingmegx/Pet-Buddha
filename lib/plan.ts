@@ -201,7 +201,7 @@ export const EXPERTS: Expert[] = [
       pull: "Free, clear videos on loose-lead walking.",
       chew: "Free videos on chewing, and what to give them instead.",
       nip: "Free videos on puppy biting and what to do instead.",
-      bark: "Free videos on why dogs bark and how to calm it.",
+      bark: "Free videos on why dogs bark and how to calm the barking.",
       alone: "Free videos on teaching a dog to be alone.",
     },
   },
@@ -305,11 +305,11 @@ export const GROUPS: Group[] = [
     tab: "Energy and chewing",
     problems: ["chew", "busy", "settle", "nip", "night"],
     aha: "{who} needs more work for the mind, not more exercise.",
-    why: "Chewing, nipping and not settling are a busy brain looking for a job. Sniffing and chewing give it one, and a calm dog follows.",
+    why: "Chewing, nipping and not settling are a busy brain looking for a job. Sniffing and chewing give that busy brain one, and a calm dog follows.",
     ahaFor: {
       chew: {
         aha: "{who} isn't being naughty. Chewing is how dogs explore and calm down.",
-        why: "You can't switch the urge off, but you can choose what gets chewed. Give it a better target every day and the furniture gets a rest.",
+        why: "You can't switch the urge off, but you can choose what gets chewed. Give the urge a better target every day and the furniture gets a rest.",
       },
       nip: {
         aha: "{who}'s teeth need a better target than your hands.",
@@ -345,7 +345,7 @@ export const GROUPS: Group[] = [
     ahaFor: {
       mark: {
         aha: "Marking is about smell, not stubbornness.",
-        why: "Dogs mark to leave their scent where others have. Take the old smell away, catch it in the act, and reward the right spot.",
+        why: "Dogs mark to leave their scent where others have. Take the old smell away, catch them in the act, and reward the right spot.",
       },
     },
     tips: [
@@ -353,7 +353,7 @@ export const GROUPS: Group[] = [
       { t: "Learn their timing", d: "Puppies pee often. Note when they go for a few days and you'll know when they're due.", for: ["toilet"] },
       { t: "Out after naps and meals", d: "Take them to the spot after sleeping, eating and playing. That's when most accidents happen.", for: ["toilet"] },
       { t: "Clean old spots well", d: "Ordinary cleaners leave a smell they'll go on again. Use an enzyme cleaner on every old spot.", for: ["mark", "toilet"] },
-      { t: "Catch it in the act", d: "A firm \"No\" as they start, then straight to the right spot and praise them there. Never scold later.", for: ["mark", "toilet"] },
+      { t: "Catch them in the act", d: "A firm \"No\" as they start, then straight to the right spot and praise them there. Never scold later.", for: ["mark", "toilet"] },
       { t: "Less space at first", d: "Until they're reliable, keep them in a smaller area when you can't watch. Fewer rooms, fewer mistakes.", for: ["toilet"] },
       { t: "Accidents? Go back a step", d: "Go out more often, or move the pad closer again. Progress isn't a straight line.", for: ["toilet"] },
     ],
@@ -465,7 +465,7 @@ export const WALK_TIPS: Partial<Record<ProblemId, Tip[]>> = {
     { t: "A cosy spot", d: "A bed with something that smells of you." },
     { t: "Diwali and crackers", d: "Close doors and windows, draw curtains early, play calm music. Skip walks in peak cracker hours (6 to 11 pm). Keep their ID tag on.", src: "@kaninenutrition" },
     { t: "Calming smells", d: "A calming spray goes on a cloth near them, never on the dog, so they can move away from it.", src: "@doggiliciouus" },
-    { t: "Not a second dog", d: "Getting another dog to keep them company rarely fixes it. You may end up with two dogs waiting for you.", src: "@kaninenutrition" },
+    { t: "Not a second dog", d: "Getting another dog to keep them company rarely fixes the problem. You may end up with two dogs waiting for you.", src: "@kaninenutrition" },
   ],
 };
 
