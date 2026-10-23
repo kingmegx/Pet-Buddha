@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
 import { ACTIVITIES, BOWLS, CALM, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
-import { BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
+import { BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, tabName, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
@@ -1003,7 +1003,7 @@ export function Results({
                       <Icon />
                     </span>
                   )}
-                  {x.tab}
+                  {tabName(x, needs)}
                 </span>
               </button>
             );
@@ -1361,7 +1361,7 @@ export function Results({
             <Experts ids={g.experts} needs={needs} />
 
             {groups.length > 1 && (
-              <NextTab groups={groups} current={g.id} onGo={showTab} />
+              <NextTab groups={groups} needs={needs} current={g.id} onGo={showTab} />
             )}
           </motion.div>
         </AnimatePresence>
@@ -1510,14 +1510,14 @@ export function Results({
 }
 
 // At the bottom of a tab: a nudge to the next one, so nobody misses a tab.
-function NextTab({ groups, current, onGo }: { groups: Group[]; current: GroupId; onGo: (id: GroupId) => void }) {
+function NextTab({ groups, needs, current, onGo }: { groups: Group[]; needs: ProblemId[]; current: GroupId; onGo: (id: GroupId) => void }) {
   const i = groups.findIndex((x) => x.id === current);
   const next = groups[(i + 1) % groups.length];
   return (
     <button className="s-next" onClick={() => onGo(next.id)}>
       <span>
         <span className="s-muted">Next</span>
-        <strong>{next.tab}</strong>
+        <strong>{tabName(next, needs)}</strong>
       </span>
       <span className="arrow" aria-hidden />
     </button>

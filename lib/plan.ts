@@ -768,6 +768,31 @@ export function headlineFor(g: Group, needs: ProblemId[]): { aha: string; why: s
 }
 
 // Which tabs this dog gets, in order. Food is always there.
+// The tab's name, from only what the owner ticked: "Barking" when they
+// picked barking alone, not "Walks and barking".
+const TAB_PARTS: Partial<Record<GroupId, { name: string; problems: ProblemId[] }[]>> = {
+  energy: [
+    { name: "Energy", problems: ["busy", "settle", "night"] },
+    { name: "Chewing", problems: ["chew", "nip"] },
+  ],
+  walks: [
+    { name: "Walks", problems: ["pull"] },
+    { name: "Barking", problems: ["bark"] },
+  ],
+  skin: [
+    { name: "Skin and coat", problems: ["itch", "coat"] },
+    { name: "Ticks", problems: ["ticks"] },
+  ],
+};
+
+export function tabName(g: Group, needs: ProblemId[]) {
+  const parts = TAB_PARTS[g.id];
+  if (!parts) return g.tab;
+  const on = parts.filter((x) => x.problems.some((p) => needs.includes(p)));
+  if (on.length !== 1) return g.tab;
+  return on[0].name === "Ticks" ? "Ticks and fleas" : on[0].name;
+}
+
 export function groupsFor(needs: ProblemId[]) {
   return GROUPS.filter((g) => g.id === "food" || g.problems.some((p) => needs.includes(p)));
 }
