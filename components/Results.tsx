@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
 import { ACTIVITIES, BOWLS, CALM, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
-import { BALANCE, BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
+import { BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
@@ -14,6 +14,7 @@ import { Sticker, type StickerKind } from "./Stickers";
 import { ToiletRoad } from "./ToiletRoad";
 import { BowlCompare } from "./BowlCompare";
 import { PerfectBowl } from "./PerfectBowl";
+import { BalanceBowl } from "./BalanceBowl";
 
 // The dog's name set in the italic accent face, like "why *pet buddha*".
 function Accent({ text, word }: { text: string; word?: string }) {
@@ -1050,12 +1051,27 @@ export function Results({
                 <NoLead.Provider value={true}>
                   <Tips tips={PERFECT_BOWL_RULES} />
                 </NoLead.Provider>
-                <FeatureFold title="Can a dog be vegetarian?" line="Short answer: no. Here's what a dog's body needs that plants can't give." kind="bone" tone="#fbe0d2">
-                  <Tips tips={VEG_TIPS} />
-                </FeatureFold>
-                <FeatureFold title="Why not dal, rice and curd?" line="It's what many Indian dogs eat. Here's what each part does, and what goes missing." kind="bowl" tone="#ddd3f7">
+                <FeatureFold title="Can a dog be vegetarian?" line="Short answer: no. What a dog's body needs that plants can't give, and why dal, rice and curd falls short." kind="bone" tone="#fbe0d2">
+                  <Tips tips={VEG_TIPS.filter((t) => !t.t.startsWith("Dal and soya"))} />
+                  {RECOMMENDED_KIBBLES.length > 0 && (
+                    <>
+                      <p className="s-feature-label">Packaged foods we recommend</p>
+                      <p className="s-links">
+                        {RECOMMENDED_KIBBLES.map((k) => (
+                          <a key={k.url} href={k.url} target="_blank" rel="noreferrer">
+                            {k.name} <span aria-hidden>→</span>
+                          </a>
+                        ))}
+                      </p>
+                    </>
+                  )}
+                  <p className="s-feature-label">Dal, rice and curd, piece by piece</p>
                   <Tips tips={DAL_RICE_CURD} />
                 </FeatureFold>
+
+                {/* 3. Balance the bowl: check what they eat against all that. */}
+                <Sub note="Add what they eat in a day, and see how it stacks up against what a dog needs." short="balance the bowl">{who === "your dog" ? "Balance the bowl" : `Balance ${Who}'s bowl`}</Sub>
+                <BalanceBowl bowl={bowl} need={dailyCalories(kg)} who={Who} />
 
                 {/* 2. One easy first step, depending on the bowl. */}
                 {bowl === "home" || bowl === "fresh" ? (
@@ -1181,11 +1197,6 @@ export function Results({
                   </>
                 )}
 
-                <div className="s-soon">
-                  <span className="s-soon-tag">Coming soon</span>
-                  <strong>{BALANCE.title}</strong>
-                  <span>{BALANCE.line}</span>
-                </div>
                 <p className="s-note">
                   {FOOD_CREDIT.text}{" "}
                   <a href={FOOD_CREDIT.url} target="_blank" rel="noreferrer">

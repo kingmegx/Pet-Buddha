@@ -926,9 +926,13 @@ export const VEG_TIPS: Tip[] = [
   { t: "The heart needs taurine", d: "Taurine keeps the heart muscle strong. Dogs make it from two amino acids, methionine and cysteine, that dal and grains are low in, and plants carry almost none. Diets heavy in lentils and peas have been linked to a heart disease called DCM." },
   { t: "Where taurine comes from", d: "Meat, especially dark chicken meat, and fish and shellfish like prawns and mussels. A meat-based bowl brings it naturally." },
   { t: "Vets who know food disagree", d: "Dogs can digest some starch, so some say they can be vegan. The Forever Dog's authors, one a vet, disagree. Vegan dog foods also tested highest for weedkiller residue." },
-  { t: "Better than a veg-only bowl", d: "A good packaged food is better for a dog than an unbalanced vegetarian home diet.", src: "Indian canine nutritionists" },
+  { t: "Packaged food beats dal or curd rice", d: "If fresh food isn't possible yet, a good packaged dog food is still better than dal rice or curd rice. It's made to be complete; a vegetarian home bowl isn't.", src: "Indian canine nutritionists" },
   { t: "A vegetarian home?", d: "Cook their eggs or meat separately, or buy fresh dog food. Their bowl doesn't have to follow the family's." },
 ];
+
+// The packaged foods we recommend, shown as links in the vegetarian card.
+// Meghna will send the list; nothing shows until it's filled in.
+export const RECOMMENDED_KIBBLES: { name: string; url: string }[] = [];
 
 // Why dal, rice and curd isn't a dog's diet, piece by piece.
 export const DAL_RICE_CURD: Tip[] = [
