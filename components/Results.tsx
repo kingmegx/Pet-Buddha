@@ -204,6 +204,7 @@ function WeekCards({ tips }: { tips: Tip[] }) {
             <strong>{tip.t}</strong>
             <span className="wk-text">{tip.d}</span>
             {tip.go === "toys" && <ToysLink />}
+            {tip.go === "elimination" && <ElimLink />}
           </motion.li>
         );
       })}
@@ -252,6 +253,28 @@ function ToysLink() {
   );
 }
 
+// Opens the guide to finding a food allergy.
+const OpenElim = createContext<() => void>(() => {});
+
+function ElimLink() {
+  const open = useContext(OpenElim);
+  return (
+    <button className="toys-link" onClick={open}>
+      <span className="link-words">How to find which food</span> <span aria-hidden>→</span>
+    </button>
+  );
+}
+
+// The elimination diet, step by step. Standard veterinary practice for
+// finding a food allergy: blood and hair tests for food allergy aren't reliable.
+const ELIMINATION: { t: string; d: string }[] = [
+  { t: "Pick one new protein", d: "A meat they have never eaten, such as quail, duck, rabbit or buffalo. If they've had everything, ask your vet about a hydrolysed diet." },
+  { t: "Feed only that, for 8 weeks", d: "Nothing else at all: no treats, chews, table scraps, flavoured tablets or dental sticks. One bite of something old can undo weeks." },
+  { t: "Write down the itch", d: "Once a week, score the scratching from 0 to 10, and note the paws, ears and tummy. Skin takes 6 to 8 weeks to settle, so don't judge early." },
+  { t: "Add back one old food", d: "If the itch has clearly eased, bring back one food they used to eat, like chicken, for up to 2 weeks. If the itch comes back, that's a culprit." },
+  { t: "Settle, then test the next", d: "Drop the culprit, wait for the skin to calm, then try the next old food the same way. Keep the ones that pass." },
+];
+
 // Inside folds and the ladder, tips are reference: no "start here".
 const NoLead = createContext(false);
 
@@ -274,6 +297,7 @@ function Tips({ tips, start = 0 }: { tips: Tip[]; start?: number }) {
           <p>{tip.d}</p>
           {tip.src && <em className="s-src">From {tip.src}</em>}
           {tip.go === "toys" && <ToysLink />}
+          {tip.go === "elimination" && <ElimLink />}
         </li>
       ))}
     </ol>
@@ -839,13 +863,18 @@ export function Results({
   // Energy tab: the three kinds of things, chews first for chewers.
   const products = pickProducts(needs, months);
   const [toys, setToys] = useState(false);
-  // Escape closes the toy shelf.
+  const [elim, setElim] = useState(false);
+  // Escape closes the toy shelf and the food-allergy guide.
   useEffect(() => {
-    if (!toys) return;
-    const close = (e: KeyboardEvent) => e.key === "Escape" && setToys(false);
+    if (!toys && !elim) return;
+    const close = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setToys(false);
+      setElim(false);
+    };
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
-  }, [toys]);
+  }, [toys, elim]);
   const order: KindId[] = needs.includes("chew") || needs.includes("nip") ? ["chew", "sniff", "puzzle"] : ["sniff", "puzzle", "chew"];
   const rules = needs.includes("chew") || needs.includes("nip");
 
@@ -887,6 +916,7 @@ export function Results({
 
   return (
     <OpenToys.Provider value={() => setToys(true)}>
+    <OpenElim.Provider value={() => setElim(true)}>
     <SeenTips.Provider value={new Set(week.map((t) => t.t))}>
     <div className="results sugg">
       <div className="results-bar">
@@ -1079,14 +1109,21 @@ export function Results({
 
             {g.id === "skin" && (
               <>
+                {(needs.includes("itch") || needs.includes("coat")) && (
+                  <>
+                    <Sub note="Small changes to the bowl that calm itchy skin from the inside." short="food for skin">Food that calms itchy skin</Sub>
+                    <Tips tips={SKIN_FOOD} />
+                  </>
+                )}
+
                 {/* Start with the bowl: itching usually starts there. */}
-                <div className="skin-food">
+                <div className="skin-food is-small">
                   <span className="s-feature-sticker" aria-hidden>
                     <Sticker kind="bowl" tone="#fbf6ef" ink="#211e1c" />
                   </span>
                   <strong>Start with the bowl.</strong>
                   <p>
-                    Itchy skin usually starts in the gut, not on the surface, and a starchy, processed diet is a known risk factor for skin allergies. Creams and baths calm it; food is what fixes it. See what {who === "your dog" ? "your dog" : Who} eats now and how to balance it.
+                    Itching usually starts in the gut. Creams and baths calm it; food is what fixes it. See what {who === "your dog" ? "your dog" : Who} eats now and how to balance it.
                   </p>
                   <div className="skin-food-go">
                     <button className="pill" onClick={() => goFood(".bc")}>
@@ -1097,15 +1134,6 @@ export function Results({
                     </button>
                   </div>
                 </div>
-
-                <TipSection tips={tipsFor(g.tips, needs)} />
-
-                {(needs.includes("itch") || needs.includes("coat")) && (
-                  <>
-                    <Sub note="Small changes to the bowl that calm itchy skin from the inside." short="food for skin">Food that calms itchy skin</Sub>
-                    <Tips tips={SKIN_FOOD} />
-                  </>
-                )}
 
                 <Sub note="Picked for what you told us. You don't need all of them; start with one." short="things that help">Things that help</Sub>
                 {(
@@ -1146,6 +1174,8 @@ export function Results({
                     );
                   })}
                 <p className="s-note">Photos, prices and directions from each store&apos;s own product page, read on 23 Oct 2026. Check the store before you buy.</p>
+
+                <TipSection tips={tipsFor(g.tips, needs)} />
               </>
             )}
 
@@ -1421,6 +1451,51 @@ export function Results({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Finding a food allergy: the elimination diet, step by step. */}
+      <AnimatePresence>
+        {elim && (
+          <motion.div className="toys" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setElim(false)}>
+            <motion.div
+              className="toys-sheet elim-sheet"
+              role="dialog"
+              aria-label="Finding a food allergy"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 220, damping: 30 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="toys-head">
+                <h2>
+                  find the food <em>behind the itch</em>
+                </h2>
+                <button className="pcard-circle toys-close" onClick={() => setElim(false)} aria-label="Close">
+                  <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden>
+                    <path d="M5 5l10 10M15 5 5 15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </div>
+              <p className="toys-lead">
+                It&apos;s called an elimination diet: strip the bowl back to one food {who === "your dog" ? "your dog has" : `${Who} has`} never eaten, then bring old foods back one at a time. It takes about two months, and it&apos;s the only reliable way to find a food allergy. Blood and hair tests for food allergy aren&apos;t reliable.
+              </p>
+              <ol className="tc elim-steps">
+                {ELIMINATION.map((step, i) => (
+                  <li key={step.t}>
+                    <span className="tc-num">{String(i + 1).padStart(2, "0")}</span>
+                    <strong>{step.t}</strong>
+                    <p>{step.d}</p>
+                  </li>
+                ))}
+              </ol>
+              <p className="elim-note">
+                <strong>No better after 8 weeks?</strong> Food probably isn&apos;t the cause. Look at fleas, dust mites, grass and pollen, and see your vet. If the skin is raw or infected, get that treated first, so you can tell what&apos;s working.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </OpenElim.Provider>
     </OpenToys.Provider>
   );
 }

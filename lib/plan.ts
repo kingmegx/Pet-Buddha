@@ -14,8 +14,9 @@ export type GroupId = "energy" | "toilet" | "walks" | "alone" | "food" | "skin";
 
 // `src` credits the account a tip comes from (shown small under the tip).
 // `for`: the problems a tip answers, so a plan can lead with what was asked.
-// `go: "toys"` adds a "Check out brain toys" link that opens the toy shelf.
-export type Tip = { t: string; d: string; src?: string; for?: ProblemId[]; go?: "toys" };
+// `go: "toys"` adds a "Check out brain toys" link that opens the toy shelf;
+// `go: "elimination"` links to the guide to finding a food allergy.
+export type Tip = { t: string; d: string; src?: string; for?: ProblemId[]; go?: "toys" | "elimination" };
 
 export type Expert = {
   id: string;
@@ -417,10 +418,10 @@ export const GROUPS: Group[] = [
       { t: "Part the fur", d: "Brush short fur against the grain and part long fur, so you see the skin, not just the coat.", src: "@backintheday.in", for: ["ticks", "coat"] },
       { t: "Treat the home too", d: "Ticks and fleas live in bedding and corners. Wash bedding hot; food-grade diatomaceous earth helps in the home.", src: "@backintheday.in", for: ["ticks"] },
       { t: "Apple cider vinegar, maybe", d: "Some owners add a splash of raw apple cider vinegar to food daily to make them less tasty to ticks. Not proven, but harmless. Don't skip real tick checks.", src: "@backintheday.in", for: ["ticks"] },
-      { t: "Allergic to chicken?", d: "Try quail, turkey, duck, mutton, buffalo or pork, rotating every few days. Retry chicken from a better source later.", src: "@carnikitchen", for: ["itch"] },
+      { t: "It could be a food", d: "They could be reacting to something you give every day, often a protein like chicken. Once you know which, swap it for quail, duck, mutton or buffalo, rotating every few days.", src: "@carnikitchen", for: ["itch"], go: "elimination" },
       { t: "Add good fats", d: "Omega-3 from fish such as salmon or sardines helps calm itchy, inflamed skin.", src: "@canine_india", for: ["itch", "coat"] },
       { t: "Deworm properly", d: "Herbal dewormers aren't enough on their own, especially in India. Test and treat with your vet.", src: "@happypuppyorganics", for: ["itch"] },
-      { t: "Itching isn't a personality", d: "Recurring itching, ear or paw trouble means something needs support. Look into it.", src: "@happypuppyorganics", for: ["itch"] },
+      { t: "Soak the paws after walks", d: "A few centimetres of water in a tub, with povidone iodine (Betadine) stirred in until it's the colour of iced tea. Let them stand in it for 2 to 5 minutes, no scrubbing, then pat dry. Every 2 to 3 days, it washes off the pollen and grime they'd otherwise lick and chew.", src: "Dr. Karen Becker, The Forever Dog", for: ["itch"] },
     ],
     avoid: "Don't put human products or neat essential oils on their skin. Don't shave them: dogs sweat through their paws, and the coat protects them from heat.",
     help: "Raw red patches, hair loss, a smelly ear, or scratching that keeps them awake needs a vet. Hot spots can spread in a day.",
@@ -984,5 +985,4 @@ export const SKIN_FOOD: Tip[] = [
   { t: "Quercetin foods", d: "A few blueberries, a slice of apple or a floret of broccoli. These carry quercetin, a plant compound that calms inflammation.", src: "The Forever Dog" },
   { t: "Feed the gut", d: "Most of the immune system sits in the gut. A spoon of plain curd or kefir, or a little fermented veg, if they'll eat it.", src: "The Forever Dog" },
   { t: "Animal protein first", d: "Itchy dogs are often on bowls heavy in rice, roti, dal or soya. Make meat the base.", src: "@backintheday.in" },
-  { t: "Allergic to chicken?", d: "Try mutton, buffalo, duck or fish for a few weeks and see if the itching eases.", src: "@carnikitchen" },
 ];

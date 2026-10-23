@@ -241,6 +241,7 @@ export const STORES = {
   bitd: { name: "Back in the Day", url: "https://backintheday.in", shops: "" },
   hpo: { name: "Happy Puppy Organics", url: "https://happypuppyorganics.com", shops: "" },
   nutkit: { name: "Nutkit", url: "https://www.nutkit.co.in", shops: "" },
+  dgl: { name: "Doggiliciouus", url: "https://doggiliciouus.com", shops: "" },
 };
 
 // sniff, puzzle and chew are brain toys; soothe, wash, inside and ticks are
@@ -528,6 +529,19 @@ export const PRODUCTS: Product[] = [
     why: "It soaks up moisture and dries out angry, weepy hot spots, and helps with insect bites and small wounds.",
     start: ["Part the fur around the hot spot.", "Sprinkle a little clay directly over it.", "Repeat as needed until it dries up and settles."],
     caution: "See a vet for wounds that are deep, spreading or don't heal.",
+  },
+  {
+    id: "equilibrium",
+    kind: "soothe",
+    store: "dgl",
+    name: "Equilibrium",
+    price: "Rs. 300",
+    image: "https://api.rootedinlove.in/storage/v1/object/public/product-images/products/body_care/equilibrium/equilibrium_thumbnail_.png",
+    path: "/product/equilibrium",
+    plain: "A skin spray of friendly microbes, to calm the skin and bring it back into balance.",
+    why: "Healthy skin carries its own good bacteria. This tops them up and supports the skin's natural barrier, for calmer, fresher skin and coat, with no chemicals or preservatives.",
+    start: ["Part the fur so it reaches the skin.", "Spray it on daily.", "Or, after a bath, use it as a leave-in soak and let it dry on."],
+    caution: "Safe if licked. The store doesn't list a size or dose. Raw, oozing or smelly skin needs a vet first.",
   },
   {
     id: "quicky-clean",

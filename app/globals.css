@@ -12615,3 +12615,49 @@ body:has(.stage),
 .dob-boxes > span {
   color: #8a837c;
 }
+
+/* Skin and coat: the bowl card sits between the food tips and the products,
+   so it is a smaller nudge, not a headline. */
+.skin-food.is-small {
+  gap: 8px;
+  max-width: 640px;
+  margin: 48px auto 0;
+  padding: 24px 26px 22px;
+  border-radius: 16px;
+}
+
+.skin-food.is-small strong {
+  font-size: clamp(20px, 2.2vw, 24px);
+}
+
+.skin-food.is-small p {
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.skin-food.is-small .s-feature-sticker {
+  top: -24px;
+  right: 40px;
+  width: 54px;
+}
+
+.skin-food.is-small .skin-food-go {
+  gap: 14px;
+  margin-top: 4px;
+}
+
+/* Finding a food allergy: steps in the slide-up sheet. */
+.elim-sheet .elim-steps {
+  margin-top: 28px !important;
+}
+
+.elim-note {
+  max-width: 62ch;
+  margin: 28px 0 0 !important;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: #fbe0d2;
+  color: #3b3530 !important;
+  font-size: 15px;
+  line-height: 1.55;
+}
