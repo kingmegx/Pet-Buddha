@@ -101,6 +101,9 @@ export function BalanceBowl({ bowl, need, who }: { bowl: Bowl | null; need: numb
                       <button onClick={() => nudge(l, 1)} aria-label={`More ${v.name}`}>
                         +
                       </button>
+                      <button className="bb-remove" onClick={() => remove(l.key)} aria-label={`Remove ${v.name}`} title="Remove">
+                        ×
+                      </button>
                     </span>
                   </div>
 

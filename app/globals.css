@@ -12279,3 +12279,31 @@ body:has(.stage),
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Remove an ingredient: a quiet × that turns red-orange on hover. */
+.bb-amount .bb-remove {
+  margin-left: 4px;
+  border-color: transparent;
+  background: none;
+  color: #8a837c;
+  font-size: 22px;
+}
+
+.bb-amount .bb-remove:hover {
+  border-color: #ee6a3c;
+  background: #fbe0d2;
+  color: var(--ink);
+}
+
+/* The "g" after the grams in the body font, not the browser's serif. */
+.bb-grams span {
+  font-family: inherit;
+}
+
+/* Best-fit card: the why-line as a pale lime box with dark green words,
+   no orange stripe. */
+.sugg .s-expert.is-pick .s-pick-why {
+  border-left: 0;
+  background: #e6f5c9;
+  color: #1f4a35;
+}
