@@ -553,6 +553,12 @@ function ProductCard({ p, who, needs, tone }: { p: Product; who: string; needs: 
   // Flips over in place to show how it helps, like the fact cards on the
   // landing. Both sides share one grid cell, so the card never changes size.
   const [flipped, setFlipped] = useState(false);
+  // The back always opens at its top.
+  const backRef = useRef<HTMLDivElement>(null);
+  const open = () => {
+    if (backRef.current) backRef.current.scrollTop = 0;
+    setFlipped(true);
+  };
   return (
     <article className={`pcard pc-${tone} ${flipped ? "is-flipped" : ""} ${warn ? "has-warn" : ""}`}>
       <motion.div className="pcard-flip" initial={false} animate={{ rotateY: flipped ? 180 : 0 }} transition={{ type: "spring", stiffness: 120, damping: 18 }} style={{ transformPerspective: 1400 }}>
@@ -562,7 +568,7 @@ function ProductCard({ p, who, needs, tone }: { p: Product; who: string; needs: 
             <img src={p.image} alt={`${p.name}, photo from ${STORES[p.store].name}`} loading="lazy" />
             {/* A round button tucked into the photo's corner, on a ring of page colour. */}
             <span className="pcard-notch">
-              <button className="pcard-more" onClick={() => setFlipped(true)} tabIndex={flipped ? -1 : 0} aria-label={`How ${p.name} helps`}>
+              <button className="pcard-more" onClick={open} tabIndex={flipped ? -1 : 0} aria-label={`How ${p.name} helps`}>
                 How it helps
                 <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden>
                   <path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -582,6 +588,8 @@ function ProductCard({ p, who, needs, tone }: { p: Product; who: string; needs: 
           </div>
         </div>
         <div className="pcard-face pcard-back" aria-hidden={!flipped}>
+          {/* Only the words scroll; the close button stays in the same corner on every card. */}
+          <div className="pcard-back-scroll" ref={backRef}>
           <strong className="pcard-back-title">
             Why it helps {who} <Draft on={p.draft} />
           </strong>
@@ -610,6 +618,7 @@ function ProductCard({ p, who, needs, tone }: { p: Product; who: string; needs: 
                 Or make one free
               </a>
             )}
+          </div>
           </div>
           <button className="pcard-circle pcard-close" onClick={() => setFlipped(false)} tabIndex={flipped ? 0 : -1} aria-label="Back to the photo">
             <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden>

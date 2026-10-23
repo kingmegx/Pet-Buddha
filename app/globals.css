@@ -12661,3 +12661,56 @@ body:has(.stage),
   font-size: 15px;
   line-height: 1.55;
 }
+
+/* Card backs: the frame stays still and only the words scroll inside it,
+   so the close button sits in the same bottom-right corner on every card. */
+.pcard-back {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.pcard-back-scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 26px 24px 84px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  /* Words fade out above the close button instead of running under it. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent calc(100% - 6px));
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent calc(100% - 6px));
+}
+
+.pcard-back-scroll > * {
+  flex-shrink: 0;
+}
+
+.pcard-close {
+  z-index: 2;
+}
+
+/* Some browsers draw moved or animated buttons through a flipping card's
+   back face, so the side facing away hides its buttons outright. */
+.pcard-notch,
+.pcard-close {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.pcard-notch {
+  transition: opacity 0.12s;
+}
+
+.pcard-close {
+  transition: opacity 0.12s, transform 0.45s var(--spring), background 0.2s;
+}
+
+.pcard.is-flipped .pcard-notch,
+.pcard:not(.is-flipped) .pcard-close {
+  opacity: 0;
+  pointer-events: none;
+}
