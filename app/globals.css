@@ -12714,3 +12714,33 @@ body:has(.stage),
   opacity: 0;
   pointer-events: none;
 }
+
+/* Loading scene: back to a white card with an ink zebra crossing. */
+.walk-scene .poster {
+  background: #fff;
+}
+
+/* Best-fit card: the reason it fits reads as plain text, not a box. */
+.sugg .s-expert.is-pick .s-pick-why {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  color: #fbf6ef !important;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Onboarding titles: room between the heading, the squiggle and the line under it. */
+.title .title-squiggle {
+  margin: 14px 0 12px;
+}
+
+/* Breed faces: a soft aqua in place of the pale green. */
+.tiles .tile::before {
+  background: #cdebe6;
+}
+.tiles .tile:nth-child(5n + 2)::before { background: #fbe0d2; }
+.tiles .tile:nth-child(5n + 3)::before { background: #c9d3ff; }
+.tiles .tile:nth-child(5n + 4)::before { background: #ecd3f5; }
+.tiles .tile:nth-child(5n)::before { background: #fde3b0; }
