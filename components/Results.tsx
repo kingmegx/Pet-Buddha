@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
-import { ACTIVITIES, BOWLS, CALM, FRESH_BOWLS, HOSPITALS, doseFor, type Dose, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
+import { ACTIVITIES, BOWLS, CALM, FRESH_BOWLS, doseFor, type Dose, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
 import { BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, tabName, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
@@ -372,6 +372,7 @@ const KIND_CLASS: Record<string, string> = {
   Trainer: "k-trainer",
   "Skin and bath": "k-care",
   "Holistic care": "k-care",
+  "Vet hospital": "k-care",
   Adoption: "k-adopt",
 };
 
@@ -450,19 +451,6 @@ function Careful({ g }: { g: Group }) {
         <div className="cf cf-help">
           <span className="cf-tag">see a vet or trainer if</span>
           <p>{g.help}</p>
-          {/* Where to go: hospitals that also groom. */}
-          <div className="cf-where">
-            <span className="cf-where-label">Where to go</span>
-            {HOSPITALS.map((h) => (
-              <a key={h.name} href={h.url} target="_blank" rel="noreferrer">
-                <strong>
-                  {h.name} <span aria-hidden>→</span>
-                </strong>
-                <small>{h.cities}</small>
-                <small>{h.offers}</small>
-              </a>
-            ))}
-          </div>
         </div>
       )}
     </div>
@@ -1600,7 +1588,7 @@ function Everyone() {
   const [open, setOpen] = useState(false);
   // Food people sit together under one heading; the rest by their kind.
   const FOOD_KINDS = ["Nutritionist", "Fresh food", "Supplements", "Vet"];
-  const groupOf = (e: Expert) => (e.kind === "Book" ? "Nutrition books to read" : FOOD_KINDS.includes(e.kind) ? "Fresh food and supplements" : e.kind);
+  const groupOf = (e: Expert) => (e.kind === "Book" ? "Nutrition books to read" : e.kind === "Vet hospital" ? "Vet hospitals and grooming" : FOOD_KINDS.includes(e.kind) ? "Fresh food and supplements" : e.kind);
   // Food first, then the books, then everyone else in list order.
   const FIRST = ["Fresh food and supplements", "Nutrition books to read"];
   const kinds = [...new Set(EXPERTS.map(groupOf))].sort((a, b) => {
@@ -1614,7 +1602,7 @@ function Everyone() {
         <span>
           <strong>Everyone we recommend</strong>
           <span>
-            {EXPERTS.length} nutritionists, trainers, makers and rescuers worth following.
+            {EXPERTS.length} nutritionists, trainers, makers, rescuers and vet hospitals worth knowing.
           </span>
         </span>
         <i className={`chev ${open ? "chev-up" : ""}`} aria-hidden />

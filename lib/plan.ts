@@ -25,7 +25,7 @@ export type Expert = {
   // What they offer, in a line.
   what: string;
   // What kind of help: shown as a small label on the card.
-  kind: "Nutritionist" | "Fresh food" | "Supplements" | "Skin and bath" | "Treats" | "Holistic care" | "Vet" | "Book" | "Trainer" | "Adoption";
+  kind: "Nutritionist" | "Fresh food" | "Supplements" | "Skin and bath" | "Treats" | "Holistic care" | "Vet" | "Book" | "Trainer" | "Adoption" | "Vet hospital";
   site?: string;
   insta?: string;
   where?: string;
@@ -37,6 +37,27 @@ export type Expert = {
 // ---------- the people we point to ----------
 
 export const EXPERTS: Expert[] = [
+  // Vet hospitals that also groom. From each hospital's own site, read 25 Oct 2026.
+  {
+    id: "vetic",
+    name: "Vetic",
+    handle: "vetic.in",
+    what: "Vet hospitals with consultations, diagnostics, surgery, physiotherapy and grooming. 24/7 emergency care at some clinics, and vet visits at home.",
+    kind: "Vet hospital",
+    site: "https://vetic.in",
+    where: "Delhi NCR, Mumbai, Pune, Bengaluru, Hyderabad, Chennai, Kolkata",
+    groups: [],
+  },
+  {
+    id: "cessna",
+    name: "Cessna Lifeline",
+    handle: "cessnalifeline.com",
+    what: "Vet hospitals with consultations, diagnostics, surgery, physiotherapy, emergency care and grooming. Emergency line: +91 76763 65365.",
+    kind: "Vet hospital",
+    site: "https://cessnalifeline.com",
+    where: "Bengaluru, Gurugram, Navi Mumbai",
+    groups: [],
+  },
   {
     id: "doggiliciouus",
     name: "Doggiliciouus",
