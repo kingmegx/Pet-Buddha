@@ -11,18 +11,50 @@
 // `has` marks the key nutrients a food is a meaningful source of. Packaged
 // dog food is fortified, so it counts as covering the basics.
 
-import type { Bowl } from "./content";
+import { PRODUCTS, type Bowl } from "./content";
 
 export type Nutrient = "taurine" | "omega3" | "calcium" | "zinc" | "vitd" | "choline";
 
 export const NUTRIENTS: Record<Nutrient, { label: string; why: string }> = {
   taurine: { label: "Taurine", why: "Keeps the heart muscle strong. From meat, dark chicken and fish." },
   omega3: { label: "Omega-3", why: "Calms inflammation in skin, joints and brain. From oily fish." },
-  calcium: { label: "Calcium", why: "Bones and teeth, and it balances the phosphorus in meat. From curd, paneer or fish with bones." },
+  calcium: { label: "Calcium", why: "Bones and teeth, and it balances the phosphorus in meat. From eggshell powder, sardines with their bones, or curd." },
   zinc: { label: "Zinc", why: "Skin, coat and immunity. From mutton, liver and eggs." },
   vitd: { label: "Vitamin D", why: "Dogs can't make it from sunlight. From oily fish, egg yolk and liver." },
   choline: { label: "Choline", why: "Liver and brain. From eggs and liver." },
 };
+
+// Ready-made toppers and what they bring, only where the store's own page
+// lists it (description or ingredients, read 24 Oct 2026). Ids are
+// products in lib/content.ts.
+export const PRODUCT_HAS: Record<string, Nutrient[]> = {
+  "dgl-mr-humpty": ["calcium"],
+  "dgl-bone-legacy-chicken": ["calcium"],
+  "dgl-bone-legacy-fish": ["calcium"],
+  "dgl-superwoof": ["vitd", "omega3", "calcium"],
+  "dgl-heart-to-heart": ["taurine", "omega3", "vitd"],
+  "dgl-soft-shiny": ["omega3", "zinc"],
+  "dgl-kefir": ["vitd", "calcium"],
+  "dgl-sardines": ["omega3", "vitd", "calcium"],
+  "dgl-anchovy-flakes": ["omega3"],
+};
+
+// The kitchen fix for each gap: one food to add to the bowl.
+export const HOME_FIX: Record<Nutrient, string> = {
+  taurine: "thigh",
+  omega3: "sardine",
+  calcium: "eggshell",
+  zinc: "liver",
+  vitd: "egg",
+  choline: "egg",
+};
+
+// What fixes a gap: the kitchen food first, then ready-made toppers,
+// in-stock ones first.
+export function fixesFor(n: Nutrient) {
+  const ready = PRODUCTS.filter((p) => PRODUCT_HAS[p.id]?.includes(n)).sort((a, b) => Number(!!a.soldOut) - Number(!!b.soldOut));
+  return { home: food(HOME_FIX[n]), ready };
+}
 
 export type Food = {
   id: string;
@@ -54,6 +86,8 @@ export const FOODS: Food[] = [
   { id: "mutton", name: "Mutton", group: "Meat and eggs", unit: "100 g", grams: 100, protein: 27, fat: 3, carbs: 0, has: ["taurine", "zinc"] },
   { id: "liver", count: true, name: "Chicken liver", group: "Meat and eggs", unit: "paw-size piece", grams: 30, protein: 24, fat: 6.5, carbs: 0.9, has: ["zinc", "vitd", "choline"] },
   { id: "egg", count: true, name: "Egg", group: "Meat and eggs", unit: "egg", grams: 50, protein: 12.6, fat: 10.6, carbs: 1.1, has: ["choline", "vitd"] },
+  // Dried, finely ground shells: almost pure calcium. About half a teaspoon per 500 g of meat.
+  { id: "eggshell", count: true, name: "Eggshell powder", group: "Meat and eggs", unit: "half teaspoon", grams: 2.5, protein: 0, fat: 0, carbs: 0, has: ["calcium"] },
 
   { id: "sardine", count: true, name: "Sardine", group: "Fish", unit: "sardine", grams: 25, protein: 25, fat: 11.5, carbs: 0, has: ["omega3", "calcium", "vitd", "taurine"] },
   { id: "bangda", name: "Mackerel (bangda)", group: "Fish", unit: "100 g", grams: 100, protein: 24, fat: 18, carbs: 0, has: ["omega3", "vitd", "taurine"] },
@@ -63,9 +97,22 @@ export const FOODS: Food[] = [
   { id: "curd", name: "Curd, plain", group: "Dairy", unit: "tbsp", grams: 15, protein: 3.5, fat: 3.3, carbs: 4.7, has: ["calcium"] },
   { id: "paneer", name: "Paneer", group: "Dairy", unit: "cube (25 g)", grams: 25, protein: 18, fat: 22, carbs: 3, has: ["calcium"] },
 
-  { id: "veg", name: "Mixed veg (gobhi, beans, carrot)", group: "Veg and fruit", unit: "½ cup", grams: 75, protein: 2, fat: 0.3, carbs: 4, has: [] },
-  { id: "pumpkin", name: "Pumpkin, cooked", group: "Veg and fruit", unit: "½ cup", grams: 120, protein: 0.7, fat: 0.1, carbs: 4.9, has: [] },
-  { id: "spinach", name: "Palak, cooked", group: "Veg and fruit", unit: "½ cup", grams: 90, protein: 3, fat: 0.3, carbs: 1.4, has: [] },
+  { id: "veg", name: "Mixed veg", group: "Veg and fruit", unit: "½ cup", grams: 75, protein: 2, fat: 0.3, carbs: 4, has: [] },
+  // Single vegetables for anyone who adds them one by one (USDA values,
+  // cooked unless eaten raw). "A little" ones are fine in small amounts:
+  // spinach and beetroot carry oxalates, sweet potato and beetroot sugar.
+  { id: "broccoli", name: "Broccoli", group: "Veg and fruit", unit: "½ cup", grams: 78, protein: 2.4, fat: 0.4, carbs: 7.2, has: [] },
+  { id: "pumpkin", name: "Pumpkin", group: "Veg and fruit", unit: "½ cup", grams: 120, protein: 0.7, fat: 0.1, carbs: 4.9, has: [] },
+  { id: "beans", name: "Green beans", group: "Veg and fruit", unit: "½ cup", grams: 62, protein: 1.9, fat: 0.3, carbs: 7.9, has: [] },
+  { id: "celery", name: "Celery", group: "Veg and fruit", unit: "½ cup", grams: 50, protein: 0.7, fat: 0.2, carbs: 3, has: [] },
+  { id: "pepper", name: "Red bell pepper", group: "Veg and fruit", unit: "½ cup", grams: 75, protein: 1, fat: 0.3, carbs: 6, has: [] },
+  { id: "carrot", name: "Carrot", group: "Veg and fruit", unit: "½ cup", grams: 78, protein: 0.8, fat: 0.2, carbs: 8.2, has: [] },
+  { id: "spinach", name: "Spinach (a little)", group: "Veg and fruit", unit: "¼ cup", grams: 45, protein: 3, fat: 0.3, carbs: 1.4, has: [] },
+  { id: "sweetpotato", name: "Sweet potato (a little)", group: "Veg and fruit", unit: "¼ cup", grams: 50, protein: 2, fat: 0.2, carbs: 20.7, has: [], starchy: true },
+  { id: "zucchini", name: "Zucchini", group: "Veg and fruit", unit: "½ cup", grams: 90, protein: 1.1, fat: 0.4, carbs: 2.7, has: [] },
+  { id: "beetroot", name: "Beetroot (a little)", group: "Veg and fruit", unit: "¼ cup", grams: 40, protein: 1.7, fat: 0.2, carbs: 10, has: [], starchy: true },
+  { id: "blueberry", name: "Blueberries", group: "Veg and fruit", unit: "handful", grams: 30, protein: 0.7, fat: 0.3, carbs: 14.5, has: [], starchy: true },
+  { id: "apple", name: "Apple (no seeds)", group: "Veg and fruit", unit: "slice", grams: 25, protein: 0.3, fat: 0.2, carbs: 14, has: [], starchy: true },
   { id: "banana", name: "Banana", group: "Veg and fruit", unit: "½ banana", grams: 60, protein: 1.1, fat: 0.3, carbs: 23, has: [], starchy: true },
 
   { id: "ghee", name: "Ghee or coconut oil", group: "Fats", unit: "tsp", grams: 5, protein: 0, fat: 100, carbs: 0, has: [] },
@@ -128,7 +175,8 @@ const KCAL = { protein: 3.5, fat: 8.5, carbs: 3.5 };
 
 // One thing in the bowl, in grams. Packaged food carries its brand (or the
 // numbers typed from the bag); "Something else" carries a name and a kind.
-export type Line = { key: string; id: string; grams: number; brand?: string; bag?: Omit<Brand, "id" | "name">; name?: string; kind?: Kind };
+// `id: "product"` is a ready-made topper from a store; `product` is its id.
+export type Line = { key: string; id: string; grams: number; brand?: string; bag?: Omit<Brand, "id" | "name">; name?: string; kind?: Kind; product?: string };
 
 type Values = { name: string; protein: number; fat: number; carbs: number; starchy: boolean; has: Nutrient[] };
 
@@ -136,6 +184,11 @@ export function valuesOf(l: Line): Values {
   if (l.id === "kibble") {
     const b = l.bag ? { id: "bag", name: "From the bag", ...l.bag } : BRANDS.find((x) => x.id === l.brand) ?? BRANDS[BRANDS.length - 1];
     return { name: "Packaged dog food", protein: b.protein, fat: b.fat, carbs: brandStarch(b), starchy: true, has: food("kibble").has };
+  }
+  if (l.id === "product") {
+    // Supplements and toppers: nutrients, not calories.
+    const p = PRODUCTS.find((x) => x.id === l.product);
+    return { name: p?.name ?? "Topper", protein: 0, fat: 0, carbs: 0, starchy: false, has: PRODUCT_HAS[l.product ?? ""] ?? [] };
   }
   if (l.id === "custom") {
     const k = KINDS[l.kind ?? "veg"];
@@ -151,9 +204,32 @@ export type Result = {
   protein: number;
   fat: number;
   starch: number;
+  // Grams a day.
+  grams: { protein: number; fat: number; starch: number };
   missing: Nutrient[];
   swaps: string[];
 };
+
+// Daily goals in grams for a dog needing `need` calories: about half the
+// calories from protein and half from fat (The Forever Dog), and starch
+// kept under a tenth of the calories.
+export function goalsFor(need: number) {
+  return {
+    protein: Math.round((need * 0.5) / KCAL.protein),
+    fat: Math.round((need * 0.5) / KCAL.fat),
+    starch: Math.round((need * 0.1) / KCAL.carbs),
+  };
+}
+
+// How far along a goal: "low" (red) under 60%, "near" (amber) under 85%,
+// "good" (green) from there to 150%, "high" (amber) beyond. For a limit
+// like starch, green while under it, amber up to twice, red beyond.
+export type Level = "low" | "near" | "good" | "high";
+export function levelFor(value: number, goal: number, limit = false): Level {
+  const r = goal ? value / goal : 0;
+  if (limit) return r <= 1 ? "good" : r <= 2 ? "near" : "low";
+  return r < 0.6 ? "low" : r < 0.85 ? "near" : r <= 1.5 ? "good" : "high";
+}
 
 export function analyse(lines: Line[], need: number): Result {
   let p = 0;
@@ -180,6 +256,7 @@ export function analyse(lines: Line[], need: number): Result {
     protein: pct(pk),
     fat: pct(fk),
     starch: pct(ck),
+    grams: { protein: Math.round(p), fat: Math.round(f), starch: Math.round(c) },
     missing: (Object.keys(NUTRIENTS) as Nutrient[]).filter((n) => !covered.has(n)),
     swaps: [],
   };
@@ -199,7 +276,7 @@ function swapsFor(lines: Line[], r: Result, need: number): string[] {
   else if (r.starch > 20 && has("kibble")) out.push("Swap a quarter of the packaged food for fresh meat or eggs. That brings the starch down fast.");
   if (r.missing.includes("omega3")) out.push("Add a sardine or a piece of bangda two or three times a week, for omega-3.");
   if (r.missing.includes("taurine")) out.push("Use dark chicken meat (thigh) instead of breast, or add fish, for taurine.");
-  if (r.missing.includes("calcium")) out.push("Add a spoon of plain curd, or sardines with their soft bones, for calcium.");
+  if (r.missing.includes("calcium")) out.push("Add eggshell powder (about half a teaspoon per 500 g of meat), or sardines with their soft bones, for calcium.");
   if (r.missing.includes("choline") || r.missing.includes("zinc")) out.push("Add an egg, or a paw-sized piece of liver a day, for choline and zinc.");
   if (r.fat < 30 && r.starch <= 20) out.push("Keep some fat on the meat, or add a teaspoon of ghee or coconut oil. Dogs run on fat.");
   if (need && r.kcal > need * 1.15) out.push(`It's about ${Math.round(((r.kcal - need) / need) * 100)}% more than they need in a day. Trim the portions a little.`);
@@ -216,10 +293,12 @@ export function startingBowl(bowl: Bowl | null, need: number): Line[] {
   const kibble = Math.max(50, Math.round(need / 3.5 / 10) * 10);
   const L = (id: string, grams: number): Line => ({ key: lineKey(), id, grams, ...(id === "kibble" ? { brand: "typical" } : {}) });
   switch (bowl) {
-    case "home":
-      return [L("rice", 160), L("dal", 150), L("curd", 30), L("chicken", 100)];
-    case "fresh":
-      return [L("thigh", 200), L("egg", 50), L("veg", 75)];
+    case "veg":
+      return [L("rice", 160), L("dal", 150), L("curd", 30), L("paneer", 25)];
+    case "meat":
+      return [L("rice", 160), L("chicken", 150), L("veg", 75)];
+    case "raw":
+      return [L("thigh", 200), L("liver", 30), L("egg", 50), L("veg", 75)];
     case "mix":
       return [L("kibble", Math.round(kibble / 2 / 10) * 10), L("chicken", 100)];
     default:

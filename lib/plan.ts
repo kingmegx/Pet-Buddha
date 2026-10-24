@@ -430,9 +430,15 @@ export const GROUPS: Group[] = [
   {
     id: "food",
     tab: "Food",
-    problems: ["tummy", "picky", "weight"],
+    problems: ["tummy", "picky", "weight", "joints"],
     aha: "Small amounts of fresh food make a real difference.",
     why: "Fresh, lightly processed food shows up in their skin, gut, weight and mood. Start with fresh toppers, then swap in as much fresh food as you can.",
+    ahaFor: {
+      joints: {
+        aha: "Strong joints are built in the bowl and on the walk.",
+        why: "A lean body, omega-3 and collagen-rich food, and gentle daily movement keep {who} moving well as they age.",
+      },
+    },
     tips: [],
     avoid: "Never feed grapes or raisins, onion (or chives), chocolate, macadamia nuts, nutmeg, xylitol (in sugar-free sweets and some peanut butter) or cooked bones.",
     help: "Vomiting or diarrhoea for more than a day, blood, or sudden weight change needs a vet. For a dog with a medical condition, ask a vet nutritionist to formulate the diet.",
@@ -545,20 +551,21 @@ export const LADDER: Rung[] = [
 ];
 
 // Where to start on the ladder, from what is in the bowl now.
-export const LADDER_START: Record<Bowl, string> = { kibble: "toppers", mix: "quarter", home: "all", fresh: "all" };
+export const LADDER_START: Record<Bowl, string> = { kibble: "toppers", mix: "quarter", veg: "all", meat: "all", raw: "all" };
 
 export const BOWL_NOTE: Record<Bowl, string> = {
   kibble: "Packaged food is a fine base to start from. Begin with toppers, then swap in fresh when you're ready.",
   mix: "You're already part way. Make sure the fresh part is a complete recipe.",
-  home: "Home-cooked is the freshest food there is, if the recipe is complete. Rotating meat, rice and vegetables is not enough.",
-  fresh: "Fresh or raw is the gold standard, if the recipe is complete. Check it against the points below.",
+  veg: "A vegetarian bowl is fresh, but it can't be complete for a dog. Start by adding eggs or meat, cooked separately if your home is vegetarian.",
+  meat: "Chicken, rice and veg is a good start. On its own it usually runs short on a few things dogs need, like calcium, omega-3 and vitamin D. Put in what you feed above, and we'll show what to add.",
+  raw: "Raw meat and veg is a great base. On its own it usually runs short on a few things, like calcium, omega-3 and vitamin D. Put in what you feed above, and we'll show what to add.",
 };
 
 // Making it at home: the rules for a complete recipe.
 export const HOMEMADE_TIPS: Tip[] = [
-  { t: "Follow a complete recipe", d: "Use a recipe made to meet a dog's nutrient needs (NRC, AAFCO or FEDIAF), and follow it exactly." },
-  { t: "Rotating isn't balancing", d: "Different meats and vegetables over the week still miss zinc, vitamins D and E, iodine, manganese and selenium." },
-  { t: "No ingredient swaps", d: "Swapping one thing for another slowly unbalances a recipe. A general multivitamin won't fix it." },
+  { t: "Add what's missing", d: "Meat, rice and veg alone run short on a few things. Add an egg (vitamin D, choline), sardines twice a week (omega-3), a little liver or mutton (zinc), and eggshell powder for calcium: about half a teaspoon per 500 g of meat." },
+  { t: "Then use a complete recipe", d: "For everything else, follow a recipe made for dogs by a canine nutritionist, or add a vitamin premix made for home-cooked dog food." },
+  { t: "No ingredient swaps", d: "Once you have a recipe, swapping one thing for another slowly unbalances it. A human multivitamin won't fix it." },
   { t: "How to spot a good recipe", d: "It states which standard it meets, lists ingredients by weight, gives calories and a nutrient breakdown." },
   { t: "Freeze, then thaw cold", d: "Freeze raw meat first, then thaw it in the fridge, not on the counter.", src: "@georginaskitchen.india" },
   { t: "Start with chews and organs", d: "While you plan a full diet, start small amounts of organs and raw chews like chicken feet or necks. A little nausea at first is normal.", src: "@georginaskitchen.india" },
@@ -632,8 +639,9 @@ export const SENIOR_TIPS: Tip[] = [
 export const BOWL_TIPS: Record<Bowl, Tip[]> = {
   kibble: [TOPPER_TIPS[0], TOPPER_TIPS[1]],
   mix: [TOPPER_TIPS[0], HOMEMADE_TIPS[0]],
-  home: [HOMEMADE_TIPS[0], HOMEMADE_TIPS[1]],
-  fresh: [HOMEMADE_TIPS[0], TOPPER_TIPS[0]],
+  veg: [HOMEMADE_TIPS[0], HOMEMADE_TIPS[1]],
+  meat: [HOMEMADE_TIPS[0], HOMEMADE_TIPS[1]],
+  raw: [HOMEMADE_TIPS[0], TOPPER_TIPS[0]],
 };
 
 export const BODY_TIPS: Partial<Record<ProblemId, Tip[]>> = {
@@ -647,6 +655,14 @@ export const BODY_TIPS: Partial<Record<ProblemId, Tip[]>> = {
     { t: "Start with organs", d: "Few dogs refuse tiny bits of cooked liver or chicken heart. Cook carrots in with them, then less and less." },
     { t: "Hide it, chop it fine", d: "Mix new foods right into the usual food, very finely chopped. A spoon of plain broth helps." },
     { t: "Meal times only", d: "Pick the bowl up between meals. A dog that grazes all day has no reason to be keen." },
+  ],
+  joints: [
+    { t: "Keep them lean", d: "Every extra kilo loads the joints. A lean dog moves more easily, and for longer." },
+    { t: "Rugs on slippery floors", d: "Marble and tile make dogs slip and strain. Runners or mats where they walk most help a lot, especially for older dogs." },
+    SENIOR_TIPS[1],
+    { t: "Little and often", d: "Two or three gentle walks are easier on joints than one long one, especially on stiff days." },
+    { t: "Fish and cartilage in the bowl", d: "Omega-3 from sardines or mackerel calms inflammation. Chicken feet and bone broth bring natural collagen and glucosamine." },
+    { t: "Start before it hurts", d: "Big and long-backed breeds are prone to joint trouble later. Joint support can start once they're fully grown.", src: "Doggiliciouus" },
   ],
   weight: [
     { t: "Chonky isn't cute", d: "Extra weight brings joint, metabolic and inflammation trouble. It's worth acting on, not laughing off.", src: "@whatsinmydogbowl" },
@@ -863,7 +879,37 @@ export const COMPARE: Record<Bowl, Compare> = {
     rows: KIBBLE_ROWS,
     note: "You're already part way there. The packaged half is where the starch and the heat damage come from, so every bit you swap counts.",
   },
-  home: {
+  veg: {
+    now: "A vegetarian bowl",
+    fresh: "A complete fresh bowl",
+    rows: [
+      {
+        topic: "Base",
+        sticker: "bowl",
+        now: "Rice or roti with dal, curd or paneer.",
+        fresh: "Meat and organs first, vegetables second, little grain.",
+        why: "Dogs run on protein and fat. Rice, roti and dal are mostly starch, which turns into sugar.",
+        for: ["weight"],
+      },
+      {
+        topic: "Heart",
+        sticker: "heart",
+        now: "Little taurine: plants carry almost none.",
+        fresh: "Taurine from meat, dark chicken and fish.",
+        why: "Taurine keeps the heart muscle strong. Diets heavy in lentils and peas have been linked to a heart disease called DCM.",
+      },
+      {
+        topic: "Balance",
+        sticker: "sparkle",
+        now: "Short on omega-3, iron, zinc and vitamin D.",
+        fresh: "A recipe made to meet a dog's nutrient needs.",
+        why: "A UC Davis study found 95% of 200 home-made dog recipes short on at least one essential nutrient.",
+        for: ["itch", "coat"],
+      },
+    ],
+    note: "Eggs are an easy first step: their protein matches what a dog's body needs.",
+  },
+  meat: {
     now: "A typical home bowl",
     fresh: "A complete fresh bowl",
     rows: [
@@ -878,9 +924,9 @@ export const COMPARE: Record<Bowl, Compare> = {
       {
         topic: "Balance",
         sticker: "sparkle",
-        now: "Rotating meat, rice and veg over the week.",
-        fresh: "A recipe made to meet a dog's nutrient needs.",
-        why: "Rotating still misses zinc, vitamins D and E, iodine, manganese and selenium. A complete recipe covers them.",
+        now: "Chicken, rice and veg, with nothing added.",
+        fresh: "The same, plus egg, sardines and calcium.",
+        why: "Chicken, rice and veg run short on calcium, omega-3 and vitamin D. Small add-ons fill the gaps, and Balance the bowl below shows which ones.",
         for: ["itch", "coat"],
       },
       {
@@ -892,18 +938,18 @@ export const COMPARE: Record<Bowl, Compare> = {
         for: ["tummy"],
       },
     ],
-    note: "Home-cooked is the freshest food there is. A few changes make it complete.",
+    note: "Fresh, meat-based food is the best start there is. A few changes make it complete.",
   },
-  fresh: {
-    now: "Fresh, unchecked",
-    fresh: "Fresh and complete",
+  raw: {
+    now: "Raw, unchecked",
+    fresh: "Raw and complete",
     rows: [
       {
         topic: "Balance",
         sticker: "sparkle",
-        now: "Rotating meats and veg, hoping it evens out.",
-        fresh: "A recipe made to a nutrient standard.",
-        why: "Rotation alone misses zinc, vitamins D and E, iodine, manganese and selenium.",
+        now: "Meat and veg, with nothing added.",
+        fresh: "Plus organs, oily fish, and bone or calcium.",
+        why: "Meat and veg alone run short on calcium, omega-3 and vitamin D. Small add-ons fill the gaps, and Balance the bowl below shows which ones.",
       },
       {
         topic: "Organs",
@@ -913,11 +959,11 @@ export const COMPARE: Record<Bowl, Compare> = {
         why: "Organs carry vitamins and minerals muscle meat doesn't. A little goes a long way.",
       },
       {
-        topic: "Cooking",
+        topic: "Handling",
         sticker: "leaf",
-        now: "Browned or fried.",
-        fresh: "Gently poached, or raw.",
-        why: "Browning creates harmful by-products. Gentle cooking keeps more of the good stuff.",
+        now: "Meat from any shop, handled like a meal for people.",
+        fresh: "Fresh meat from a trusted source, kept cold, bowls washed.",
+        why: "Raw meat can carry germs like salmonella. Good sourcing and kitchen hygiene keep the risk low for the dog and your family.",
       },
     ],
     note: "You're feeding the gold standard. Just make sure it's complete.",
@@ -941,7 +987,7 @@ export const PERFECT_BOWL: { id: string; label: string; share: number; color: st
 export const PERFECT_BOWL_RULES: Tip[] = [
   { t: "Half protein, half fat", d: "Roughly half a dog's calories should come from protein and half from fat. That's the diet dogs choose and do best on." },
   { t: "Starch under 10%", d: "Rice, roti and other grains turn into sugar. Dogs need none; under 10% is natural, up to 20% for very active dogs." },
-  { t: "Made to a recipe", d: "A complete recipe meets a dog's nutrient needs. Rotating ingredients alone still leaves gaps." },
+  { t: "Nothing missing", d: "Meat and veg alone leave a few gaps, like calcium and vitamin D. A few measured add-ons, or a complete recipe, fill them." },
 ];
 
 // Can a dog be vegetarian? From The Forever Dog (chapter 5) and our

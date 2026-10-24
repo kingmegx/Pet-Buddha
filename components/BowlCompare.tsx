@@ -62,7 +62,8 @@ function BowlArt({ fill }: { fill: Fill }) {
 
 export function BowlCompare({ bowl, needs, who }: { bowl: Bowl | null; needs: ProblemId[]; who: string }) {
   const c = COMPARE[bowl ?? "kibble"];
-  const nowFill: Fill = bowl === "home" ? "home" : bowl === "fresh" ? "fresh" : "kibble";
+  // A vegetarian or home-cooked meat bowl looks like the rice bowl; raw like the fresh one.
+  const nowFill: Fill = bowl === "veg" || bowl === "meat" ? "home" : bowl === "raw" ? "fresh" : "kibble";
   const mine = (r: { for?: ProblemId[] }) => !!r.for?.some((p) => needs.includes(p));
   const first = Math.max(0, c.rows.findIndex(mine));
   const [open, setOpen] = useState<number | null>(first);
@@ -79,7 +80,7 @@ export function BowlCompare({ bowl, needs, who }: { bowl: Bowl | null; needs: Pr
           <path d="M58 18l13 3-4-12" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         <div className="bc-side is-fresh">
-          <BowlArt fill={bowl === "fresh" ? "fresh" : "fresh"} />
+          <BowlArt fill="fresh" />
           <span className="bc-label">{c.fresh}</span>
         </div>
       </div>

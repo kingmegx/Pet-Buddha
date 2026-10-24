@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
-import { ACTIVITIES, BOWLS, CALM, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
+import { ACTIVITIES, BOWLS, CALM, FRESH_BOWLS, doseFor, type Dose, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
 import { BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, tabName, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
@@ -172,7 +172,46 @@ const KIND_STICKER: Record<KindId, { kind: StickerKind; tone: string; ink: strin
   wash: { kind: "sparkle", tone: "#c9d3ff", ink: "#3a3f8f" },
   inside: { kind: "leaf", tone: "#e6f5c9", ink: "#1f5c43" },
   ticks: { kind: "paw", tone: "#fde3b0", ink: "#6b3a12" },
+  gaps: { kind: "bowl", tone: "#e6f5c9", ink: "#1f5c43" },
+  joints: { kind: "bone", tone: "#ddd3f7", ink: "#3a3f8f" },
+  gut: { kind: "leaf", tone: "#fde3b0", ink: "#6b3a12" },
+  picky: { kind: "nose", tone: "#fbe0d2", ink: "#7c2d4a" },
+  slim: { kind: "ball", tone: "#c9d3ff", ink: "#3a3f8f" },
+  calm: { kind: "heart", tone: "#ddd3f7", ink: "#3a3f8f" },
 };
+
+// The dog's weight and age, for doses on product cards.
+const DogSize = createContext<{ kg: number; months: number; name: string }>({ kg: 10, months: 24, name: "your dog" });
+
+// One kind of product: its sticker, what to look for, then the cards.
+function KindShelf({ id, products, who, needs }: { id: KindId; products: Product[]; who: string; needs: ProblemId[] }) {
+  const k = KINDS.find((x) => x.id === id)!;
+  const shown = products.filter((p) => p.kind === id);
+  if (shown.length === 0) return null;
+  return (
+    <div className={`s-kind s-kind-${id}`}>
+      <div className="s-kind-head">
+        <div>
+          <span className="s-kind-sticker" aria-hidden>
+            <Sticker kind={KIND_STICKER[id].kind} tone={KIND_STICKER[id].tone} ink={KIND_STICKER[id].ink} />
+          </span>
+          <h3>{k.label}</h3>
+          <p>{k.lead}</p>
+        </div>
+        <ul className="s-look">
+          {k.lookFor.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="pcards">
+        {shown.map((p, i) => (
+          <ProductCard key={p.id} p={p} who={who} needs={needs} tone={["lime", "peach", "lilac"][i % 3]} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // "Start with these three" as a small hand of coloured cards, like the
 // landing's "why pet buddha".
@@ -548,6 +587,18 @@ function Sock() {
 
 // One product. Closed, it is a photo, a name, a price and one line. Tapping it
 // opens it across the full width with the reason, the first steps and the caution.
+// "How much for Bruno": from the store's feeding guide, for their weight,
+// or the puppy line while they're under a year.
+function DoseLine({ dose }: { dose: Dose }) {
+  const { kg, months, name } = useContext(DogSize);
+  const puppy = months < 12 && dose.puppy;
+  return (
+    <p className="pcard-dose">
+      <strong>How much for {name}.</strong> {puppy ? dose.puppy : `At ${kg} kg, ${doseFor(dose, kg)}.`} <span>From the store&apos;s feeding guide.</span>
+    </p>
+  );
+}
+
 function ProductCard({ p, who, needs, tone }: { p: Product; who: string; needs: ProblemId[]; tone: string }) {
   const warn = p.notFor && needs.includes(p.notFor.problem) ? p.notFor.note : null;
   // Flips over in place to show how it helps, like the fact cards on the
@@ -564,8 +615,16 @@ function ProductCard({ p, who, needs, tone }: { p: Product; who: string; needs: 
       <motion.div className="pcard-flip" initial={false} animate={{ rotateY: flipped ? 180 : 0 }} transition={{ type: "spring", stiffness: 120, damping: 18 }} style={{ transformPerspective: 1400 }}>
         <div className="pcard-face pcard-front" aria-hidden={flipped}>
           <div className="pcard-photo">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.image} alt={`${p.name}, photo from ${STORES[p.store].name}`} loading="lazy" />
+            {p.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={p.image} alt={`${p.name}, photo from ${STORES[p.store].name}`} loading="lazy" />
+            ) : (
+              // The store has no photo: a paw sticker on the card's colour.
+              <span className="pcard-nophoto" aria-hidden>
+                <Sticker kind="paw" tone="#fbf6ef" ink="#211e1c" />
+                <span>{STORES[p.store].name}</span>
+              </span>
+            )}
             {/* A round button tucked into the photo's corner, on a ring of page colour. */}
             <span className="pcard-notch">
               <button className="pcard-more" onClick={open} tabIndex={flipped ? -1 : 0} aria-label={`How ${p.name} helps`}>
@@ -605,6 +664,7 @@ function ProductCard({ p, who, needs, tone }: { p: Product; who: string; needs: 
               <li key={line}>{line}</li>
             ))}
           </ol>
+          {p.dose && <DoseLine dose={p.dose} />}
           <p className="pcard-caution">
             <strong>Watch out.</strong> {p.caution}
           </p>
@@ -924,6 +984,7 @@ export function Results({
   const told = chosen.map((p) => p.label.toLowerCase());
 
   return (
+    <DogSize.Provider value={{ kg, months, name: Who }}>
     <OpenToys.Provider value={() => setToys(true)}>
     <OpenElim.Provider value={() => setElim(true)}>
     <SeenTips.Provider value={new Set(week.map((t) => t.t))}>
@@ -943,7 +1004,7 @@ export function Results({
             <Accent text={fill(headlineFor(lead, needs).aha)} word={name || undefined} />
           </h1>
           <Squiggle className="s-squiggle" />
-          <p className="s-sub">{headlineFor(lead, needs).why}</p>
+          <p className="s-sub">{fill(headlineFor(lead, needs).why)}</p>
           <div className="s-top-actions">
             <a className="pill" href="#plan">
               See the plan <span className="arrow arrow-down" aria-hidden />
@@ -1019,7 +1080,7 @@ export function Results({
                   <Accent text={fill(headlineFor(g, needs).aha)} word={name || undefined} />
                 </h2>
                 <Squiggle className="s-squiggle" />
-                <p>{headlineFor(g, needs).why}</p>
+                <p>{fill(headlineFor(g, needs).why)}</p>
               </div>
             )}
             <PanelIndex />
@@ -1046,34 +1107,10 @@ export function Results({
                 <WhyWalk />
 
                 <Sub note="You don't need all of them. Start with one." short="chews and toys">Chews and toys that help</Sub>
-                {order.map((id) => {
-                  const k = KINDS.find((x) => x.id === id)!;
-                  const shown = products.filter((p) => p.kind === id);
-                  if (shown.length === 0) return null;
-                  return (
-                    <div key={id} className={`s-kind s-kind-${id}`}>
-                      <div className="s-kind-head">
-                        <div>
-                          <span className="s-kind-sticker" aria-hidden>
-                            <Sticker kind={KIND_STICKER[id].kind} tone={KIND_STICKER[id].tone} ink={KIND_STICKER[id].ink} />
-                          </span>
-                          <h3>{k.label}</h3>
-                          <p>{k.lead}</p>
-                        </div>
-                        <ul className="s-look">
-                          {k.lookFor.map((line) => (
-                            <li key={line}>{line}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="pcards">
-                        {shown.map((p, i) => (
-                          <ProductCard key={p.id} p={p} who={who} needs={needs} tone={["lime", "peach", "lilac"][i % 3]} />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
+                {order.map((id) => (
+                  <KindShelf key={id} id={id} products={products} who={who} needs={needs} />
+                ))}
+                {(needs.includes("settle") || needs.includes("night")) && <KindShelf id="calm" products={products} who={who} needs={needs} />}
                 <p className="s-note">
                   Photos and prices from each store's own site, read on {CHECKED}. Check the store before you buy. We earn nothing from these links.
                 </p>
@@ -1113,6 +1150,9 @@ export function Results({
             {g.id === "alone" && (
               <>
                 <TipSection tips={tipsFor(WALK_TIPS.alone!, needs)} />
+                <Sub note="A help alongside slow practice, not a fix on their own." short="things that help">Things that help</Sub>
+                <KindShelf id="calm" products={products} who={who} needs={needs} />
+                <p className="s-note">Photos, prices and directions from each store&apos;s own product page, read on 24 Oct 2026. Check the store before you buy.</p>
               </>
             )}
 
@@ -1154,34 +1194,9 @@ export function Results({
                   ] as [KindId, ProblemId[]][]
                 )
                   .filter(([, forP]) => forP.some((x) => needs.includes(x)))
-                  .map(([id]) => {
-                    const k = KINDS.find((x) => x.id === id)!;
-                    const shown = products.filter((p) => p.kind === id);
-                    if (shown.length === 0) return null;
-                    return (
-                      <div key={id} className={`s-kind s-kind-${id}`}>
-                        <div className="s-kind-head">
-                          <div>
-                            <span className="s-kind-sticker" aria-hidden>
-                              <Sticker kind={KIND_STICKER[id].kind} tone={KIND_STICKER[id].tone} ink={KIND_STICKER[id].ink} />
-                            </span>
-                            <h3>{k.label}</h3>
-                            <p>{k.lead}</p>
-                          </div>
-                          <ul className="s-look">
-                            {k.lookFor.map((line) => (
-                              <li key={line}>{line}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div className="pcards">
-                          {shown.map((p, i) => (
-                            <ProductCard key={p.id} p={p} who={who} needs={needs} tone={["lime", "peach", "lilac"][i % 3]} />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
+                  .map(([id]) => (
+                    <KindShelf key={id} id={id} products={products} who={who} needs={needs} />
+                  ))}
                 <p className="s-note">Photos, prices and directions from each store&apos;s own product page, read on 23 Oct 2026. Check the store before you buy.</p>
 
                 <TipSection tips={tipsFor(g.tips, needs)} />
@@ -1220,10 +1235,10 @@ export function Results({
 
                 {/* 3. Balance the bowl: check what they eat against all that. */}
                 <Sub note="Add what they eat in a day, and see how it stacks up against what a dog needs." short="balance the bowl">{who === "your dog" ? "Balance the bowl" : `Balance ${Who}'s bowl`}</Sub>
-                <BalanceBowl bowl={bowl} need={dailyCalories(kg)} who={Who} />
+                <BalanceBowl bowl={bowl} need={dailyCalories(kg)} who={Who} kg={kg} />
 
                 {/* 2. One easy first step, depending on the bowl. */}
-                {bowl === "home" || bowl === "fresh" ? (
+                {bowl && FRESH_BOWLS.includes(bowl) ? (
                   <>
                     <Sub note={bowl ? BOWL_NOTE[bowl] : undefined} short="first step">Your first step: make it complete</Sub>
                     <Tips tips={HOMEMADE_TIPS} />
@@ -1322,6 +1337,30 @@ export function Results({
                   </>
                 )}
 
+                {/* Ready-made toppers for what they told us. Gap fillers sit in Balance the bowl. */}
+                {(() => {
+                  const kinds = (
+                    [
+                      ["joints", needs.includes("joints")],
+                      ["gut", needs.includes("tummy")],
+                      ["picky", needs.includes("picky")],
+                      ["slim", needs.includes("weight")],
+                    ] as [KindId, boolean][]
+                  )
+                    .filter(([, on]) => on)
+                    .map(([id]) => id);
+                  if (kinds.length === 0) return null;
+                  return (
+                    <>
+                      <Sub note="Ready-made toppers, picked for what you told us. You don't need all of them; start with one." short="toppers">Toppers that help</Sub>
+                      {kinds.map((id) => (
+                        <KindShelf key={id} id={id} products={products} who={who} needs={needs} />
+                      ))}
+                      <p className="s-note">Photos, prices, directions and doses from each store&apos;s own product page, read on 24 Oct 2026. Check the store before you buy.</p>
+                    </>
+                  );
+                })()}
+
                 {/* 4. Kitchen rules, in one switchable section. */}
                 <Sub note={`${who === "your dog" ? "A grown dog" : Who} at ${kg} kg needs roughly ${dailyCalories(kg)} calories a day, more if very active.`} short="kitchen rules">Kitchen rules</Sub>
                 <KitchenRules kg={kg} months={months} />
@@ -1330,14 +1369,14 @@ export function Results({
                 <Faq items={FOOD_FAQ} />
 
                 {/* 5. Their tummy, picky or weight problems, if ticked. */}
-                {(["tummy", "picky", "weight"] as ProblemId[])
+                {(["tummy", "picky", "weight", "joints"] as ProblemId[])
                   .filter((p) => needs.includes(p))
                   .map((p) => (
                     <TipSection key={p} tips={BODY_TIPS[p]!} title={PROBLEMS.find((x) => x.id === p)!.label} keep />
                   ))}
 
                 {/* 6. Tools and research, folded away. */}
-                {bowl !== "home" && bowl !== "fresh" && (
+                {!(bowl && FRESH_BOWLS.includes(bowl)) && (
                   <>
                     <Sub short="check the bag">Check the bag</Sub>
                     <Fold title="How much starch is in their food?" line="Work it out from the numbers on the label.">
@@ -1506,6 +1545,7 @@ export function Results({
       </AnimatePresence>
     </OpenElim.Provider>
     </OpenToys.Provider>
+    </DogSize.Provider>
   );
 }
 

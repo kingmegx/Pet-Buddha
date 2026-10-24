@@ -12744,3 +12744,241 @@ body:has(.stage),
 .tiles .tile:nth-child(5n + 3)::before { background: #c9d3ff; }
 .tiles .tile:nth-child(5n + 4)::before { background: #ecd3f5; }
 .tiles .tile:nth-child(5n)::before { background: #fde3b0; }
+
+/* Balance the bowl: a ready-made topper under a missing nutrient. */
+.bb-ready {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* A product with no store photo: a paw sticker and the store's name. */
+.pcard-nophoto {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  aspect-ratio: 1;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.pcard-nophoto .line-sticker,
+.pcard-nophoto svg {
+  width: 96px;
+  height: 96px;
+}
+
+.pcard-nophoto > span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5c5650;
+}
+
+/* The store's dose, for this dog's weight. */
+.pcard-dose {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.pcard-dose span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: #6b655f;
+}
+
+/* Balance the bowl: under each gap, the fixes, one tap to add. */
+.bb-fix {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.bb-missing li .bb-fix-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(251, 246, 239, 0.65);
+}
+
+.bb-fix-home,
+.bb-fix-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: #fbf6ef;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+}
+
+.bb-fix-home {
+  justify-content: space-between;
+  cursor: pointer;
+  background: #e6f5c9;
+  transition: transform 0.2s var(--spring);
+}
+
+.bb-fix-home:hover {
+  transform: translateY(-1px);
+}
+
+.bb-missing li .bb-fix-home span,
+.bb-missing li .bb-fix-item span {
+  color: var(--ink);
+}
+
+.bb-fix-home span {
+  font-weight: 600;
+}
+
+.bb-fix-home small,
+.bb-fix-name small {
+  color: #6b655f;
+  font-size: 12px;
+}
+
+.bb-fix-item img,
+.bb-fix-noimg {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: #fff;
+}
+
+.bb-fix-name {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.bb-fix-name strong {
+  font-size: 14px;
+}
+
+.bb-fix-item.is-out {
+  opacity: 0.7;
+}
+
+.bb-fix-add {
+  flex: none;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fbf6ef;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* The shopping list: everything added from a store, with a buy link. */
+.bb-list {
+  display: grid;
+  gap: 8px;
+}
+
+.bb-list ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bb-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fbf6ef;
+  color: var(--ink);
+}
+
+.bb-list li > span {
+  display: grid;
+}
+
+.bb-list small {
+  color: #6b655f;
+  font-size: 12px;
+}
+
+.bb-list .pill {
+  flex: none;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.bb-list a.pill {
+  background: var(--ink);
+  color: #fbf6ef !important;
+  text-decoration: none !important;
+}
+
+/* Balance the bowl bars: grams against the day's goal, coloured by how
+   close they are. Red far off, amber close (or well over), green met. */
+.bb-track {
+  position: relative;
+}
+
+.bb-bar.is-low .bb-track span { background: #ee6a3c; }
+.bb-bar.is-near .bb-track span,
+.bb-bar.is-high .bb-track span { background: #f2c14e; }
+.bb-bar.is-good .bb-track span { background: #c9e3a8; }
+
+.bb-bar-top strong small {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(251, 246, 239, 0.7);
+}
+
+.bb-target b {
+  font-weight: 600;
+  color: #fbf6ef;
+}
+
+.bb-bar.is-low .bb-target b { color: #ffb59a; }
+.bb-bar.is-near .bb-target b,
+.bb-bar.is-high .bb-target b { color: #f7d98a; }
+
+/* The limit line on the starch bar. */
+.bb-mark {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: rgba(251, 246, 239, 0.7);
+  z-index: 1;
+}
+
+.bb-track:has(.bb-mark) {
+  overflow: visible;
+}
+
+.bb-goal-note {
+  margin: -4px 0 6px !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+  color: rgba(251, 246, 239, 0.65) !important;
+}

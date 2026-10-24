@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import type { Bowl } from "@/lib/content";
-import { BRANDS, FOODS, KINDS, NUTRIENTS, analyse, food, guessKind, lineKey, startingBowl, valuesOf, type Kind, type Line } from "@/lib/balance";
+import { PRODUCTS, STORES, doseFor, type Bowl } from "@/lib/content";
+import { BRANDS, FOODS, KINDS, NUTRIENTS, analyse, fixesFor, goalsFor, levelFor, food, guessKind, lineKey, startingBowl, valuesOf, type Kind, type Line } from "@/lib/balance";
 
 // Balance the bowl: what the dog eats in a day, in grams, checked against
 // what a dog needs. Pick from the shelf, type in anything else, and choose
@@ -12,17 +12,42 @@ import { BRANDS, FOODS, KINDS, NUTRIENTS, analyse, food, guessKind, lineKey, sta
 
 const GROUPS = ["Meat and eggs", "Fish", "Grains and dal", "Dairy", "Veg and fruit", "Fats", "Packaged"] as const;
 
-function Bar({ label, value, target, good }: { label: string; value: number; target: string; good: boolean }) {
+// One nutrient against its daily goal, in grams, like a food label for
+// people. The bar fills towards the goal and changes colour: red when far
+// off, amber when close, green once it's met. Starch is a limit: green
+// while under it.
+function Bar({ label, grams, goal, share, limit = false }: { label: string; grams: number; goal: number; share: number; limit?: boolean }) {
+  const level = levelFor(grams, goal, limit);
+  const fill = limit ? Math.min(100, (grams / (goal * 2 || 1)) * 100) : Math.min(100, (grams / (goal || 1)) * 100);
+  const note = limit
+    ? level === "good"
+      ? "Under the limit"
+      : level === "near"
+        ? "Over the limit"
+        : "Well over the limit"
+    : level === "good"
+      ? "Goal met"
+      : level === "high"
+        ? "More than needed"
+        : level === "near"
+          ? "Nearly there"
+          : "Too low";
   return (
-    <div className="bb-bar">
+    <div className={`bb-bar is-${level}`}>
       <div className="bb-bar-top">
         <span>{label}</span>
-        <strong>{value}%</strong>
+        <strong>
+          {grams} g <small>/ {limit ? "under " : ""}{goal} g</small>
+        </strong>
       </div>
       <div className="bb-track">
-        <motion.span className={good ? "is-good" : "is-off"} initial={false} animate={{ width: `${Math.min(100, value)}%` }} transition={{ type: "spring", stiffness: 160, damping: 24 }} />
+        {/* For a limit, the goal sits halfway along the bar. */}
+        {limit && <i className="bb-mark" style={{ left: "50%" }} aria-hidden />}
+        <motion.span initial={false} animate={{ width: `${fill}%` }} transition={{ type: "spring", stiffness: 160, damping: 24 }} />
       </div>
-      <span className="bb-target">{target}</span>
+      <span className="bb-target">
+        <b>{note}.</b> {share}% of the day&apos;s calories.
+      </span>
     </div>
   );
 }
@@ -34,14 +59,17 @@ function hint(l: Line) {
   if (!f.count) return null;
   const n = Math.round((l.grams / f.grams) * 2) / 2;
   if (!n) return null;
+  // Eggshell powder reads better in teaspoons than in "half teaspoons".
+  if (l.id === "eggshell") return `≈ ${n / 2} tsp`;
   return `≈ ${n} ${n === 1 ? f.unit : `${f.unit}s`}`;
 }
 
-export function BalanceBowl({ bowl, need, who }: { bowl: Bowl | null; need: number; who: string }) {
+export function BalanceBowl({ bowl, need, who, kg }: { bowl: Bowl | null; need: number; who: string; kg: number }) {
   const [lines, setLines] = useState<Line[]>(() => startingBowl(bowl, need));
   const [adding, setAdding] = useState(false);
   const [own, setOwn] = useState({ name: "", grams: "", kind: "veg" as Kind, touched: false });
   const r = useMemo(() => analyse(lines, need), [lines, need]);
+  const goals = goalsFor(need);
 
   const update = (key: string, patch: Partial<Line>) => setLines((now) => now.map((l) => (l.key === key ? { ...l, ...patch } : l)));
   const remove = (key: string) => setLines((now) => now.filter((l) => l.key !== key));
@@ -57,6 +85,10 @@ export function BalanceBowl({ bowl, need, who }: { bowl: Bowl | null; need: numb
       if (there) return now.map((l) => (l === there ? { ...l, grams: l.grams + (id === "kibble" ? 50 : food(id).grams) } : l));
       return [...now, { key: lineKey(), id, grams: id === "kibble" ? 100 : food(id).grams, ...(id === "kibble" ? { brand: "typical" } : {}) }];
     });
+  // A ready-made topper from a store: it counts for its nutrients, not calories.
+  const addProduct = (id: string) => setLines((now) => (now.some((l) => l.product === id) ? now : [...now, { key: lineKey(), id: "product", grams: 1, product: id }]));
+  const picked = lines.filter((l) => l.id === "product").map((l) => PRODUCTS.find((p) => p.id === l.product)!).filter(Boolean);
+
   const addOwn = () => {
     const g = Number(own.grams);
     if (!own.name.trim() || !g) return;
@@ -77,6 +109,22 @@ export function BalanceBowl({ bowl, need, who }: { bowl: Bowl | null; need: numb
               const v = valuesOf(l);
               return (
                 <motion.li key={l.key} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.2 }}>
+                  {l.id === "product" ? (
+                    <div className="bb-row">
+                      <span className="bb-name">
+                        <strong>{v.name}</strong>
+                        <span>
+                          {STORES[PRODUCTS.find((p) => p.id === l.product)!.store].name}
+                          {PRODUCTS.find((p) => p.id === l.product)?.dose && `, ${doseFor(PRODUCTS.find((p) => p.id === l.product)!.dose!, kg)}`}
+                        </span>
+                      </span>
+                      <span className="bb-amount">
+                        <button className="bb-remove" onClick={() => remove(l.key)} aria-label={`Remove ${v.name}`} title="Remove">
+                          ×
+                        </button>
+                      </span>
+                    </div>
+                  ) : (
                   <div className="bb-row">
                     <span className="bb-name">
                       <strong>{l.id === "custom" ? l.name : v.name}</strong>
@@ -106,6 +154,7 @@ export function BalanceBowl({ bowl, need, who }: { bowl: Bowl | null; need: numb
                       </button>
                     </span>
                   </div>
+                  )}
 
                   {/* Packaged food: which brand, or numbers from the bag. */}
                   {l.id === "kibble" && (
@@ -217,20 +266,51 @@ export function BalanceBowl({ bowl, need, who }: { bowl: Bowl | null; need: numb
           </span>
         </div>
 
-        <Bar label="Protein" value={r.protein} target="Aim for about half" good={r.protein >= 35} />
-        <Bar label="Fat" value={r.fat} target="Aim for about half" good={r.fat >= 30} />
-        <Bar label="Starch" value={r.starch} target="Keep under 10%, up to 20% if very active" good={r.starch <= 20} />
+        <Bar label="Protein" grams={r.grams.protein} goal={goals.protein} share={r.protein} />
+        <Bar label="Fat" grams={r.grams.fat} goal={goals.fat} share={r.fat} />
+        <Bar label="Starch" grams={r.grams.starch} goal={goals.starch} share={r.starch} limit />
+        <p className="bb-goal-note">Goals for {who === "your dog" ? "your dog" : who}: about half the calories from protein and half from fat, with starch under a tenth.</p>
 
         {r.missing.length > 0 ? (
           <div className="bb-missing">
             <span className="bb-sub">Missing or low</span>
             <ul>
-              {r.missing.map((n) => (
-                <li key={n}>
-                  <strong>{NUTRIENTS[n].label}</strong>
-                  <span>{NUTRIENTS[n].why}</span>
-                </li>
-              ))}
+              {r.missing.map((n) => {
+                const fix = fixesFor(n);
+                return (
+                  <li key={n}>
+                    <strong>{NUTRIENTS[n].label}</strong>
+                    <span>{NUTRIENTS[n].why}</span>
+                    <div className="bb-fix">
+                      <span className="bb-fix-label">Fix it</span>
+                      <button className="bb-fix-home" onClick={() => add(fix.home.id)}>
+                        <span>+ Add {fix.home.name.toLowerCase().replace(/ \(.*\)/, "")}</span>
+                        <small>from your kitchen</small>
+                      </button>
+                      {fix.ready.map((p) => (
+                        <div key={p.id} className={`bb-fix-item ${p.soldOut ? "is-out" : ""}`}>
+                          {p.image ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.image} alt="" loading="lazy" />
+                          ) : (
+                            <span className="bb-fix-noimg" aria-hidden />
+                          )}
+                          <span className="bb-fix-name">
+                            <strong>{p.name}</strong>
+                            <small>
+                              {STORES[p.store].name} · {p.price}
+                              {p.soldOut && " · check stock"}
+                            </small>
+                          </span>
+                          <button className="bb-fix-add" onClick={() => addProduct(p.id)}>
+                            + Add
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ) : (
@@ -245,6 +325,27 @@ export function BalanceBowl({ bowl, need, who }: { bowl: Bowl | null; need: numb
                 <li key={s}>{s}</li>
               ))}
             </ol>
+          </div>
+        )}
+        {picked.length > 0 && (
+          <div className="bb-list">
+            <span className="bb-sub">Your shopping list</span>
+            <ul>
+              {picked.map((p) => (
+                <li key={p.id}>
+                  <span>
+                    <strong>{p.name}</strong>
+                    <small>
+                      {STORES[p.store].name} · {p.price}
+                      {p.dose && ` · ${doseFor(p.dose, kg)}`}
+                    </small>
+                  </span>
+                  <a className="pill" href={STORES[p.store].url + p.path} target="_blank" rel="noreferrer">
+                    Buy <span className="arrow" aria-hidden />
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
         {lines.some((l) => l.id === "kibble") && (
