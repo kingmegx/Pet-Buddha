@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
-import { ACTIVITIES, BOWLS, CALM, FRESH_BOWLS, doseFor, type Dose, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
+import { ACTIVITIES, BOWLS, CALM, FRESH_BOWLS, HOSPITALS, doseFor, type Dose, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
 import { BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, tabName, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
@@ -450,6 +450,19 @@ function Careful({ g }: { g: Group }) {
         <div className="cf cf-help">
           <span className="cf-tag">see a vet or trainer if</span>
           <p>{g.help}</p>
+          {/* Where to go: hospitals that also groom. */}
+          <div className="cf-where">
+            <span className="cf-where-label">Where to go</span>
+            {HOSPITALS.map((h) => (
+              <a key={h.name} href={h.url} target="_blank" rel="noreferrer">
+                <strong>
+                  {h.name} <span aria-hidden>→</span>
+                </strong>
+                <small>{h.cities}</small>
+                <small>{h.offers}</small>
+              </a>
+            ))}
+          </div>
         </div>
       )}
     </div>

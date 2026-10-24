@@ -1330,3 +1330,22 @@ export const FUN_FACTS = [
   "Dogs dream. Those twitching paws are part of the same deep sleep stage we have.",
   "Dogs are not colour-blind. They see blues and yellows, but not reds and greens.",
 ];
+
+// ---------- vet hospitals ----------
+
+// Hospitals to go to, shown under "see a vet or trainer if" on every tab.
+// Both also groom. From each hospital's own site, read 25 Oct 2026.
+export const HOSPITALS: { name: string; url: string; cities: string; offers: string }[] = [
+  {
+    name: "Vetic",
+    url: "https://vetic.in",
+    cities: "Delhi NCR, Mumbai, Pune, Bengaluru, Hyderabad, Chennai, Kolkata",
+    offers: "Consultations, diagnostics, surgery, physiotherapy and grooming. 24/7 emergency care at some clinics, and vet visits at home.",
+  },
+  {
+    name: "Cessna Lifeline",
+    url: "https://cessnalifeline.com",
+    cities: "Bengaluru, Gurugram, Navi Mumbai",
+    offers: "Consultations, diagnostics, surgery, physiotherapy, emergency care and grooming. Emergency line: +91 76763 65365.",
+  },
+];
