@@ -13006,3 +13006,231 @@ body:has(.stage),
     justify-content: center;
   }
 }
+
+/* =====================================================================
+   A day's bowl: the diet chart, by the gram.
+   ===================================================================== */
+#experts {
+  scroll-margin-top: 90px;
+}
+
+.dc {
+  display: grid;
+  gap: 20px;
+  max-width: 920px;
+  margin: 40px auto 0;
+}
+
+.dc-note {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #fde3b0;
+  color: #3b3530;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.dc-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dc-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dc-total {
+  display: grid;
+  gap: 2px;
+}
+
+.dc-total strong {
+  font-family: var(--font-brand), sans-serif;
+  font-size: clamp(40px, 6vw, 56px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.dc-total span {
+  color: #5c5650;
+}
+
+.dc-meals {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 999px;
+  background: #f3efe9;
+}
+
+.dc-meals button {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dc-meals button.is-on {
+  background: var(--ink);
+  color: #fbf6ef;
+}
+
+.dc-rows {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dc-rows li {
+  display: grid;
+  grid-template-columns: 140px 180px minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: #f6f3ef;
+}
+
+.dc-rows li:nth-child(1) { background: #fbe0d2; }
+.dc-rows li:nth-child(2),
+.dc-rows li:nth-child(3) { background: #f8e7df; }
+.dc-rows li:nth-child(4) { background: #e6f5c9; }
+.dc-rows li:nth-child(5) { background: #fdf0d3; }
+.dc-rows li:nth-child(6) { background: #ece8f8; }
+
+.dc-part {
+  font-family: var(--font-brand), sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.dc-amount {
+  display: grid;
+}
+
+.dc-amount strong {
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+
+.dc-amount small,
+.dc-what em {
+  font-size: 12px;
+  font-style: normal;
+  color: #6b655f;
+}
+
+.dc-what {
+  display: grid;
+  gap: 6px;
+  color: #3b3530;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.dc-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dc-pick i {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.dc-extra {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dc-extra > div {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1.5px solid #ece6df;
+  border-radius: 16px;
+}
+
+.dc-extra p {
+  margin: 0;
+  color: #3b3530;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.dc-gaps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px;
+  border-radius: 18px;
+  background: #2e6a4c;
+  color: #fbf6ef;
+}
+
+.dc-gaps p {
+  flex: 1 1 360px;
+  margin: 0;
+  color: rgba(251, 246, 239, 0.9) !important;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.dc-gaps p strong {
+  color: #fbf6ef;
+}
+
+.dc-gaps .pill {
+  background: #fbf6ef;
+  color: var(--ink);
+}
+
+.dc-src {
+  margin: 0;
+  font-size: 12px;
+  color: #8a837c;
+}
+
+@media (max-width: 760px) {
+  .dc-rows li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .dc-rows .dc-what {
+    grid-column: 1 / -1;
+  }
+
+  .dc-amount {
+    text-align: right;
+  }
+
+  .dc-extra {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

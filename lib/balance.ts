@@ -82,6 +82,7 @@ export const FOODS: Food[] = [
   { id: "oats", name: "Oats, cooked", group: "Grains and dal", unit: "cup", grams: 230, protein: 2.5, fat: 1.5, carbs: 12, has: [], starchy: true },
 
   { id: "chicken", name: "Chicken breast", group: "Meat and eggs", unit: "100 g", grams: 100, protein: 31, fat: 3.6, carbs: 0, has: ["choline"] },
+  { id: "organs", name: "Gizzard and heart", group: "Meat and eggs", unit: "100 g", grams: 100, protein: 28, fat: 5, carbs: 0, has: ["taurine", "zinc"] },
   { id: "thigh", name: "Chicken thigh (dark meat)", group: "Meat and eggs", unit: "100 g", grams: 100, protein: 26, fat: 10.9, carbs: 0, has: ["taurine", "zinc", "choline"] },
   { id: "mutton", name: "Mutton", group: "Meat and eggs", unit: "100 g", grams: 100, protein: 27, fat: 3, carbs: 0, has: ["taurine", "zinc"] },
   { id: "liver", count: true, name: "Chicken liver", group: "Meat and eggs", unit: "paw-size piece", grams: 30, protein: 24, fat: 6.5, carbs: 0.9, has: ["zinc", "vitd", "choline"] },
@@ -115,6 +116,9 @@ export const FOODS: Food[] = [
   { id: "apple", name: "Apple (no seeds)", group: "Veg and fruit", unit: "slice", grams: 25, protein: 0.3, fat: 0.2, carbs: 14, has: [], starchy: true },
   { id: "banana", name: "Banana", group: "Veg and fruit", unit: "½ banana", grams: 60, protein: 1.1, fat: 0.3, carbs: 23, has: [], starchy: true },
 
+  // Flax, chia, pumpkin and sunflower seeds, ground together. ALA, not the
+  // fish omega-3 the bowl checks for, so it doesn't count towards that.
+  { id: "seeds", name: "Ground seed mix", group: "Fats", unit: "tsp", grams: 3, protein: 22, fat: 42, carbs: 28, has: [] },
   { id: "ghee", name: "Ghee or coconut oil", group: "Fats", unit: "tsp", grams: 5, protein: 0, fat: 100, carbs: 0, has: [] },
 
   { id: "kibble", name: "Packaged dog food (dry)", group: "Packaged", unit: "cup", grams: 100, protein: 25, fat: 14, carbs: 40, has: ["taurine", "omega3", "calcium", "zinc", "vitd", "choline"], starchy: true },
@@ -304,4 +308,38 @@ export function startingBowl(bowl: Bowl | null, need: number): Line[] {
     default:
       return [L("kibble", kibble)];
   }
+}
+
+// ---------- a day's bowl, by the gram ----------
+
+// What a complete fresh bowl looks like for a healthy adult dog, after the
+// complete homemade recipes in The Forever Dog (pp. 314-316, analysed on
+// pp. 399-402): about 55% lean meat, 20% organs (half of it liver) and 25%
+// vegetables by weight, plus ground seeds, a calcium source and oily fish.
+// The book's beef recipe uses 25 g calcium carbonate in about 3.9 kg of
+// food (0.65%); eggshell powder is almost all calcium carbonate, about
+// 5.5 g a teaspoon. Grams are solved from the food values above so the
+// bowl lands on the dog's calories. Indian foods in place of US ones are ours.
+export function dietChart(kg: number, need: number) {
+  const kcal = (id: string) => {
+    const f = food(id);
+    return (f.protein * KCAL.protein + f.fat * KCAL.fat + (f.starchy ? f.carbs * KCAL.carbs : 0)) / 100;
+  };
+  // 1 tsp of ground seeds (about 3 g) per 10 kg, at least half a teaspoon.
+  const seedTsp = Math.max(0.5, Math.round(kg / 10 * 2) / 2);
+  const seedG = seedTsp * food("seeds").grams;
+  const share = { thigh: 0.55, liver: 0.1, organs: 0.1, veg: 0.25 };
+  const perGram = (Object.keys(share) as (keyof typeof share)[]).reduce((t, id) => t + share[id] * kcal(id), 0);
+  const rest = Math.max(0, need - seedG * kcal("seeds")) / perGram;
+  const g5 = (x: number) => Math.max(5, Math.round(x / 5) * 5);
+  const meat = g5(rest * share.thigh);
+  const liver = g5(rest * share.liver);
+  const organs = g5(rest * share.organs);
+  const veg = g5(rest * share.veg);
+  const total = meat + liver + organs + veg;
+  // Eggshell powder in quarter teaspoons.
+  const shellTsp = Math.max(0.25, Math.round(((total * 0.0065) / 5.5) * 4) / 4);
+  // Oily fish a few times a week: one sardine per 9 kg (as in SKIN_FOOD).
+  const sardines = Math.max(1, Math.round(kg / 9));
+  return { meat, liver, organs, veg, total, seedTsp, seedG, shellTsp, shellG: Math.round(shellTsp * 5.5 * 10) / 10, sardines };
 }

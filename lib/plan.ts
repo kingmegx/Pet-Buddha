@@ -759,7 +759,10 @@ export function weekPlan(groups: Group[], needs: ProblemId[]): (Tip & { group: G
       if (tip) add(tip, p);
     }
   }
-  return out;
+  // Keep tips from the same tab next to each other, in the order their
+  // tabs first came up, so the three read as one or two clear topics.
+  const first = (g: GroupId) => out.findIndex((o) => o.group === g);
+  return out.map((o, i) => ({ o, i })).sort((a, b) => first(a.o.group) - first(b.o.group) || a.i - b.i).map(({ o }) => o);
 }
 
 // A tab's tips with the ones for the asked-about problems first.

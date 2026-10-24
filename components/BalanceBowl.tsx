@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { PRODUCTS, STORES, doseFor, type Bowl } from "@/lib/content";
 import { BRANDS, FOODS, KINDS, NUTRIENTS, analyse, fixesFor, goalsFor, levelFor, food, guessKind, lineKey, startingBowl, valuesOf, type Kind, type Line } from "@/lib/balance";
@@ -64,8 +64,15 @@ function hint(l: Line) {
   return `≈ ${n} ${n === 1 ? f.unit : `${f.unit}s`}`;
 }
 
-export function BalanceBowl({ bowl, need, who, kg }: { bowl: Bowl | null; need: number; who: string; kg: number }) {
+// `preset` replaces the bowl, e.g. with the day's bowl from the diet chart;
+// a new `key` loads it again.
+export type Preset = { key: number; lines: [string, number][] };
+
+export function BalanceBowl({ bowl, need, who, kg, preset }: { bowl: Bowl | null; need: number; who: string; kg: number; preset?: Preset | null }) {
   const [lines, setLines] = useState<Line[]>(() => startingBowl(bowl, need));
+  useEffect(() => {
+    if (preset) setLines(preset.lines.map(([id, grams]) => ({ key: lineKey(), id, grams })));
+  }, [preset]);
   const [adding, setAdding] = useState(false);
   const [own, setOwn] = useState({ name: "", grams: "", kind: "veg" as Kind, touched: false });
   const r = useMemo(() => analyse(lines, need), [lines, need]);

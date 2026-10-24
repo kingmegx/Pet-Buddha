@@ -14,7 +14,8 @@ import { Sticker, type StickerKind } from "./Stickers";
 import { ToiletRoad } from "./ToiletRoad";
 import { BowlCompare } from "./BowlCompare";
 import { PerfectBowl } from "./PerfectBowl";
-import { BalanceBowl } from "./BalanceBowl";
+import { BalanceBowl, type Preset } from "./BalanceBowl";
+import { DietChart } from "./DietChart";
 
 // The dog's name set in the italic accent face, like "why *pet buddha*".
 function Accent({ text, word }: { text: string; word?: string }) {
@@ -932,6 +933,8 @@ export function Results({
   // Energy tab: the three kinds of things, chews first for chewers.
   const products = pickProducts(needs, months);
   const [toys, setToys] = useState(false);
+  // The diet chart's bowl, loaded into Balance the bowl.
+  const [preset, setPreset] = useState<Preset | null>(null);
   const [elim, setElim] = useState(false);
   // Escape closes the toy shelf and the food-allergy guide.
   useEffect(() => {
@@ -1087,8 +1090,7 @@ export function Results({
 
             {g.id === "energy" && (
               <>
-                <TipSection tips={tipsFor(g.tips, needs)} />
-                {/* For chewers, the house rules come straight after the first steps. */}
+                {/* Order in every tab: the main section, then things that help, then more tips. */}
                 {rules && (
                   <>
                     <Sub note={HOUSE_RULES.lead} short="chewing rules">{HOUSE_RULES.title}</Sub>
@@ -1129,6 +1131,7 @@ export function Results({
                   <Sock />
                 </div>
 
+                <TipSection tips={tipsFor(g.tips, needs)} />
               </>
             )}
 
@@ -1149,10 +1152,10 @@ export function Results({
 
             {g.id === "alone" && (
               <>
-                <TipSection tips={tipsFor(WALK_TIPS.alone!, needs)} />
                 <Sub note="A help alongside slow practice, not a fix on their own." short="things that help">Things that help</Sub>
                 <KindShelf id="calm" products={products} who={who} needs={needs} />
                 <p className="s-note">Photos, prices and directions from each store&apos;s own product page, read on 24 Oct 2026. Check the store before you buy.</p>
+                <TipSection tips={tipsFor(WALK_TIPS.alone!, needs)} />
               </>
             )}
 
@@ -1233,9 +1236,23 @@ export function Results({
                   <Tips tips={DAL_RICE_CURD} />
                 </FeatureFold>
 
+                {/* A day's bowl by the gram, for a healthy adult dog. */}
+                <Sub note={`What a complete fresh bowl looks like for ${Who} at ${kg} kg, by the gram, with Indian food.`} short="a day's bowl">{who === "your dog" ? "A day's bowl" : `A day's bowl for ${Who}`}</Sub>
+                <DietChart
+                  kg={kg}
+                  months={months}
+                  need={dailyCalories(kg)}
+                  who={Who}
+                  onLoad={(p) => {
+                    setPreset({ key: Date.now(), ...p });
+                    window.setTimeout(() => document.querySelector(".bb")?.closest(".s-panel")?.querySelectorAll(".s-subhead").forEach((h) => h.textContent?.startsWith("Balance") && h.scrollIntoView({ behavior: "smooth", block: "start" })), 50);
+                  }}
+                  onExperts={() => document.getElementById("experts")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                />
+
                 {/* 3. Balance the bowl: check what they eat against all that. */}
                 <Sub note="Add what they eat in a day, and see how it stacks up against what a dog needs." short="balance the bowl">{who === "your dog" ? "Balance the bowl" : `Balance ${Who}'s bowl`}</Sub>
-                <BalanceBowl bowl={bowl} need={dailyCalories(kg)} who={Who} kg={kg} />
+                <BalanceBowl bowl={bowl} need={dailyCalories(kg)} who={Who} kg={kg} preset={preset} />
 
                 {/* 2. One easy first step, depending on the bowl. */}
                 {bowl && FRESH_BOWLS.includes(bowl) ? (
@@ -1396,6 +1413,7 @@ export function Results({
 
             <Careful g={g} />
 
+            <div id="experts" />
             <Sub note="People we trust for this. Follow them, or book them if you need a hand." short="who to follow">People to learn from</Sub>
             <Experts ids={g.experts} needs={needs} />
 
