@@ -674,8 +674,13 @@ export default function Onboarding() {
                 ))}
               </div>
               <p className="hint">Anything about their body?</p>
-              <div className="chips chips-quiet">
-                {PROBLEMS.filter((p) => p.body).map((p) => (
+              {/* Two even rows: skin and coat, then food and body. */}
+              {[
+                ["itch", "ticks", "coat"],
+                ["tummy", "picky", "weight", "joints"],
+              ].map((row) => (
+                <div key={row[0]} className="chips chips-quiet chips-row">
+                  {PROBLEMS.filter((p) => row.includes(p.id)).map((p) => (
                   <button
                     key={p.id}
                     className="chip"
@@ -684,8 +689,9 @@ export default function Onboarding() {
                   >
                     {p.label}
                   </button>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ))}
               <button className="pill" onClick={() => go("curating")}>
                 {name.trim() ? `See ${cap(name)}'s plan` : "See the plan"} <span className="arrow" aria-hidden />
               </button>

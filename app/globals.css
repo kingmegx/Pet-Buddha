@@ -12982,3 +12982,27 @@ body:has(.stage),
   line-height: 1.45 !important;
   color: rgba(251, 246, 239, 0.65) !important;
 }
+
+/* Breed step: the search sits a fixed distance under the heading block
+   (which starts at clamp(32px, 9vh, 88px) and is about 150px tall), so
+   the line under the title never runs into it on shorter screens. */
+.screen-breed .breed-pick {
+  top: max(28%, calc(clamp(32px, 9vh, 88px) + 190px));
+}
+
+/* Food step: body chips in two even rows (skin and coat, then food and
+   body). Each row stays on one line where there's room, and the rows sit
+   as close as the chips inside them. */
+.chips-row + .chips-row {
+  margin-top: -8px;
+}
+
+@media (min-width: 720px) {
+  .screen-food .chips-row {
+    flex-wrap: nowrap;
+    width: max-content;
+    max-width: 92vw;
+    align-self: center;
+    justify-content: center;
+  }
+}
