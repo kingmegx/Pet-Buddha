@@ -660,16 +660,23 @@ function ProductCard({ p, who, needs, tone }: { p: Product; who: string; needs: 
               <strong>Heads up.</strong> {warn}
             </p>
           )}
-          <span className="pcard-label">How to start</span>
-          <ol className="pcard-steps">
-            {p.start.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ol>
+          {/* Directions come from the store's own page, never ours. */}
+          <span className="pcard-label">How to use, from the store</span>
+          {p.start.length > 0 ? (
+            <ol className="pcard-steps">
+              {p.start.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ol>
+          ) : (
+            <p className="pcard-nodir">The store&apos;s page doesn&apos;t give directions. Ask them how to use it, and how much, for your dog.</p>
+          )}
           {p.dose && <DoseLine dose={p.dose} />}
-          <p className="pcard-caution">
-            <strong>Watch out.</strong> {p.caution}
-          </p>
+          {p.caution && (
+            <p className="pcard-caution">
+              <strong>Watch out.</strong> {p.caution}
+            </p>
+          )}
           <div className="pcard-links">
             <a className="pill" href={STORES[p.store].url + p.path} target="_blank" rel="noreferrer" tabIndex={flipped ? 0 : -1}>
               See it at the store <span className="arrow" aria-hidden />

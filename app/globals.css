@@ -13234,3 +13234,9 @@ body:has(.stage),
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.pcard-nodir {
+  margin: 0;
+  font-size: 14px !important;
+  color: #5c5650 !important;
+}
