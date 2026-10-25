@@ -1003,7 +1003,7 @@ export const COMPARE: Record<Bowl, Compare> = {
 export const PERFECT_BOWL: { id: string; label: string; share: number; color: string; line: string }[] = [
   { id: "meat", label: "Meat and organs", share: 55, color: "#d9654f", line: "The base. Muscle meat with a little liver or heart. This is where most of the protein and fat comes from." },
   { id: "fish", label: "Eggs and fish", share: 15, color: "#f2b33d", line: "Eggs, sardines or other oily fish. Egg protein matches what a dog's body needs, and fish brings omega-3 fats." },
-  { id: "veg", label: "Vegetables and greens", share: 20, color: "#7fb069", line: "Chopped, lightly cooked or raw: gobhi, palak, beans, pumpkin. Fibre for the gut, without much starch." },
+  { id: "veg", label: "Vegetables and greens", share: 20, color: "#7fb069", line: "Chopped, lightly cooked or raw: broccoli, pumpkin, green beans, carrot. Fibre for the gut, without much starch." },
   { id: "extra", label: "Fruit and toppers", share: 7, color: "#8c9cf5", line: "A few cubes of fruit or berries, and fresh toppers. Part of the 10% extras." },
   { id: "herbs", label: "Herbs and spices", share: 3, color: "#2e6a4c", line: "A pinch of haldi, jeera or dalchini, fresh coriander, and measured fresh garlic." },
 ];

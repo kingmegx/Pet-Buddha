@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { dietChart } from "@/lib/balance";
 import { garlicCloves } from "@/lib/plan";
 import type { Preset } from "./BalanceBowl";
@@ -24,7 +23,8 @@ function tsp(n: number) {
 }
 
 export function DietChart({ kg, months, need, who, onLoad, onExperts }: { kg: number; months: number; need: number; who: string; onLoad: (p: Omit<Preset, "key">) => void; onExperts: () => void }) {
-  const [meals, setMeals] = useState<2 | 3>(2);
+  // Puppies under 8 months eat three meals; after that, two meals with a snack in between.
+  const meals = months < 8 ? 3 : 2;
   const c = dietChart(kg, need);
   const per = (g: number) => Math.round(g / meals / 5) * 5;
   const garlic = garlicCloves(kg);
@@ -63,13 +63,7 @@ export function DietChart({ kg, months, need, who, onLoad, onExperts }: { kg: nu
             of fresh food a day for {who} at {kg} kg, about {need} calories
           </span>
         </div>
-        <div className="dc-meals" role="group" aria-label="Meals a day">
-          {[2, 3].map((m) => (
-            <button key={m} className={meals === m ? "is-on" : ""} aria-pressed={meals === m} onClick={() => setMeals(m as 2 | 3)}>
-              {m} meals
-            </button>
-          ))}
-        </div>
+        <span className="dc-meals-note">{meals === 3 ? "Split into 3 meals a day" : "Split into 2 meals a day, with a snack in between"}</span>
       </div>
 
       <ol className="dc-rows">
@@ -128,7 +122,7 @@ export function DietChart({ kg, months, need, who, onLoad, onExperts }: { kg: nu
 
       <div className="dc-gaps">
         <p>
-          <strong>Even a good home bowl misses a few things</strong>, like zinc, vitamin D and E, and iodine. The book&apos;s recipes add them as supplements. Load this bowl into Balance the bowl to see what&apos;s missing and what fixes it.
+          <strong>Even a good home bowl misses a few things</strong>, like zinc, vitamin D and E, and iodine. The book&apos;s recipes add them as supplements. Load this bowl into the checker above to see what&apos;s missing and what fixes it.
         </p>
         <button
           className="pill"
@@ -145,7 +139,7 @@ export function DietChart({ kg, months, need, who, onLoad, onExperts }: { kg: nu
             })
           }
         >
-          Check it in Balance the bowl <span className="arrow" aria-hidden />
+          Load it into the bowl above <span className="arrow" aria-hidden />
         </button>
       </div>
       <p className="dc-src">Built on the complete homemade recipes in The Forever Dog by Rodney Habib and Dr. Karen Becker, with Indian foods.</p>

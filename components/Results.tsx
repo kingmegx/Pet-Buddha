@@ -321,14 +321,14 @@ const NoLead = createContext(false);
 // Tips as small open cards: the action and its one line, all visible, no
 // clicking. Anything already in "start with these three" is left out. When
 // nothing was left out, the first card is marked "start here".
-function Tips({ tips, start = 0 }: { tips: Tip[]; start?: number }) {
+function Tips({ tips, start = 0, compact = false }: { tips: Tip[]; start?: number; compact?: boolean }) {
   const seen = useContext(SeenTips);
   const noLead = useContext(NoLead);
   const shown = tips.filter((t) => !seen.has(t.t));
   if (shown.length === 0) return null;
-  const lead = !noLead && shown.length === tips.length && shown.length > 1;
+  const lead = !compact && !noLead && shown.length === tips.length && shown.length > 1;
   return (
-    <ol className={`tc ${lead ? "has-lead" : ""}`}>
+    <ol className={`tc ${lead ? "has-lead" : ""} ${compact ? "tc-compact" : ""}`}>
       {shown.map((tip, i) => (
         <li key={tip.t} className={lead && i === 0 ? "tc-lead" : ""}>
           {lead && i === 0 && <span className="tl-start">start here</span>}
@@ -1216,199 +1216,25 @@ export function Results({
 
             {g.id === "food" && (
               <>
-                {/* 1. Why: their bowl next to a fresh one. */}
-                <Sub note={`What's in ${who === "your dog" ? "the" : `${Who}'s`} bowl now, next to a fresh one. Tap a row to see why it matters.`} short="why fresh">Why fresh food</Sub>
-                <BowlCompare bowl={bowl} needs={needs} who={Who} />
+                {/* 1. Their bowl first: what they eat now, checked against what a dog needs. */}
+                <Sub note={`Start with what ${who === "your dog" ? "they eat" : `${Who} eats`} now: change the amounts to match a real day, and see what's missing and what fixes it.`} short="balance the bowl">{who === "your dog" ? "Balance the bowl" : `Balance ${Who}'s bowl`}</Sub>
+                <BalanceBowl bowl={bowl} need={dailyCalories(kg)} who={Who} kg={kg} preset={preset} />
 
-                {/* 2. What a complete bowl looks like, and why not vegetarian. */}
-                <Sub note="What to aim for, whatever you feed now." short="perfect bowl">The perfect bowl</Sub>
-                <PerfectBowl />
-                <NoLead.Provider value={true}>
-                  <Tips tips={PERFECT_BOWL_RULES} />
-                </NoLead.Provider>
-                <FeatureFold title="Can a dog be vegetarian?" line="Short answer: no. What a dog's body needs that plants can't give, and why dal, rice and curd falls short." kind="bone" tone="#fbe0d2">
-                  <Tips tips={VEG_TIPS.filter((t) => !t.t.startsWith("Dal and soya"))} />
-                  {RECOMMENDED_KIBBLES.length > 0 && (
-                    <>
-                      <p className="s-feature-label">Packaged foods we recommend</p>
-                      <p className="s-links">
-                        {RECOMMENDED_KIBBLES.map((k) => (
-                          <a key={k.url} href={k.url} target="_blank" rel="noreferrer">
-                            {k.name} <span aria-hidden>→</span>
-                          </a>
-                        ))}
-                      </p>
-                    </>
-                  )}
-                  <p className="s-feature-label">Dal, rice and curd, piece by piece</p>
-                  <Tips tips={DAL_RICE_CURD} />
-                </FeatureFold>
-
-                {/* A day's bowl by the gram, for a healthy adult dog. */}
-                <Sub note={`What a complete fresh bowl looks like for ${Who} at ${kg} kg, by the gram, with Indian food.`} short="a day's bowl">{who === "your dog" ? "A day's bowl" : `A day's bowl for ${Who}`}</Sub>
-                <DietChart
+                {/* 2. Then one thing at a time: they pick what to see next. */}
+                <Sub note="Pick one. You can come back for the rest." short="what next">{`What next for ${Who}?`}</Sub>
+                <FoodNext
+                  bowl={bowl}
+                  needs={needs}
                   kg={kg}
                   months={months}
-                  need={dailyCalories(kg)}
-                  who={Who}
+                  who={who}
+                  Who={Who}
+                  products={products}
                   onLoad={(p) => {
                     setPreset({ key: Date.now(), ...p });
                     window.setTimeout(() => document.querySelector(".bb")?.closest(".s-panel")?.querySelectorAll(".s-subhead").forEach((h) => h.textContent?.startsWith("Balance") && h.scrollIntoView({ behavior: "smooth", block: "start" })), 50);
                   }}
-                  onExperts={() => document.getElementById("experts")?.scrollIntoView({ behavior: "smooth", block: "start" })}
                 />
-
-                {/* 3. Balance the bowl: check what they eat against all that. */}
-                <Sub note="Add what they eat in a day, and see how it stacks up against what a dog needs." short="balance the bowl">{who === "your dog" ? "Balance the bowl" : `Balance ${Who}'s bowl`}</Sub>
-                <BalanceBowl bowl={bowl} need={dailyCalories(kg)} who={Who} kg={kg} preset={preset} />
-
-                {/* 2. One easy first step, depending on the bowl. */}
-                {bowl && FRESH_BOWLS.includes(bowl) ? (
-                  <>
-                    <Sub note={bowl ? BOWL_NOTE[bowl] : undefined} short="first step">Your first step: make it complete</Sub>
-                    <Tips tips={HOMEMADE_TIPS} />
-                    <p className="s-links">
-                      {HOMEMADE_LINKS.map((l) => (
-                        <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
-                          {l.label} <span aria-hidden>→</span>
-                        </a>
-                      ))}
-                    </p>
-                    <Fold title="Fresh toppers to add" line="Easy fresh extras from your own kitchen, and how much of each.">
-                      <ToppersGrid />
-                      <Tips tips={TOPPER_AMOUNTS} />
-                    </Fold>
-                    <FeatureFold title="Why garlic? Isn't it toxic?" line={garlicCloves(kg) ? `It isn't onion. Why we add it, and ${who === "your dog" ? "how much" : `how much for ${Who}`}.` : "It isn't onion. Why we add it, and why very small dogs skip it."} kind="leaf" tone="#e6f5c9">
-                      <Tips
-                        tips={[
-                          ...GARLIC_WHY,
-                          {
-                            t: garlicCloves(kg) ? `For ${Who}: ${garlicCloves(kg)} a day` : "Very small dogs: skip it",
-                            d: garlicCloves(kg)
-                              ? `At ${kg} kg, up to ${garlicCloves(kg)} of fresh garlic a day, chopped into the food. Stop if they seem unwell.`
-                              : "Under 4.5 kg, leave garlic out. Onion is never safe at any size.",
-                            src: "The Forever Dog",
-                          },
-                        ]}
-                      />
-                      <p className="s-feature-label">The research, in plain words</p>
-                      <ul className="s-papers">
-                        {GARLIC_RESEARCH.map((r) => (
-                          <li key={r.url}>
-                            <a href={r.url} target="_blank" rel="noreferrer">
-                              {r.title}
-                            </a>
-                            <span className="s-papers-cite">{r.cite}</span>
-                            <span>{r.plain}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <p className="s-toilet-note">{GARLIC_CONTEXT}</p>
-                    </FeatureFold>
-                  </>
-                ) : (
-                  <>
-                    <Sub note="Keep their usual food. Add fresh bites, up to a tenth of the day's food." short="first step">Your first step: 10% fresh</Sub>
-                    <Tips tips={TOPPER_TIPS} />
-                    <ToppersGrid />
-                    <Fold title="How much of each?" line="Organs, sardines, spices, and what to do if they're chubby.">
-                      <Tips
-                        tips={[
-                          ...TOPPER_AMOUNTS,
-                        ]}
-                      />
-                    </Fold>
-                    <FeatureFold title="Why garlic? Isn't it toxic?" line={garlicCloves(kg) ? `It isn't onion. Why we add it, and ${who === "your dog" ? "how much" : `how much for ${Who}`}.` : "It isn't onion. Why we add it, and why very small dogs skip it."} kind="leaf" tone="#e6f5c9">
-                      <Tips
-                        tips={[
-                          ...GARLIC_WHY,
-                          {
-                            t: garlicCloves(kg) ? `For ${Who}: ${garlicCloves(kg)} a day` : "Very small dogs: skip it",
-                            d: garlicCloves(kg)
-                              ? `At ${kg} kg, up to ${garlicCloves(kg)} of fresh garlic a day, chopped into the food. Stop if they seem unwell.`
-                              : "Under 4.5 kg, leave garlic out. Onion is never safe at any size.",
-                            src: "The Forever Dog",
-                          },
-                        ]}
-                      />
-                      <p className="s-feature-label">The research, in plain words</p>
-                      <ul className="s-papers">
-                        {GARLIC_RESEARCH.map((r) => (
-                          <li key={r.url}>
-                            <a href={r.url} target="_blank" rel="noreferrer">
-                              {r.title}
-                            </a>
-                            <span className="s-papers-cite">{r.cite}</span>
-                            <span>{r.plain}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <p className="s-toilet-note">{GARLIC_CONTEXT}</p>
-                    </FeatureFold>
-
-                    {/* 3. How far to go. */}
-                    <Sub note={bowl ? BOWL_NOTE[bowl] : "Every bit of fresh food counts. Pick how far you want to go."} short="how far to go">When you're ready for more</Sub>
-                    <Ladder start={bowl ? LADDER_START[bowl] : LADDER[0].id} />
-                    <Fold title="Making it at home" line="What makes a home-made bowl complete, not just fresh.">
-                      <Tips tips={HOMEMADE_TIPS} />
-                      <p className="s-links">
-                        {HOMEMADE_LINKS.map((l) => (
-                          <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
-                            {l.label} <span aria-hidden>→</span>
-                          </a>
-                        ))}
-                      </p>
-                    </Fold>
-                  </>
-                )}
-
-                {/* Ready-made toppers for what they told us. Gap fillers sit in Balance the bowl. */}
-                {(() => {
-                  const kinds = (
-                    [
-                      ["joints", needs.includes("joints")],
-                      ["gut", needs.includes("tummy")],
-                      ["picky", needs.includes("picky")],
-                      ["slim", needs.includes("weight")],
-                    ] as [KindId, boolean][]
-                  )
-                    .filter(([, on]) => on)
-                    .map(([id]) => id);
-                  if (kinds.length === 0) return null;
-                  return (
-                    <>
-                      <Sub note="Ready-made toppers, picked for what you told us. You don't need all of them; start with one." short="toppers">Toppers that help</Sub>
-                      {kinds.map((id) => (
-                        <KindShelf key={id} id={id} products={products} who={who} needs={needs} />
-                      ))}
-                      <p className="s-note">Photos, prices, directions and doses from each store&apos;s own product page, read on 24 Oct 2026. Check the store before you buy.</p>
-                    </>
-                  );
-                })()}
-
-                {/* 4. Kitchen rules, in one switchable section. */}
-                <Sub note={`${who === "your dog" ? "A grown dog" : Who} at ${kg} kg needs roughly ${dailyCalories(kg)} calories a day, more if very active.`} short="kitchen rules">Kitchen rules</Sub>
-                <KitchenRules kg={kg} months={months} />
-
-                <Sub short="questions">Questions people ask</Sub>
-                <Faq items={FOOD_FAQ} />
-
-                {/* 5. Their tummy, picky or weight problems, if ticked. */}
-                {(["tummy", "picky", "weight", "joints"] as ProblemId[])
-                  .filter((p) => needs.includes(p))
-                  .map((p) => (
-                    <TipSection key={p} tips={BODY_TIPS[p]!} title={PROBLEMS.find((x) => x.id === p)!.label} keep />
-                  ))}
-
-                {/* 6. Tools and research, folded away. */}
-                {!(bowl && FRESH_BOWLS.includes(bowl)) && (
-                  <>
-                    <Sub short="check the bag">Check the bag</Sub>
-                    <Fold title="How much starch is in their food?" line="Work it out from the numbers on the label.">
-                      <StarchCheck />
-                    </Fold>
-                  </>
-                )}
 
                 <p className="s-note">
                   {FOOD_CREDIT.text}{" "}
@@ -1572,6 +1398,211 @@ export function Results({
     </OpenElim.Provider>
     </OpenToys.Provider>
     </DogSize.Provider>
+  );
+}
+
+// The Food tab after Balance the bowl: a short row of choices, and only the
+// one they pick opens. Progressive: the diet chart is made when they ask.
+type NextId = "perfect" | "start" | "why" | "help" | "rules" | "faq";
+
+function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bowl: Bowl | null; needs: ProblemId[]; kg: number; months: number; who: string; Who: string; products: Product[]; onLoad: (p: Omit<Preset, "key">) => void }) {
+  const [pick, setPick] = useState<NextId | null>(null);
+  const [chart, setChart] = useState<"no" | "making" | "yes">("no");
+  const fresh = !!bowl && FRESH_BOWLS.includes(bowl);
+  const packaged = !bowl || bowl === "kibble" || bowl === "mix";
+  const body = (["tummy", "picky", "weight", "joints"] as ProblemId[]).filter((p) => needs.includes(p));
+  const kinds = (
+    [
+      ["joints", needs.includes("joints")],
+      ["gut", needs.includes("tummy")],
+      ["picky", needs.includes("picky")],
+      ["slim", needs.includes("weight")],
+    ] as [KindId, boolean][]
+  )
+    .filter(([, on]) => on)
+    .map(([id]) => id);
+  const helpLabel = body.map((p) => PROBLEMS.find((x) => x.id === p)!.label.toLowerCase()).join(" and ");
+
+  const choices: { id: NextId; label: string; line: string; kind: StickerKind; tone: string; on: boolean }[] = [
+    { id: "perfect", label: `${Who}'s perfect bowl`, line: "What to aim for, and a diet chart by the gram.", kind: "bowl", tone: "#e6f5c9", on: true },
+    { id: "start", label: fresh ? "Make the bowl complete" : "Start adding fresh food", line: fresh ? "What to add so nothing's missing." : "One small first step, then more.", kind: "leaf", tone: "#fbe0d2", on: true },
+    { id: "why", label: "Why fresh food?", line: "Their bowl next to a fresh one.", kind: "sparkle", tone: "#fde3b0", on: packaged },
+    { id: "help", label: `Help with ${helpLabel}`, line: "Tips and toppers for what you told us.", kind: "heart", tone: "#ddd3f7", on: body.length > 0 },
+    { id: "rules", label: "Kitchen rules", line: "Safe foods, unsafe foods, how much.", kind: "paw", tone: "#c9d3ff", on: true },
+    { id: "faq", label: "Questions people ask", line: "Curd rice, rice for tummies, and more.", kind: "nose", tone: "#fbe0d2", on: true },
+  ];
+  const shown = choices.filter((c) => c.on);
+  const open = (id: NextId) => {
+    setPick(pick === id ? null : id);
+    window.setTimeout(() => document.getElementById("food-next-open")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+  };
+  const makeChart = () => {
+    setChart("making");
+    window.setTimeout(() => setChart("yes"), 900);
+  };
+
+  const garlic = (
+    <FeatureFold title="Why garlic? Isn't it toxic?" line={garlicCloves(kg) ? `It isn't onion. Why we add it, and ${who === "your dog" ? "how much" : `how much for ${Who}`}.` : "It isn't onion. Why we add it, and why very small dogs skip it."} kind="leaf" tone="#e6f5c9">
+      <Tips
+        compact
+        tips={[
+          ...GARLIC_WHY,
+          {
+            t: garlicCloves(kg) ? `For ${Who}: ${garlicCloves(kg)} a day` : "Very small dogs: skip it",
+            d: garlicCloves(kg) ? `At ${kg} kg, up to ${garlicCloves(kg)} of fresh garlic a day, chopped into the food. Stop if they seem unwell.` : "Under 4.5 kg, leave garlic out. Onion is never safe at any size.",
+            src: "The Forever Dog",
+          },
+        ]}
+      />
+      <p className="s-feature-label">The research, in plain words</p>
+      <ul className="s-papers">
+        {GARLIC_RESEARCH.map((r) => (
+          <li key={r.url}>
+            <a href={r.url} target="_blank" rel="noreferrer">
+              {r.title}
+            </a>
+            <span className="s-papers-cite">{r.cite}</span>
+            <span>{r.plain}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="s-toilet-note">{GARLIC_CONTEXT}</p>
+    </FeatureFold>
+  );
+  const links = (
+    <p className="s-links">
+      {HOMEMADE_LINKS.map((l) => (
+        <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
+          {l.label} <span aria-hidden>→</span>
+        </a>
+      ))}
+    </p>
+  );
+
+  return (
+    <div className="fn">
+      <div className={`fn-choices n-${shown.length}`}>
+        {shown.map((c) => (
+          <button key={c.id} className={`fn-choice ${pick === c.id ? "is-on" : ""}`} onClick={() => open(c.id)} aria-expanded={pick === c.id}>
+            <span className="fn-sticker" aria-hidden>
+              <Sticker kind={c.kind} tone={c.tone} ink="#211e1c" />
+            </span>
+            <span className="fn-words">
+              <strong>{c.label}</strong>
+              <small>{c.line}</small>
+            </span>
+            {/* A round button, like "How it helps +" on product cards: plus to open, minus to close. */}
+            <span className="fn-plus" aria-hidden>
+              <svg viewBox="0 0 20 20" width="14" height="14">
+                <path d={pick === c.id ? "M4 10h12" : "M10 4v12M4 10h12"} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <AnimatePresence mode="wait">
+        {pick && (
+          <motion.div key={pick} id="food-next-open" className="fn-open" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }}>
+            {pick === "perfect" && (
+              <>
+                <PerfectBowl />
+                <NoLead.Provider value={true}>
+                  <Tips compact tips={PERFECT_BOWL_RULES} />
+                </NoLead.Provider>
+                {chart === "yes" ? (
+                  <DietChart kg={kg} months={months} need={dailyCalories(kg)} who={Who} onLoad={onLoad} onExperts={() => document.getElementById("experts")?.scrollIntoView({ behavior: "smooth", block: "start" })} />
+                ) : (
+                  <div className="fn-cta">
+                    <p>
+                      <strong>Want this as a plan?</strong> We&apos;ll size a general diet chart for {Who} at {kg} kg, in grams, with Indian food.
+                    </p>
+                    <button className="pill" onClick={makeChart} disabled={chart === "making"}>
+                      {chart === "making" ? `Making ${Who}'s chart…` : `Make ${Who}'s diet chart`} <span className="arrow" aria-hidden />
+                    </button>
+                  </div>
+                )}
+                {bowl === "veg" && (
+                  <FeatureFold title="Can a dog be vegetarian?" line="Short answer: no. What a dog's body needs that plants can't give, and why dal, rice and curd falls short." kind="bone" tone="#fbe0d2">
+                    <Tips compact tips={VEG_TIPS.filter((t) => !t.t.startsWith("Dal and soya"))} />
+                    <p className="s-feature-label">Dal, rice and curd, piece by piece</p>
+                    <Tips compact tips={DAL_RICE_CURD} />
+                  </FeatureFold>
+                )}
+              </>
+            )}
+
+            {pick === "start" &&
+              (fresh ? (
+                <>
+                  {bowl && <p className="fn-lead">{BOWL_NOTE[bowl]}</p>}
+                  <Tips compact tips={HOMEMADE_TIPS} />
+                  {links}
+                  <Fold title="Fresh toppers to add" line="Easy fresh extras from your own kitchen, and how much of each.">
+                    <ToppersGrid />
+                    <Tips compact tips={TOPPER_AMOUNTS} />
+                  </Fold>
+                  {garlic}
+                </>
+              ) : (
+                <>
+                  <p className="fn-lead">Keep their usual food. Add fresh bites, up to a tenth of the day&apos;s food.</p>
+                  <Tips compact tips={TOPPER_TIPS} />
+                  <Fold title="Fresh toppers, and how much" line="Organs, sardines, spices, and what to do if they're chubby.">
+                    <ToppersGrid />
+                    <Tips compact tips={TOPPER_AMOUNTS} />
+                  </Fold>
+                  {garlic}
+                  <Fold title="When you're ready for more" line="A quarter, half, or all fresh: what each step looks like.">
+                    <Ladder start={bowl ? LADDER_START[bowl] : LADDER[0].id} />
+                  </Fold>
+                  <Fold title="Making it at home" line="What makes a home-made bowl complete, not just fresh.">
+                    <Tips compact tips={HOMEMADE_TIPS} />
+                    {links}
+                  </Fold>
+                </>
+              ))}
+
+            {pick === "why" && <BowlCompare bowl={bowl} needs={needs} who={Who} />}
+
+            {pick === "help" && (
+              <>
+                {body.map((p) => (
+                  <div key={p} className="fn-group">
+                    <h4>{PROBLEMS.find((x) => x.id === p)!.label}</h4>
+                    <Tips compact tips={BODY_TIPS[p]!} />
+                  </div>
+                ))}
+                {kinds.map((id) => (
+                  <KindShelf key={id} id={id} products={products} who={who} needs={needs} />
+                ))}
+                {kinds.length > 0 && <p className="s-note">Photos, prices, directions and doses from each store&apos;s own product page, read on 24 Oct 2026. Check the store before you buy.</p>}
+              </>
+            )}
+
+            {pick === "rules" && (
+              <>
+                <p className="fn-lead">
+                  {who === "your dog" ? "A grown dog" : Who} at {kg} kg needs roughly {dailyCalories(kg)} calories a day, more if very active.
+                </p>
+                <KitchenRules kg={kg} months={months} />
+              </>
+            )}
+
+            {pick === "faq" && (
+              <>
+                <Faq items={FOOD_FAQ} />
+                {packaged && (
+                  <Fold title="How much starch is in their food?" line="Work it out from the numbers on the bag.">
+                    <StarchCheck />
+                  </Fold>
+                )}
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
