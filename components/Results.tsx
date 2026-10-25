@@ -1628,7 +1628,7 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bow
                 <>
                   <p className="fn-lead">Keep their usual food. Add fresh bites, up to a tenth of the day&apos;s food.</p>
                   <Tips compact tips={TOPPER_TIPS} />
-                  <Fold title="Fresh toppers, and how much" line="Organs, sardines, spices, and what to do if they're chubby.">
+                  <Fold title="Fresh toppers, and how much" line="Organs, sardines, spices, and how to keep their weight in check.">
                     <ToppersGrid />
                     <Tips compact tips={TOPPER_AMOUNTS} />
                   </Fold>

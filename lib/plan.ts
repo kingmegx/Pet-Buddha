@@ -534,7 +534,7 @@ export const TOPPER_AMOUNTS: Tip[] = [
   { t: "Organs: a paw a day", d: "Liver and other organs are rich. About the size of your dog's paw is plenty for a day." },
   { t: "Sardines: 1 per 9 kg", d: "One sardine for every 9 kg of dog, two or three times a week." },
   { t: "Spices: a pinch per 5 kg", d: "A pinch (about ⅛ tsp) of a dried spice for every 5 kg, mixed into the food. Fresh herbs: ¼ tsp per 9 kg." },
-  { t: "Chubby dog? Swap, don't add", d: "If they need to lose weight, take 10% of their food away and replace it with toppers." },
+  { t: "Watching their weight? Swap, don't add", d: "Take 10% of their usual food away and give fresh toppers in its place, so the bowl stays the same size." },
 ];
 
 // Step 2: how much of the bowl to make fresh. "Fresh" means lightly
@@ -683,7 +683,7 @@ export const BODY_TIPS: Partial<Record<ProblemId, Tip[]>> = {
     { t: "Ginger for gas", d: "Cooled ginger tea on the food can ease bloating, gas and acid reflux.", src: "@georginaskitchen.india" },
   ],
   picky: [
-    { t: "Start with organs", d: "Few dogs refuse tiny bits of cooked liver or chicken heart. Cook carrots in with them, then less and less." },
+    { t: "Make it smell like food", d: "Picky eaters often come round for a stronger smell. Put a few tiny bits of cooked liver or chicken heart on top, then use less and less as they start eating." },
     { t: "Hide it, chop it fine", d: "Mix new foods right into the usual food, very finely chopped. A spoon of plain broth helps." },
     { t: "Meal times only", d: "Pick the bowl up between meals. A dog that grazes all day has no reason to be keen." },
   ],
@@ -696,7 +696,7 @@ export const BODY_TIPS: Partial<Record<ProblemId, Tip[]>> = {
     { t: "Start before it hurts", d: "Big and long-backed breeds are prone to joint trouble later. Joint support can start once they're fully grown.", src: "Doggiliciouus" },
   ],
   weight: [
-    { t: "Chonky isn't cute", d: "Extra weight brings joint, metabolic and inflammation trouble. It's worth acting on, not laughing off.", src: "@whatsinmydogbowl" },
+    { t: "A lighter dog, more good years", d: "Even a little extra weight puts strain on the joints and the body. Bringing it down gently is one of the kindest things you can do for them.", src: "@whatsinmydogbowl" },
     { t: "Swap, don't add", d: "Take 10% of their food away and give fresh toppers in its place." },
     { t: "1% a week", d: "Aim to lose about 1% of body weight a week. Weigh them weekly." },
     { t: "A shorter window", d: "Feed within 10 hours for two weeks, then 8 hours. Ask your vet to set the target weight." },
