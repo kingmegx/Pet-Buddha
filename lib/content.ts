@@ -248,6 +248,7 @@ export const STORES = {
   hpo: { name: "Happy Puppy Organics", url: "https://happypuppyorganics.com", shops: "" },
   nutkit: { name: "Nutkit", url: "https://www.nutkit.co.in", shops: "" },
   dgl: { name: "Doggiliciouus", url: "https://doggiliciouus.com", shops: "" },
+  amazon: { name: "Amazon", url: "https://www.amazon.in", shops: "" },
 };
 
 // sniff, puzzle and chew are brain toys; soothe, wash, inside and ticks are
@@ -303,7 +304,7 @@ export const KINDS: { id: KindId; label: string; lead: string; lookFor: string[]
   {
     id: "ticks",
     label: "For ticks",
-    lead: "A natural spray to make your dog less inviting to ticks.",
+    lead: "Natural sprays, powders and balms that make your dog less inviting to ticks and fleas.",
     lookFor: ["Plant-based, with no synthetic pesticides.", "Light enough to use before every walk."],
     skip: "Relying on a spray alone. Check for ticks after every walk.",
   },
@@ -386,6 +387,8 @@ export type Product = {
   notFor?: { problem: ProblemId; note: string };
   // Shown as a small tag when the store had it out of stock when we checked.
   soldOut?: boolean;
+  // Other shelves it also belongs on (e.g. Scooby-dub-dub for ticks too).
+  also?: KindId[];
   // The store's feeding guide, where it has one. Doggiliciouus doses go up
   // in step with weight: about one unit per 10 kg, from ¼ up to 4.
   dose?: Dose;
@@ -573,6 +576,7 @@ export const PRODUCTS: Product[] = [
     why: "It helps get rid of ticks and fleas, and heals skin issues like fungal infections, eczema, flea dermatitis, heavy fur fall, hot spots and rashes. The store says it's very effective for mange and scabies too.",
     start: ["Mix the powder with cold-pressed coconut oil (or aloe vera gel, or another dog-safe cold-pressed oil).", "Massage it into the skin before a bath.", "Leave it on for at least 15 minutes and up to an hour.", "Wash it off with a natural soap or a mild shampoo.", "Between baths, dry powder on the skin helps keep ticks and fleas away and manages itching. It's safe every day and doesn't need washing off."],
     caution: "Licking it is harmless, but the more they lick off, the less is left working on the skin. For atopic dermatitis or very sensitive skin, the store suggests bathing with Quicky Clean with a spoon of Scooby-dub-dub added instead.",
+    also: ["ticks"],
   },
   {
     id: "french-clay",
@@ -1220,6 +1224,45 @@ export const PRODUCTS: Product[] = [
     caution: "For a diagnosed heart condition or heart medicine, use it with your vet.",
     dose: { unit: "scoop", times: "twice a day", puppy: "3 to 6 months: 2 to 3 pinches, twice a day. 6 to 12 months: half the adult dose." },
     fromMonths: 3,
+  },
+  {
+    id: "huft-tick-spray",
+    kind: "ticks",
+    store: "huft",
+    name: "Organic Anti-Tick and Flea Spray",
+    price: "Rs. 499 (200 ml)",
+    image: "https://cdn.shopify.com/s/files/1/0086/0795/7054/files/DSC_9027copy.jpg?v=1762415193",
+    path: "/products/huft-organic-anti-flea-and-tick-spray-200ml",
+    plain: "A natural spray of lemongrass and geranium oils.",
+    why: "It repels ticks and fleas for a couple of hours at a time, and is gentle enough to use all year before outdoor play.",
+    start: ["Ruffle the coat and spray directly onto the skin: back, tail, legs and belly.", "For the head, rub a little on your palms and work it in around the ears.", "Keep it away from the eyes and mouth."],
+    caution: "For dogs over 8 weeks old.",
+  },
+  {
+    id: "huft-paw-balm",
+    kind: "ticks",
+    store: "huft",
+    name: "Organic Anti-Tick and Flea Paw Balm",
+    price: "Rs. 299 (25 g)",
+    image: "https://cdn.shopify.com/s/files/1/0086/0795/7054/files/DSC_9143copycopy.jpg?v=1773811190",
+    path: "/products/huft-organic-paw-butter-for-dogs-15gms",
+    plain: "A plant-wax paw balm with tick- and flea-repelling oils.",
+    why: "It softens cracked, dry paw pads and its essential oils help keep ticks and fleas off: paws pick them up first on walks.",
+    start: ["Take a little on your fingertips.", "Apply to clean paw pads.", "Use as often as needed."],
+    caution: "",
+  },
+  {
+    id: "bragg-acv",
+    kind: "ticks",
+    store: "amazon",
+    name: "Bragg Raw Apple Cider Vinegar",
+    price: "Rs. 699 (473 ml)",
+    image: "https://m.media-amazon.com/images/I/71EdgjDu2kL._SL1500_.jpg",
+    path: "/dp/B000R73XZ0",
+    plain: "Raw, unfiltered apple cider vinegar, with the mother.",
+    why: "A holistic way to make your dog less appealing to ticks and fleas, from the inside. Not proven, but harmless.",
+    start: [],
+    caution: "Our suggestion, not the label's: about ½ teaspoon per 10 kg a day, mixed into food. Keep up the tick checks.",
   },
   {
     id: "quicky-clean",

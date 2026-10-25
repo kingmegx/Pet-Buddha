@@ -13633,3 +13633,31 @@ body:has(.stage),
     padding-right: 24px;
   }
 }
+
+.skin-food-go a.pill {
+  text-decoration: none !important;
+  color: var(--ink) !important;
+}
+
+/* Research links inside slide-up sheets read like the rest of the site. */
+.toys-sheet .s-papers a {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.toys-sheet .s-papers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+
+.toys-sheet .s-papers li {
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+  color: #5c5650;
+}

@@ -16,7 +16,7 @@ export type GroupId = "energy" | "toilet" | "walks" | "alone" | "food" | "skin";
 // `for`: the problems a tip answers, so a plan can lead with what was asked.
 // `go: "toys"` adds a "Check out brain toys" link that opens the toy shelf;
 // `go: "elimination"` links to the guide to finding a food allergy.
-export type Tip = { t: string; d: string; src?: string; for?: ProblemId[]; go?: "toys" | "elimination" };
+export type Tip = { t: string; d: string; src?: string; for?: ProblemId[]; go?: "toys" | "elimination" | "garlic" };
 
 export type Expert = {
   id: string;
@@ -225,6 +225,10 @@ export const EXPERTS: Expert[] = [
       nip: "Free videos on puppy biting and what to do instead.",
       bark: "Free videos on why dogs bark and how to calm the barking.",
       alone: "Free videos on teaching a dog to be alone.",
+      busy: "Free videos full of brain games and tricks to keep a busy dog's mind working.",
+      settle: "Free videos on teaching a calm settle and an off switch.",
+      night: "Free videos on calm routines, so evenings wind down.",
+      mark: "Free videos on marking indoors and how to stop it.",
     },
   },
   {
@@ -347,10 +351,15 @@ export const GROUPS: Group[] = [
       },
     },
     tips: [
-      { t: "Slow the walk", d: "Let them stop and sniff. Ten minutes of their choosing beats thirty at your pace.", for: ["busy", "settle"] },
+      // Brain games first: a busy dog needs a job for the mind, not more rest advice.
       { t: "Make food a job", d: "Scatter part of a meal, or use a snuffle mat, instead of a bowl.", for: ["busy", "chew"], go: "toys" },
+      { t: "Hide and find", d: "Hide a few treats around a room and say \"find it\". Start in plain sight, then make it harder. Five minutes of nose work tires the brain.", for: ["busy", "settle"], go: "toys" },
+      { t: "Lick to calm", d: "Spread curd or mashed pumpkin on a lick mat, or freeze it to last longer. Licking is soothing and slows them right down.", for: ["settle", "busy"], go: "toys" },
+      { t: "Muffin-tray puzzle", d: "Drop treats into a muffin tray and cover each cup with a ball or a scrunched sock. They work out how to get them: a free brain game.", for: ["busy"] },
+      { t: "Slow the walk", d: "Let them stop and sniff. Ten minutes of their choosing beats thirty at your pace.", for: ["busy", "settle"] },
+      { t: "Teach a settle", d: "When they lie down calmly on a mat, drop a treat between their paws. Short and often, and they learn that calm pays.", for: ["settle"] },
       { t: "Give a chew", d: "Something safe to work on, lying down, when you need them to switch off.", for: ["chew", "settle"], go: "toys" },
-      { t: "Let them sleep", d: "Grown dogs need 12 to 15 hours of sleep a day, puppies 16 to 18. A tired, rested dog is calmer.", src: "@kaninenutrition", for: ["settle", "night"] },
+      { t: "Plan quiet time", d: "Grown dogs need 12 to 15 hours of sleep a day. After a brain game, give them a quiet spot and leave them be for an hour.", src: "@kaninenutrition", for: ["night"] },
       { t: "Wind down at night", d: "A slow, sniffy evening walk and a chew on their bed, then lights down. No rough play in the last hour.", for: ["night"] },
       { t: "Swap, don't scold", d: "When teeth land on hands or furniture, swap in a toy, then praise them for taking it.", for: ["nip", "chew"] },
     ],
@@ -438,7 +447,8 @@ export const GROUPS: Group[] = [
       { t: "Check after walks", d: "Clean paws after every walk. Run your fingers over ears, neck, armpits and between toes for ticks.", src: "@kaninenutrition", for: ["ticks"] },
       { t: "Part the fur", d: "Brush short fur against the grain and part long fur, so you see the skin, not just the coat.", src: "@backintheday.in", for: ["ticks", "coat"] },
       { t: "Treat the home too", d: "Ticks and fleas live in bedding and corners. Wash bedding hot; food-grade diatomaceous earth helps in the home.", src: "@backintheday.in", for: ["ticks"] },
-      { t: "Apple cider vinegar, maybe", d: "Some owners add a splash of raw apple cider vinegar to food daily to make them less tasty to ticks. Not proven, but harmless. Don't skip real tick checks.", src: "@backintheday.in", for: ["ticks"] },
+      { t: "Apple cider vinegar in the bowl", d: "A holistic way to make them less appealing to ticks and fleas: raw, unfiltered apple cider vinegar in their food, about ½ teaspoon per 10 kg a day. Not proven, but harmless. Keep up the tick checks.", src: "@backintheday.in", for: ["ticks"] },
+      { t: "Fresh garlic, measured", d: "Fresh garlic is another holistic tick and flea deterrent. In measured amounts by weight, it isn't toxic: it isn't onion.", for: ["ticks"], go: "garlic" },
       { t: "It could be a food", d: "They could be reacting to something you give every day, often a protein like chicken. Once you know which, swap it for quail, duck, mutton or buffalo, rotating every few days.", src: "@carnikitchen", for: ["itch"], go: "elimination" },
       { t: "Add good fats", d: "Omega-3 from fish such as salmon or sardines helps calm itchy, inflamed skin.", src: "@canine_india", for: ["itch", "coat"] },
       { t: "Deworm properly", d: "Herbal dewormers aren't enough on their own, especially in India. Test and treat with your vet.", src: "@happypuppyorganics", for: ["itch"] },

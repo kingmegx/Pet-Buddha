@@ -187,7 +187,7 @@ const DogSize = createContext<{ kg: number; months: number; name: string }>({ kg
 // One kind of product: its sticker, what to look for, then the cards.
 function KindShelf({ id, products, who, needs }: { id: KindId; products: Product[]; who: string; needs: ProblemId[] }) {
   const k = KINDS.find((x) => x.id === id)!;
-  const shown = products.filter((p) => p.kind === id);
+  const shown = products.filter((p) => p.kind === id || p.also?.includes(id));
   if (shown.length === 0) return null;
   return (
     <div className={`s-kind s-kind-${id}`}>
@@ -245,6 +245,7 @@ function WeekCards({ tips }: { tips: Tip[] }) {
             <span className="wk-text">{tip.d}</span>
             {tip.go === "toys" && <ToysLink />}
             {tip.go === "elimination" && <ElimLink />}
+            {tip.go === "garlic" && <GarlicLink />}
           </motion.li>
         );
       })}
@@ -295,6 +296,17 @@ function ToysLink() {
 
 // Opens the guide to finding a food allergy.
 const OpenElim = createContext<() => void>(() => {});
+// Opens "Isn't garlic toxic?", with this dog's amount.
+const OpenGarlic = createContext<() => void>(() => {});
+
+function GarlicLink() {
+  const open = useContext(OpenGarlic);
+  return (
+    <button className="toys-link" onClick={open}>
+      <span className="link-words">Isn&apos;t garlic toxic?</span> <span aria-hidden>→</span>
+    </button>
+  );
+}
 
 function ElimLink() {
   const open = useContext(OpenElim);
@@ -338,6 +350,7 @@ function Tips({ tips, start = 0, compact = false }: { tips: Tip[]; start?: numbe
           {tip.src && <em className="s-src">From {tip.src}</em>}
           {tip.go === "toys" && <ToysLink />}
           {tip.go === "elimination" && <ElimLink />}
+            {tip.go === "garlic" && <GarlicLink />}
         </li>
       ))}
     </ol>
@@ -409,7 +422,7 @@ function ExpertCard({ e, hideKind = false, pick = null }: { e: Expert; hideKind?
 // A tab's people: four at first, the rest on request, so the list stays scannable.
 // The tab's people, best fit first. The first one with a reason for the
 // owner's first problem is highlighted, with that reason on the card.
-function Experts({ ids, needs }: { ids: string[]; needs: ProblemId[] }) {
+function Experts({ ids, needs, prefer }: { ids: string[]; needs: ProblemId[]; prefer?: string }) {
   const [all, setAll] = useState(false);
   const reason = (id: string) => {
     const e = expert(id);
@@ -420,8 +433,10 @@ function Experts({ ids, needs }: { ids: string[]; needs: ProblemId[] }) {
     const i = needs.findIndex((x) => expert(id).goodFor?.[x]);
     return i === -1 ? 99 : i;
   };
-  const ordered = [...ids].sort((a, b) => rank(a) - rank(b));
-  const pick = ordered.find((id) => reason(id));
+  // On training tabs the trainer leads, whatever else fits.
+  const lead = prefer && ids.includes(prefer) && reason(prefer) ? prefer : null;
+  const ordered = [...ids].sort((a, b) => (a === lead ? -1 : b === lead ? 1 : rank(a) - rank(b)));
+  const pick = lead ?? ordered.find((id) => reason(id));
   const shown = all ? ordered : ordered.slice(0, 4);
   return (
     <>
@@ -944,17 +959,19 @@ export function Results({
   // The diet chart's bowl, loaded into Balance the bowl.
   const [preset, setPreset] = useState<Preset | null>(null);
   const [elim, setElim] = useState(false);
+  const [garlicOpen, setGarlicOpen] = useState(false);
   // Escape closes the toy shelf and the food-allergy guide.
   useEffect(() => {
-    if (!toys && !elim) return;
+    if (!toys && !elim && !garlicOpen) return;
     const close = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       setToys(false);
       setElim(false);
+      setGarlicOpen(false);
     };
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
-  }, [toys, elim]);
+  }, [toys, elim, garlicOpen]);
   const order: KindId[] = needs.includes("chew") || needs.includes("nip") ? ["chew", "sniff", "puzzle"] : ["sniff", "puzzle", "chew"];
   const rules = needs.includes("chew") || needs.includes("nip");
 
@@ -998,6 +1015,7 @@ export function Results({
     <DogSize.Provider value={{ kg, months, name: Who }}>
     <OpenToys.Provider value={() => setToys(true)}>
     <OpenElim.Provider value={() => setElim(true)}>
+    <OpenGarlic.Provider value={() => setGarlicOpen(true)}>
     <SeenTips.Provider value={new Set(week.map((t) => t.t))}>
     <div className="results sugg">
       <div className="results-bar">
@@ -1176,6 +1194,8 @@ export function Results({
                   </>
                 )}
 
+                {(needs.includes("itch") || needs.includes("coat")) && (
+                  <>
                 {/* Start with the bowl: itching usually starts there. */}
                 <div className="skin-food is-small">
                   <span className="s-feature-sticker" aria-hidden>
@@ -1194,6 +1214,28 @@ export function Results({
                     </button>
                   </div>
                 </div>
+                  </>
+                )}
+                {/* Ticks: two holistic helps from the bowl. */}
+                {needs.includes("ticks") && (
+                  <div className="skin-food is-small">
+                    <span className="s-feature-sticker" aria-hidden>
+                      <Sticker kind="bowl" tone="#fbf6ef" ink="#211e1c" />
+                    </span>
+                    <strong>Help from the bowl.</strong>
+                    <p>
+                      Two holistic ways to make {Who} less appealing to ticks and fleas: a little raw apple cider vinegar in the food (about ½ teaspoon per 10 kg a day), and measured fresh garlic. Not a replacement for tick checks after walks.
+                    </p>
+                    <div className="skin-food-go">
+                      <a className="pill" href="https://www.amazon.in/dp/B000R73XZ0" target="_blank" rel="noreferrer">
+                        Get the apple cider vinegar <span className="arrow" aria-hidden />
+                      </a>
+                      <button className="skin-food-link" onClick={() => setGarlicOpen(true)}>
+                        <span className="link-words">Isn&apos;t garlic toxic?</span> <span aria-hidden>→</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 <Sub note="Picked for what you told us. You don't need all of them; start with one." short="things that help">Things that help</Sub>
                 {(
@@ -1249,7 +1291,7 @@ export function Results({
 
             <div id="experts" />
             <Sub note="People we trust for this. Follow them, or book them if you need a hand." short="who to follow">People to learn from</Sub>
-            <Experts ids={g.experts} needs={needs} />
+            <Experts ids={g.experts} needs={needs} prefer={["energy", "toilet", "walks", "alone"].includes(g.id) ? "zak" : undefined} />
 
             {groups.length > 1 && (
               <NextTab groups={groups} needs={needs} current={g.id} onGo={showTab} />
@@ -1352,6 +1394,43 @@ export function Results({
         )}
       </AnimatePresence>
 
+      {/* Isn't garlic toxic? Why we add it, and how much for this dog. */}
+      <AnimatePresence>
+        {garlicOpen && (
+          <motion.div className="toys" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setGarlicOpen(false)}>
+            <motion.div className="toys-sheet elim-sheet" role="dialog" aria-label="Is garlic toxic for dogs?" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ type: "spring", stiffness: 220, damping: 30 }} onClick={(e) => e.stopPropagation()}>
+              <div className="toys-head">
+                <h2>
+                  isn&apos;t garlic <em>toxic?</em>
+                </h2>
+                <button className="pcard-circle toys-close" onClick={() => setGarlicOpen(false)} aria-label="Close">
+                  <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden>
+                    <path d="M5 5l10 10M15 5 5 15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </div>
+              <p className="toys-lead">
+                {garlicCloves(kg) ? `Not in measured amounts. At ${kg} kg, ${Who} can have up to ${garlicCloves(kg)} of fresh garlic a day, chopped into food.` : `Under 4.5 kg, leave garlic out. Onion is never safe at any size.`}
+              </p>
+              <Tips compact tips={GARLIC_WHY} />
+              <p className="s-feature-label">The research, in plain words</p>
+              <ul className="s-papers">
+                {GARLIC_RESEARCH.map((r) => (
+                  <li key={r.url}>
+                    <a href={r.url} target="_blank" rel="noreferrer">
+                      {r.title}
+                    </a>
+                    <span className="s-papers-cite">{r.cite}</span>
+                    <span>{r.plain}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="elim-note">{GARLIC_CONTEXT}</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Finding a food allergy: the elimination diet, step by step. */}
       <AnimatePresence>
         {elim && (
@@ -1395,6 +1474,7 @@ export function Results({
           </motion.div>
         )}
       </AnimatePresence>
+    </OpenGarlic.Provider>
     </OpenElim.Provider>
     </OpenToys.Provider>
     </DogSize.Provider>
