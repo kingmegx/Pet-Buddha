@@ -162,11 +162,11 @@ export function Squiggle({ className = "" }: { className?: string }) {
 // you need" hand of cards: a coloured card per area, a sticker on top, a rule
 // and a short list of the concrete things inside.
 const CARDS: { t: string; items: string[]; kind: StickerKind; tone: string; tilt: number }[] = [
-  { t: "made for your dog", items: ["8 questions, about 2 minutes", "Built on their breed, age, weight and bowl", "No sign-up, nothing to buy"], kind: "paw", tone: "green", tilt: -4 },
-  { t: "food, sorted", items: ["Check their bowl, gram by gram", "One-tap fixes for what's missing", "A diet chart sized for them"], kind: "bowl", tone: "blue", tilt: 3 },
-  { t: "better behaviour", items: ["Chewing, barking, pulling, accidents", "Brain games that calm, not tire", "Kind, reward-based methods only"], kind: "bone", tone: "orange", tilt: -2 },
-  { t: "india's experts", items: ["Nutritionists, vets and trainers we trust", "Every tip credited to its source", "Follow them, or book a consult"], kind: "heart", tone: "plum", tilt: 4 },
-  { t: "pawsome finds", items: ["Toppers, chews and skin care", "From Indian stores, doses sized for them", "Only what suits your dog"], kind: "ball", tone: "lilac", tilt: -3 },
+  { t: "made for your dog", items: ["8 questions, 2 minutes", "Breed, age, weight, bowl", "No sign-up needed"], kind: "paw", tone: "green", tilt: -4 },
+  { t: "food, sorted", items: ["Their bowl, checked", "Gaps fixed in a tap", "A diet chart, sized"], kind: "bowl", tone: "blue", tilt: 3 },
+  { t: "better behaviour", items: ["Chewing, barking, pulling", "Brain games that calm", "Kind methods only"], kind: "bone", tone: "orange", tilt: -2 },
+  { t: "india's experts", items: ["Vets, nutritionists, trainers", "Every tip credited", "Follow or book them"], kind: "heart", tone: "plum", tilt: 4 },
+  { t: "pawsome finds", items: ["Toppers, chews, skin care", "From Indian stores", "Doses sized for them"], kind: "ball", tone: "lilac", tilt: -3 },
 ];
 
 // Text and picture stickers scattered around the cards.
@@ -191,9 +191,23 @@ const STICKER_TONES: Record<string, { tone: string; ink: string }> = {
   lilac: { tone: "#ffffff", ink: "#7c2d4a" },
 };
 
+const CARD_W = 260;
+
 function CardHand() {
   const [hot, setHot] = useState<number | null>(null);
   const [wide, setWide] = useState(true);
+  // Spread the fan as wide as the row allows, so cards barely overlap.
+  const row = useRef<HTMLUListElement>(null);
+  const [spread, setSpread] = useState(230);
+  useEffect(() => {
+    const fit = () => {
+      const w = row.current?.clientWidth ?? 1200;
+      setSpread(Math.max(170, Math.min(250, (w - CARD_W - 40) / (CARDS.length - 1))));
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, []);
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 900px)");
     const sync = () => setWide(mq.matches);
@@ -204,10 +218,10 @@ function CardHand() {
 
   const n = CARDS.length;
   return (
-    <ul className="hand-row" onPointerLeave={() => setHot(null)}>
+    <ul ref={row} className="hand-row" onPointerLeave={() => setHot(null)} style={{ "--cover": `${Math.max(0, CARD_W - spread)}px` } as React.CSSProperties}>
       {CARDS.map((c, i) => {
         // Spread from the centre; neighbours of the hovered card move away.
-        const base = (i - (n - 1) / 2) * 196;
+        const base = (i - (n - 1) / 2) * spread;
         const push = hot === null || i === hot ? 0 : i < hot ? -70 : 70;
         const pose = wide
           ? { x: base + push, y: hot === i ? -16 : i % 2 ? 22 : 0, rotate: hot === i ? 0 : c.tilt }

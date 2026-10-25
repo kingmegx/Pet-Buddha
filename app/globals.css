@@ -13602,3 +13602,34 @@ body:has(.stage),
 .sw + .rc {
   padding-top: 0 !important;
 }
+
+/* "why pet buddha" cards: as tall as their words, and the words keep clear
+   of the strip the next card covers (--cover, set from the fan's spread). */
+.hand-card {
+  left: calc(50% - 130px);
+  width: 260px;
+  height: auto;
+  min-height: 300px;
+  padding: 64px calc(24px + var(--cover, 0px)) 28px 24px;
+}
+
+.hand-row {
+  height: 500px;
+}
+
+.hand-card strong {
+  font-size: 25px;
+}
+
+@media (max-width: 899px) {
+  .hand-row {
+    height: auto;
+  }
+
+  .hand-card {
+    left: auto;
+    width: min(340px, 100%);
+    min-height: 0;
+    padding-right: 24px;
+  }
+}
