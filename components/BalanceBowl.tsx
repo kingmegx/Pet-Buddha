@@ -10,13 +10,26 @@ import { BRANDS, FOODS, KINDS, NUTRIENTS, analyse, fixesFor, goalsFor, levelFor,
 // the brand of packaged food. The maths runs in the page from typical food
 // values (lib/balance.ts). A rough guide, not a recipe.
 
+// Store supplements for the shelf: the kinds that go in or on food.
+const SUPPLEMENTS = PRODUCTS.filter((p) => ["gaps", "inside", "joints", "gut", "picky", "slim"].includes(p.kind) && !p.soldOut);
+// Grouped by what they're for, so the shelf stays easy to scan.
+const SUPPLEMENT_GROUPS: [string, string[]][] = [
+  ["Supplements: everyday gaps", ["gaps"]],
+  ["Supplements: skin and coat", ["inside"]],
+  ["Supplements: joints", ["joints"]],
+  ["Supplements: gut", ["gut"]],
+  ["Supplements: fussy eaters and weight", ["picky", "slim"]],
+];
+
 const GROUPS = ["Meat and eggs", "Fish", "Grains and dal", "Dairy", "Veg and fruit", "Fats", "Packaged"] as const;
 
 // One nutrient against its daily goal, in grams, like a food label for
 // people. The bar fills towards the goal and changes colour: red when far
 // off, amber when close, green once it's met. Starch is a limit: green
 // while under it.
-function Bar({ label, grams, goal, share, limit = false }: { label: string; grams: number; goal: number; share: number; limit?: boolean }) {
+type Fix = { label: string; run: () => void };
+
+function Bar({ label, grams, goal, share, limit = false, fixes = [] }: { label: string; grams: number; goal: number; share: number; limit?: boolean; fixes?: Fix[] }) {
   const level = levelFor(grams, goal, limit);
   const fill = limit ? Math.min(100, (grams / (goal * 2 || 1)) * 100) : Math.min(100, (grams / (goal || 1)) * 100);
   const note = limit
@@ -48,6 +61,17 @@ function Bar({ label, grams, goal, share, limit = false }: { label: string; gram
       <span className="bb-target">
         <b>{note}.</b> {share}% of the day&apos;s calories.
       </span>
+      {/* One tap to close the gap, sized to it. */}
+      {(level === "low" || level === "near" || (limit && level !== "good")) && fixes.length > 0 && (
+        <div className="bb-barfix">
+          <span>Fix it</span>
+          {fixes.map((f) => (
+            <button key={f.label} onClick={f.run}>
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -77,6 +101,53 @@ export function BalanceBowl({ bowl, need, who, kg, preset }: { bowl: Bowl | null
   const [own, setOwn] = useState({ name: "", grams: "", kind: "veg" as Kind, touched: false });
   const r = useMemo(() => analyse(lines, need), [lines, need]);
   const goals = goalsFor(need);
+
+  // Add grams of a food: to its line if it's there, or as a new line.
+  const addGrams = (id: string, grams: number) =>
+    setLines((now) => (now.some((l) => l.id === id) ? now.map((l) => (l.id === id ? { ...l, grams: l.grams + grams } : l)) : [...now, { key: lineKey(), id, grams }]));
+  const kcalPerG = (id: string) => {
+    const f = food(id);
+    return (f.protein * 3.5 + f.fat * 8.5 + (f.starchy ? f.carbs * 3.5 : 0)) / 100;
+  };
+  const r10 = (x: number) => Math.max(10, Math.round(x / 10) * 10);
+
+  // Fixes for each bar, sized to what's missing.
+  const fatShort = Math.max(0, goals.fat - r.grams.fat);
+  const proteinShort = Math.max(0, goals.protein - r.grams.protein);
+  const breast = lines.find((l) => l.id === "chicken");
+  const fatFixes: Fix[] = [
+    ...(breast ? [{ label: "Swap chicken breast for thigh", run: () => setLines((now) => now.map((l) => (l.id === "chicken" ? { ...l, id: "thigh" } : l))) }] : []),
+    // Whole foods first, then a little ghee.
+    { label: "+ Add 1 egg", run: () => addGrams("egg", 50) },
+    { label: "+ Add 1 sardine", run: () => addGrams("sardine", 25) },
+    { label: `+ Add ${Math.min(3, Math.max(1, Math.ceil(fatShort / 5)))} tsp ghee or coconut oil`, run: () => addGrams("ghee", Math.min(3, Math.max(1, Math.ceil(fatShort / 5))) * 5) },
+  ];
+  const proteinFixes: Fix[] = [
+    { label: `+ Add ${Math.min(300, r10(proteinShort / 0.26))} g chicken thigh`, run: () => addGrams("thigh", Math.min(300, r10(proteinShort / 0.26))) },
+    { label: "+ Add 1 egg", run: () => addGrams("egg", 50) },
+    { label: `+ Add ${Math.min(300, r10(proteinShort / 0.27))} g mutton`, run: () => addGrams("mutton", Math.min(300, r10(proteinShort / 0.27))) },
+  ];
+  // Too much starch: halve the biggest starchy food, or swap half of it for
+  // the same calories of chicken thigh.
+  const starchy = [...lines].filter((l) => l.id !== "product" && valuesOf(l).starchy).sort((a, b) => b.grams - a.grams)[0];
+  const starchName = starchy ? (starchy.id === "kibble" ? "packaged food" : valuesOf(starchy).name.toLowerCase().replace(/, cooked/, "")) : "";
+  const swapG = starchy && starchy.id !== "kibble" && starchy.id !== "custom" ? r10(((starchy.grams / 2) * kcalPerG(starchy.id)) / kcalPerG("thigh")) : 0;
+  const starchFixes: Fix[] = starchy
+    ? [
+        { label: `Halve the ${starchName}`, run: () => setLines((now) => now.map((l) => (l.key === starchy.key ? { ...l, grams: Math.round(l.grams / 2) } : l))) },
+        ...(swapG
+          ? [
+              {
+                label: `Swap half the ${starchName} for ${swapG} g chicken thigh`,
+                run: () => {
+                  setLines((now) => now.map((l) => (l.key === starchy.key ? { ...l, grams: Math.round(l.grams / 2) } : l)));
+                  addGrams("thigh", swapG);
+                },
+              },
+            ]
+          : []),
+      ]
+    : [];
 
   const update = (key: string, patch: Partial<Line>) => setLines((now) => now.map((l) => (l.key === key ? { ...l, ...patch } : l)));
   const remove = (key: string) => setLines((now) => now.filter((l) => l.key !== key));
@@ -227,6 +298,20 @@ export function BalanceBowl({ bowl, need, who, kg, preset }: { bowl: Bowl | null
                 </div>
               ))}
 
+              {/* Supplements from the stores: they count for their nutrients and go on the shopping list. */}
+              {SUPPLEMENT_GROUPS.map(([label, kinds]) => (
+                <div key={label} className="bb-group">
+                  <span className="bb-group-name">{label}</span>
+                  <div className="bb-chips">
+                    {SUPPLEMENTS.filter((p) => kinds.includes(p.kind)).map((p) => (
+                      <button key={p.id} className="chip" onClick={() => addProduct(p.id)} aria-pressed={lines.some((l) => l.product === p.id)}>
+                        {p.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
               {/* Anything else, typed in. */}
               <div className="bb-group bb-own">
                 <span className="bb-group-name">Something else</span>
@@ -273,9 +358,9 @@ export function BalanceBowl({ bowl, need, who, kg, preset }: { bowl: Bowl | null
           </span>
         </div>
 
-        <Bar label="Protein" grams={r.grams.protein} goal={goals.protein} share={r.protein} />
-        <Bar label="Fat" grams={r.grams.fat} goal={goals.fat} share={r.fat} />
-        <Bar label="Starch" grams={r.grams.starch} goal={goals.starch} share={r.starch} limit />
+        <Bar label="Protein" grams={r.grams.protein} goal={goals.protein} share={r.protein} fixes={proteinFixes} />
+        <Bar label="Fat" grams={r.grams.fat} goal={goals.fat} share={r.fat} fixes={fatFixes} />
+        <Bar label="Starch" grams={r.grams.starch} goal={goals.starch} share={r.starch} limit fixes={starchFixes} />
         <p className="bb-goal-note">Goals for {who === "your dog" ? "your dog" : who}: about half the calories from protein and half from fat, with starch under a tenth.</p>
 
         {r.missing.length > 0 ? (

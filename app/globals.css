@@ -13524,3 +13524,37 @@ body:has(.stage),
     grid-column: auto;
   }
 }
+
+/* Under a bar that's off: one-tap fixes, sized to the gap. */
+.bb-barfix {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.bb-barfix > span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(251, 246, 239, 0.65);
+}
+
+.bb-barfix button {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #fbf6ef;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s var(--spring);
+}
+
+.bb-barfix button:hover {
+  transform: translateY(-1px);
+}
