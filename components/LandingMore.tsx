@@ -162,11 +162,11 @@ export function Squiggle({ className = "" }: { className?: string }) {
 // you need" hand of cards: a coloured card per area, a sticker on top, a rule
 // and a short list of the concrete things inside.
 const CARDS: { t: string; items: string[]; kind: StickerKind; tone: string; tilt: number }[] = [
-  { t: "a plan for your pup", items: ["8 quick questions", "Built around breed, age and size", "No sign-up needed"], kind: "paw", tone: "green", tilt: -4 },
-  { t: "food, sorted", items: ["Fresh-food steps, vet-backed", "Their daily calories, worked out", "Bowl balancing, coming soon"], kind: "bowl", tone: "blue", tilt: 3 },
-  { t: "better behaviour", items: ["Chewing and biting, redirected", "Potty training made paw-sible", "Kind methods only"], kind: "bone", tone: "orange", tilt: -2 },
-  { t: "india's experts", items: ["Top Indian nutritionists and vets", "Every tip credited", "Book them in a tap"], kind: "heart", tone: "plum", tilt: 4 },
-  { t: "pawsome finds", items: ["Sniff mats, puzzles and chews", "From Indian stores", "Only what suits your dog"], kind: "ball", tone: "lilac", tilt: -3 },
+  { t: "made for your dog", items: ["8 questions, about 2 minutes", "Built on their breed, age, weight and bowl", "No sign-up, nothing to buy"], kind: "paw", tone: "green", tilt: -4 },
+  { t: "food, sorted", items: ["Check their bowl, gram by gram", "One-tap fixes for what's missing", "A diet chart sized for them"], kind: "bowl", tone: "blue", tilt: 3 },
+  { t: "better behaviour", items: ["Chewing, barking, pulling, accidents", "Brain games that calm, not tire", "Kind, reward-based methods only"], kind: "bone", tone: "orange", tilt: -2 },
+  { t: "india's experts", items: ["Nutritionists, vets and trainers we trust", "Every tip credited to its source", "Follow them, or book a consult"], kind: "heart", tone: "plum", tilt: 4 },
+  { t: "pawsome finds", items: ["Toppers, chews and skin care", "From Indian stores, doses sized for them", "Only what suits your dog"], kind: "ball", tone: "lilac", tilt: -3 },
 ];
 
 // Text and picture stickers scattered around the cards.
