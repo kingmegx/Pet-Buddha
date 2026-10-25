@@ -274,7 +274,7 @@ function ReasonCards() {
 // "did you know?": a fan of tall fact cards, like truus's work carousel. The
 // card in the middle stands up straight, fact side out; as a card moves off
 // to the side it flips over to its picture side and leans out behind. The blue blob sits behind the fan. It moves
-// on every few seconds, or straight away on a click; hovering holds it.
+// on every 3 seconds, or straight away on a click.
 const FACT_LOOK: { label: string; kind: StickerKind; bg: string; tone: string; ink: string }[] = [
   { label: "nose facts", kind: "nose", bg: "#2e6a4c", tone: "#e6f5c9", ink: "#1f5c43" },
   { label: "nose facts", kind: "sparkle", bg: "#ee6a3c", tone: "#fde3b0", ink: "#b2431c" },
@@ -288,12 +288,12 @@ const FACT_LOOK: { label: string; kind: StickerKind; bg: string; tone: string; i
 function DidYouKnow() {
   const n = FUN_FACTS.length;
   const [top, setTop] = useState(0);
-  const [held, setHeld] = useState(false);
+  // Turns on its own every 3 seconds; a click moves it on straight away
+  // (and restarts the 3 seconds, since the timer follows `top`).
   useEffect(() => {
-    if (held) return;
-    const t = window.setTimeout(() => setTop((v) => (v + 1) % n), 4000);
+    const t = window.setTimeout(() => setTop((v) => (v + 1) % n), 3000);
     return () => window.clearTimeout(t);
-  }, [top, held, n]);
+  }, [top, n]);
 
   return (
     <section className="dyk">
@@ -303,7 +303,7 @@ function DidYouKnow() {
         </h2>
         <Squiggle className="is-short" />
       </div>
-      <div className="dyk-fan" onPointerEnter={() => setHeld(true)} onPointerLeave={() => setHeld(false)}>
+      <div className="dyk-fan">
         <svg className="dyk-blob" viewBox="0 0 400 400" aria-hidden>
           <path d="M210 20c40 2 54 50 40 92 30-30 84-32 98 4 14 36-22 64-62 70 40 10 70 44 54 78-16 34-62 30-92 6 6 44-18 98-58 92-40-6-44-60-28-96-34 26-90 26-100-12-10-36 32-60 72-64-40-14-70-52-50-84 20-30 64-20 90 10-10-44 0-98 36-96Z" fill="#8aa4ff" />
         </svg>
@@ -354,7 +354,10 @@ function DidYouKnow() {
                   </span>
                 </span>
               </motion.span>
-              <span className="dyk-label">{look.label}</span>
+              {/* Only the front card wears its label, so none get cut off behind it. */}
+              <motion.span className="dyk-label" initial={false} animate={{ opacity: d === 0 ? 1 : 0, y: d === 0 ? 0 : 8 }} transition={{ duration: 0.25 }} aria-hidden={d !== 0}>
+                {look.label}
+              </motion.span>
             </motion.button>
           );
         })}
