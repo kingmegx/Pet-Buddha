@@ -13558,3 +13558,17 @@ body:has(.stage),
 .bb-barfix button:hover {
   transform: translateY(-1px);
 }
+
+/* The list's label stays a small tag, not a full-width band. */
+.bb-list .bb-sub {
+  justify-self: start;
+}
+
+/* Counted foods (eggs, roti, sardines): a short number, then the word. */
+.bb-grams.is-count input {
+  width: 30px;
+}
+
+.bb-grams.is-count span {
+  min-width: 52px;
+}

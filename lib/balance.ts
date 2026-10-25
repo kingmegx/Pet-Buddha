@@ -180,7 +180,9 @@ const KCAL = { protein: 3.5, fat: 8.5, carbs: 3.5 };
 // One thing in the bowl, in grams. Packaged food carries its brand (or the
 // numbers typed from the bag); "Something else" carries a name and a kind.
 // `id: "product"` is a ready-made topper from a store; `product` is its id.
-export type Line = { key: string; id: string; grams: number; brand?: string; bag?: Omit<Brand, "id" | "name">; name?: string; kind?: Kind; product?: string };
+// `suggested` marks a product added from a "Fix it" suggestion (to buy), as
+// opposed to one they already give, added from the shelf.
+export type Line = { key: string; id: string; grams: number; brand?: string; bag?: Omit<Brand, "id" | "name">; name?: string; kind?: Kind; product?: string; suggested?: boolean };
 
 type Values = { name: string; protein: number; fat: number; carbs: number; starchy: boolean; has: Nutrient[] };
 

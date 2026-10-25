@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
 import { Sticker, type StickerKind } from "./Stickers";
 
 // The "curating" loading scene: a line of beagles walking over an ink zebra
-// crossing drawn on the page, with stickers floating around and a text
-// sticker saying what's being put together. Hovering it makes
+// crossing drawn on the page, with stickers floating around. No captions.
+// Hovering it makes
 // the hand cursor say "The Beagles" (see data-say and HandCursor).
 //
 // The beagles match the beagle head used everywhere else on the site: flat
@@ -113,9 +111,6 @@ const PACK = [
   { size: 1.04, head: -2, tail: -22 },
 ];
 
-// What's happening, shown under the crossing while the plan is put together.
-const STEPS = (who: string) => [`reading ${who}'s answers`, "picking chews and toys", "balancing the bowl", "asking the experts"];
-
 const FLOATS: { kind: StickerKind; tone: string; ink: string; style: React.CSSProperties }[] = [
   { kind: "sparkle", tone: "#fde3b0", ink: "#6b3a12", style: { left: "6%", top: "4%", "--r": "-10deg" } as React.CSSProperties },
   { kind: "heart", tone: "#fbe0d2", ink: "#7c2d4a", style: { right: "8%", top: "0%", "--r": "8deg" } as React.CSSProperties },
@@ -124,13 +119,6 @@ const FLOATS: { kind: StickerKind; tone: string; ink: string; style: React.CSSPr
 ];
 
 export function Walkers({ name = "" }: { name?: string }) {
-  const steps = STEPS(name || "your dog");
-  const [at, setAt] = useState(0);
-  useEffect(() => {
-    const t = window.setInterval(() => setAt((v) => Math.min(v + 1, steps.length - 1)), 1100);
-    return () => window.clearInterval(t);
-  }, [steps.length]);
-
   return (
     <div className="walk-scene">
       {FLOATS.map((f, i) => (
@@ -158,20 +146,10 @@ export function Walkers({ name = "" }: { name?: string }) {
           ))}
         </div>
       </div>
-      <div className="walk-status" aria-live="polite">
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={at}
-            className={`text-sticker ${["ts-lime", "ts-coral", "ts-lilac", "ts-sun"][at % 4]}`}
-            initial={{ opacity: 0, y: 10, rotate: -6 }}
-            animate={{ opacity: 1, y: 0, rotate: -3 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ type: "spring", stiffness: 260, damping: 18 }}
-          >
-            {steps[at]}
-          </motion.span>
-        </AnimatePresence>
-      </div>
+      {/* No captions on screen; screen readers still hear what's happening. */}
+      <span className="sr" aria-live="polite">
+        Putting together {name ? `${name}'s` : "your"} plan
+      </span>
     </div>
   );
 }

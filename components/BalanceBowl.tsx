@@ -21,6 +21,9 @@ const SUPPLEMENT_GROUPS: [string, string[]][] = [
   ["Supplements: fussy eaters and weight", ["picky", "slim"]],
 ];
 
+// Foods people count rather than weigh: [one, many].
+const BY_COUNT: Record<string, [string, string]> = { egg: ["egg", "eggs"], roti: ["roti", "rotis"] };
+
 const GROUPS = ["Meat and eggs", "Fish", "Grains and dal", "Dairy", "Veg and fruit", "Fats", "Packaged"] as const;
 
 // One nutrient against its daily goal, in grams, like a food label for
@@ -151,12 +154,14 @@ export function BalanceBowl({ bowl, need, who, kg, preset }: { bowl: Bowl | null
 
   const update = (key: string, patch: Partial<Line>) => setLines((now) => now.map((l) => (l.key === key ? { ...l, ...patch } : l)));
   const remove = (key: string) => setLines((now) => now.filter((l) => l.key !== key));
-  const step = (l: Line) => (l.id !== "kibble" && l.id !== "custom" && food(l.id).count ? food(l.id).grams : 10);
-  const nudge = (l: Line, dir: 1 | -1) => {
-    const g = Math.max(0, l.grams + dir * step(l));
-    if (g === 0) remove(l.key);
-    else update(l.key, { grams: g });
+  // Counted foods step one at a time; the rest by 10 g (or by their small
+  // serving, like eggshell powder). Minus stops at 0; only × removes a row.
+  const step = (l: Line) => {
+    if (l.id === "kibble" || l.id === "custom") return 10;
+    if (BY_COUNT[l.id]) return food(l.id).grams;
+    return Math.min(10, food(l.id).grams);
   };
+  const nudge = (l: Line, dir: 1 | -1) => update(l.key, { grams: Math.max(0, Math.round((l.grams + dir * step(l)) * 10) / 10) });
   const add = (id: string) =>
     setLines((now) => {
       const there = now.find((l) => l.id === id);
@@ -164,8 +169,9 @@ export function BalanceBowl({ bowl, need, who, kg, preset }: { bowl: Bowl | null
       return [...now, { key: lineKey(), id, grams: id === "kibble" ? 100 : food(id).grams, ...(id === "kibble" ? { brand: "typical" } : {}) }];
     });
   // A ready-made topper from a store: it counts for its nutrients, not calories.
-  const addProduct = (id: string) => setLines((now) => (now.some((l) => l.product === id) ? now : [...now, { key: lineKey(), id: "product", grams: 1, product: id }]));
-  const picked = lines.filter((l) => l.id === "product").map((l) => PRODUCTS.find((p) => p.id === l.product)!).filter(Boolean);
+  // From the shelf: something they already give. From a fix: a suggestion to buy.
+  const addProduct = (id: string, suggested = false) => setLines((now) => (now.some((l) => l.product === id) ? now : [...now, { key: lineKey(), id: "product", grams: 1, product: id, suggested }]));
+  const picked = lines.filter((l) => l.id === "product" && l.suggested).map((l) => PRODUCTS.find((p) => p.id === l.product)!).filter(Boolean);
 
   const addOwn = () => {
     const g = Number(own.grams);
@@ -207,23 +213,38 @@ export function BalanceBowl({ bowl, need, who, kg, preset }: { bowl: Bowl | null
                     <span className="bb-name">
                       <strong>{l.id === "custom" ? l.name : v.name}</strong>
                       {l.id === "custom" && <span>Counted as {KINDS[l.kind ?? "veg"].label.toLowerCase()} (approximate)</span>}
-                      {hint(l) && <span>{hint(l)}</span>}
+                      {!BY_COUNT[l.id] && hint(l) && <span>{hint(l)}</span>}
                     </span>
                     <span className="bb-amount">
                       <button onClick={() => nudge(l, -1)} aria-label={`Less ${v.name}`}>
                         −
                       </button>
-                      <label className="bb-grams">
-                        <input
-                          type="number"
-                          inputMode="decimal"
-                          min={0}
-                          value={l.grams}
-                          onChange={(e) => update(l.key, { grams: Math.max(0, Number(e.target.value) || 0) })}
-                          aria-label={`Grams of ${v.name}`}
-                        />
-                        <span>g</span>
-                      </label>
+                      {BY_COUNT[l.id] ? (
+                        // Eggs, roti and sardines in pieces, not grams.
+                        <label className="bb-grams is-count">
+                          <input
+                            type="number"
+                            inputMode="numeric"
+                            min={0}
+                            value={Math.round(l.grams / food(l.id).grams)}
+                            onChange={(e) => update(l.key, { grams: Math.max(0, Math.round(Number(e.target.value) || 0)) * food(l.id).grams })}
+                            aria-label={`Number of ${BY_COUNT[l.id][1]}`}
+                          />
+                          <span>{Math.round(l.grams / food(l.id).grams) === 1 ? BY_COUNT[l.id][0] : BY_COUNT[l.id][1]}</span>
+                        </label>
+                      ) : (
+                        <label className="bb-grams">
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            min={0}
+                            value={l.grams}
+                            onChange={(e) => update(l.key, { grams: Math.max(0, Number(e.target.value) || 0) })}
+                            aria-label={`Grams of ${v.name}`}
+                          />
+                          <span>g</span>
+                        </label>
+                      )}
                       <button onClick={() => nudge(l, 1)} aria-label={`More ${v.name}`}>
                         +
                       </button>
@@ -290,7 +311,7 @@ export function BalanceBowl({ bowl, need, who, kg, preset }: { bowl: Bowl | null
                   <span className="bb-group-name">{g}</span>
                   <div className="bb-chips">
                     {FOODS.filter((f) => f.group === g).map((f) => (
-                      <button key={f.id} className="chip" onClick={() => add(f.id)}>
+                      <button key={f.id} className="chip" onClick={() => add(f.id)} aria-pressed={lines.some((l) => l.id === f.id)}>
                         {f.name}
                       </button>
                     ))}
@@ -394,7 +415,7 @@ export function BalanceBowl({ bowl, need, who, kg, preset }: { bowl: Bowl | null
                               {p.soldOut && " · check stock"}
                             </small>
                           </span>
-                          <button className="bb-fix-add" onClick={() => addProduct(p.id)}>
+                          <button className="bb-fix-add" onClick={() => addProduct(p.id, true)}>
                             + Add
                           </button>
                         </div>
@@ -421,7 +442,7 @@ export function BalanceBowl({ bowl, need, who, kg, preset }: { bowl: Bowl | null
         )}
         {picked.length > 0 && (
           <div className="bb-list">
-            <span className="bb-sub">Your shopping list</span>
+            <span className="bb-sub">To buy, from our suggestions</span>
             <ul>
               {picked.map((p) => (
                 <li key={p.id}>
