@@ -1012,10 +1012,10 @@ export function Results({
         <div className="s-top-text">
           <p className="s-kicker text-sticker ts-lime">{name ? `${name}'s plan` : "Your plan"}</p>
           <h1>
-            <Accent text={fill(headlineFor(lead, needs).aha)} word={name || undefined} />
+            <Accent text={fill(headlineFor(lead, needs, bowl).aha)} word={name || undefined} />
           </h1>
           <Squiggle className="s-squiggle" />
-          <p className="s-sub">{fill(headlineFor(lead, needs).why)}</p>
+          <p className="s-sub">{fill(headlineFor(lead, needs, bowl).why)}</p>
           <div className="s-top-actions">
             <a className="pill" href="#plan">
               See the plan <span className="arrow arrow-down" aria-hidden />
@@ -1088,10 +1088,10 @@ export function Results({
             {g.id !== lead.id && (
               <div className="s-panel-head">
                 <h2>
-                  <Accent text={fill(headlineFor(g, needs).aha)} word={name || undefined} />
+                  <Accent text={fill(headlineFor(g, needs, bowl).aha)} word={name || undefined} />
                 </h2>
                 <Squiggle className="s-squiggle" />
-                <p>{fill(headlineFor(g, needs).why)}</p>
+                <p>{fill(headlineFor(g, needs, bowl).why)}</p>
               </div>
             )}
             <PanelIndex />

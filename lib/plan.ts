@@ -800,11 +800,41 @@ export function tipsFor(tips: Tip[], needs: ProblemId[]): Tip[] {
 }
 
 // The tab's headline and line under it, sharpened to the main problem asked.
-export function headlineFor(g: Group, needs: ProblemId[]): { aha: string; why: string } {
+// The Food tab's headline, by what's in the bowl. Anyone not already on a
+// fresh, meat-based bowl is nudged towards one.
+const BOWL_HEAD: Record<Bowl, { aha: string; why: string }> = {
+  kibble: {
+    aha: "Swap some of the packaged food for fresh meat.",
+    why: "Even a quarter of the bowl as fresh, meat-based food cuts the starch and processing {who} eats every day. Start with fresh toppers, then swap in more.",
+  },
+  mix: {
+    aha: "You're part way there. Swap more of the packaged food for fresh meat.",
+    why: "Every bit of packaged food you replace with fresh, meat-based food brings the starch down. Aim for a bowl that's mostly meat.",
+  },
+  veg: {
+    aha: "Dogs need meat. Start adding eggs and meat to the bowl.",
+    why: "A vegetarian bowl is fresh, but it can't be complete for a dog: it runs short on taurine, protein and key nutrients. Eggs are an easy first step; cook meat separately if your home is vegetarian.",
+  },
+  meat: {
+    aha: "Fresh, meat-based food is the best start. Now make it complete.",
+    why: "Check {who}'s bowl below for anything missing, like calcium, omega-3 or vitamin D, and fix the gaps in a tap.",
+  },
+  raw: {
+    aha: "Raw is a great base. Now make sure it's complete.",
+    why: "Check {who}'s bowl below for anything missing, like calcium, omega-3 or vitamin D, and fix the gaps in a tap.",
+  },
+};
+
+export function headlineFor(g: Group, needs: ProblemId[], bowl?: Bowl | null): { aha: string; why: string } {
+  // Food: packaged, mixed and vegetarian bowls hear "switch to fresh meat"
+  // first; meat-based and raw bowls let a problem they asked about lead.
+  if (g.id === "food" && bowl && bowl !== "meat" && bowl !== "raw") return BOWL_HEAD[bowl];
   // The first problem asked about in this tab decides; if it has no sharper
   // line of its own, the tab's general one is used.
   const p = needs.find((x) => g.problems.includes(x));
-  return p && g.ahaFor?.[p] ? g.ahaFor[p]! : { aha: g.aha, why: g.why };
+  if (p && g.ahaFor?.[p]) return g.ahaFor[p]!;
+  if (g.id === "food" && bowl) return BOWL_HEAD[bowl];
+  return { aha: g.aha, why: g.why };
 }
 
 // Which tabs this dog gets, in order. Food is always there.

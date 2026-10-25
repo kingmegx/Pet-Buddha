@@ -13572,3 +13572,33 @@ body:has(.stage),
 .bb-grams.is-count span {
   min-width: 52px;
 }
+
+/* "every dog is different": straight after the scroll cue, with the line
+   high in the pinned screen instead of in its middle. */
+.sw {
+  margin-top: 0 !important;
+}
+
+/* (The sentence stays centred in its full-screen pin, as designed.) */
+
+/* Landing rhythm: one gap between every section. Each section gets half of
+   it above and below, so any two neighbours sit the same distance apart. */
+.rc,
+.dyk,
+.l-end,
+.sw-pin {
+  --l-half: clamp(72px, 11vh, 120px);
+}
+
+.rc,
+.dyk,
+.l-end {
+  padding-top: var(--l-half) !important;
+  padding-bottom: var(--l-half) !important;
+}
+
+/* The pinned sentence keeps its full screen; the space under the centred
+   line already acts as the gap, so the section after it adds none on top. */
+.sw + .rc {
+  padding-top: 0 !important;
+}

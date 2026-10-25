@@ -46,7 +46,9 @@ function ScatterWords({ scroller }: { scroller: React.RefObject<HTMLElement | nu
   const frame = useRef(0);
   const chars = [...SENTENCE];
   const seeds = useMemo(() => chars.map((_, i) => scatter(i)), [chars.length]); // eslint-disable-line react-hooks/exhaustive-deps
-  const { scrollYProgress: raw } = useScroll({ container: scroller, target: section, offset: ["start start", "end end"] });
+  // Starts as soon as the line scrolls into view (section top at 75% of the
+  // screen), not once the section reaches the top, so nothing waits off-screen.
+  const { scrollYProgress: raw } = useScroll({ container: scroller, target: section, offset: ["start 0.75", "end end"] });
   // Smoothed, so the line glides with the wheel or trackpad.
   const progress = useSpring(raw, { stiffness: 140, damping: 30, mass: 0.5, restDelta: 0.0002 });
 
