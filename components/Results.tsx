@@ -1628,6 +1628,21 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bow
                 <>
                   <p className="fn-lead">Keep their usual food. Add fresh bites, up to a tenth of the day&apos;s food.</p>
                   <Tips compact tips={TOPPER_TIPS} />
+                  {/* For the packaged part: a better kibble while they move towards fresh. */}
+                  {RECOMMENDED_KIBBLES.length > 0 && (
+                    <div className="fn-kibble">
+                      <p>
+                        <strong>Keeping some packaged food?</strong> Pick one with more meat and less starch. We like Hearty from Heads Up For Tails: oven-baked, 60% animal ingredients, no by-products. Check it in the bowl above to compare.
+                      </p>
+                      <p className="s-links">
+                        {RECOMMENDED_KIBBLES.map((k) => (
+                          <a key={k.url} href={k.url} target="_blank" rel="noreferrer">
+                            {k.name} <span aria-hidden>→</span>
+                          </a>
+                        ))}
+                      </p>
+                    </div>
+                  )}
                   <Fold title="Fresh toppers, and how much" line="Organs, sardines, spices, and how to keep their weight in check.">
                     <ToppersGrid />
                     <Tips compact tips={TOPPER_AMOUNTS} />

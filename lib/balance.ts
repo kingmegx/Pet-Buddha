@@ -130,12 +130,27 @@ export const FOODS: Food[] = [
 // as 100 minus protein, fat, fibre, moisture and ash (6% if not listed).
 export type Brand = { id: string; name: string; protein: number; fat: number; fibre: number; moisture: number; ash?: number };
 
+// Packaged dry foods, with the guaranteed analysis from each label (as
+// listed on Heads Up For Tails, read 26 Oct 2026, or the brand's own pack).
+// Starch is worked out as whatever the label doesn't account for.
 export const BRANDS: Brand[] = [
+  // Hearty (Heads Up For Tails), oven-baked: from the back of each pack.
+  { id: "hearty-chicken", name: "Hearty Chicken & Duck (adult)", protein: 36.2, fat: 10.7, fibre: 4.5, moisture: 11, ash: 7.8 },
+  { id: "hearty-lamb", name: "Hearty Lamb & Blueberry (adult)", protein: 36.9, fat: 11.4, fibre: 4.5, moisture: 11, ash: 6.1 },
+  { id: "hearty-gf", name: "Hearty Grain-Free Turkey, Fish & Chicken", protein: 30.9, fat: 18.2, fibre: 2, moisture: 9, ash: 2.8 },
+  { id: "orijen", name: "Orijen Original", protein: 38, fat: 18, fibre: 4, moisture: 12, ash: 10 }, // ash isn't on the label; set so starch matches its stated 18%
+  { id: "acana-small", name: "Acana Small Breed Adult", protein: 31, fat: 17, fibre: 5, moisture: 12, ash: 7 },
+  { id: "acana-large", name: "Acana Large Breed Adult", protein: 31, fat: 15, fibre: 6, moisture: 12, ash: 7 },
+  { id: "farmina", name: "Farmina N&D Ancestral Grain Adult", protein: 30, fat: 18, fibre: 2.9, moisture: 9, ash: 6.8 },
+  { id: "farmina-pumpkin", name: "Farmina N&D Pumpkin Chicken & Pomegranate Adult", protein: 30, fat: 18, fibre: 2.9, moisture: 9, ash: 7 },
+  { id: "signature", name: "Signature Grain Zero Adult", protein: 28, fat: 16, fibre: 2.5, moisture: 10, ash: 6.6 },
+  { id: "rcmaxi", name: "Royal Canin Maxi Adult", protein: 26, fat: 17, fibre: 1.3, moisture: 11, ash: 6.7 },
+  { id: "totw-pacific", name: "Taste of the Wild Pacific Stream", protein: 25, fat: 15, fibre: 3, moisture: 10, ash: 8.9 },
+  { id: "totw-sierra", name: "Taste of the Wild Sierra Mountain", protein: 25, fat: 15, fibre: 5, moisture: 10, ash: 8.6 },
+  { id: "proplan", name: "Purina Pro Plan Medium Adult", protein: 25, fat: 15, fibre: 3, moisture: 10 }, // label gives protein and fat only; fibre and moisture are typical values
+  { id: "supercoat", name: "Purina Supercoat Adult", protein: 23, fat: 10, fibre: 4, moisture: 12 },
   { id: "pedigree", name: "Pedigree Adult", protein: 21, fat: 10, fibre: 4, moisture: 12 },
   { id: "drools", name: "Drools Adult Chicken & Egg", protein: 20, fat: 10, fibre: 2.5, moisture: 10 },
-  { id: "supercoat", name: "Purina Supercoat Adult", protein: 23, fat: 10, fibre: 4, moisture: 12 },
-  { id: "rcmaxi", name: "Royal Canin Maxi Adult", protein: 26, fat: 17, fibre: 1.3, moisture: 11, ash: 6.7 },
-  { id: "farmina", name: "Farmina N&D Ancestral Grain", protein: 30, fat: 18, fibre: 2.9, moisture: 9 },
   { id: "typical", name: "Not sure / another brand", protein: 25, fat: 14, fibre: 3, moisture: 10 },
 ];
 

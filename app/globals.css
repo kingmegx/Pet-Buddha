@@ -13661,3 +13661,21 @@ body:has(.stage),
   font-size: 14px;
   color: #5c5650;
 }
+
+/* "Keeping some packaged food?": a quiet box with the recommended kibbles. */
+.fn-kibble {
+  padding: 16px 18px;
+  border: 1.5px solid #ece6df;
+  border-radius: 14px;
+}
+
+.fn-kibble p:first-child {
+  margin: 0 !important;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #3b3530 !important;
+}
+
+.fn-kibble .s-links {
+  margin-top: 12px !important;
+}

@@ -1069,7 +1069,12 @@ export const VEG_TIPS: Tip[] = [
 
 // The packaged foods we recommend, shown as links in the vegetarian card.
 // Meghna will send the list; nothing shows until it's filled in.
-export const RECOMMENDED_KIBBLES: { name: string; url: string }[] = [];
+export const RECOMMENDED_KIBBLES: { name: string; url: string }[] = [
+  { name: "Hearty Chicken & Duck", url: "https://headsupfortails.com/products/hearty-oven-baked-food-for-adult-dog" },
+  { name: "Hearty Lamb & Blueberry", url: "https://headsupfortails.com/products/hearty-oven-baked-lamb-blueberry-dry-food" },
+  { name: "Hearty Grain-Free Turkey, Fish & Chicken", url: "https://headsupfortails.com/products/hearty-turkey-fish-chicken-grain-free-oven-baked-adult-dog-food" },
+  { name: "Hearty Puppy, Chicken & Fish", url: "https://headsupfortails.com/products/hearty-oven-baked-food-for-puppy" },
+];
 
 // Why dal, rice and curd isn't a dog's diet, piece by piece.
 export const DAL_RICE_CURD: Tip[] = [
