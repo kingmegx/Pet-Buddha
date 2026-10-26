@@ -14506,3 +14506,111 @@ body:has(.stage),
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
 }
+
+/* Phones: the cards stack into a tall column, so stickers placed by
+   percentage landed on them. Keep two in the gap under the heading and
+   two in the space under the last card; hide the ones that can only sit
+   on a card. */
+@media (max-width: 900px) {
+  .rc {
+    padding-bottom: 140px !important;
+  }
+
+  .rc > :nth-child(1) {
+    top: 104px !important;
+    left: 16px !important;
+  }
+
+  .rc > :nth-child(2) {
+    top: 92px !important;
+    right: 24px !important;
+  }
+
+  .rc > :nth-child(3),
+  .rc > :nth-child(4),
+  .rc > :nth-child(6) {
+    display: none;
+  }
+
+  .rc > :nth-child(5) {
+    top: auto !important;
+    bottom: 56px !important;
+    left: 16px !important;
+  }
+
+  .rc > :nth-child(7) {
+    top: auto !important;
+    bottom: 48px !important;
+    right: 16px !important;
+    left: auto !important;
+  }
+}
+
+/* =====================================================================
+   Phone and touch standards:
+   - every tap target is at least 44 × 44 px (Apple's guideline);
+   - text inputs are 16 px, so iPhones don't zoom in when you tap them;
+   - no text smaller than 12 px.
+   Laptops with a mouse are untouched.
+   ===================================================================== */
+@media (max-width: 760px), (pointer: coarse) {
+  .linklike,
+  .l-scroll,
+  .tp-more,
+  .s-expert-links a,
+  .results-bar .linklike {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .chip,
+  .pill,
+  a.pill,
+  [role="tab"],
+  .bb-fix-home,
+  .bb-fix-add,
+  .bb-barfix button,
+  .acct-chip {
+    min-height: 44px;
+  }
+
+  /* The bowl's −, + and remove buttons. */
+  .bb-amount button,
+  .bb-amount .bb-remove {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Number boxes: tall enough to tap, 16 px so the page doesn't zoom. */
+  .bb-grams {
+    height: 44px;
+  }
+
+  .bb-grams input,
+  .kg,
+  .dob .dob-boxes input {
+    font-size: 16px;
+  }
+
+  .kg,
+  .dob .dob-boxes input {
+    min-height: 44px;
+  }
+
+  .bb-grams input {
+    height: 100%;
+  }
+
+  /* Links inside a line of text: extra tap room above and below, without
+     moving the text. */
+  p a,
+  li a {
+    padding-block: 4px;
+  }
+
+  .bb-missing li .bb-fix-label,
+  .bb-barfix > span {
+    font-size: 12px;
+  }
+}

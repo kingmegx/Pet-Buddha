@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
 import { ACTIVITIES, CALM, FOOD_CHIP, foodsFromBowl, FRESH_BOWLS, doseFor, type Dose, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
-import { BODY_TIPS, BOWL_NOTE, COOKING, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, tabName, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
+import { BODY_TIPS, BOWL_NOTE, COOKING, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, caloriesFor, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, tabName, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
@@ -1274,7 +1274,7 @@ export function Results({
               <>
                 {/* 1. Their bowl first: what they eat now, checked against what a dog needs. */}
                 <Sub note={`Start with what ${who === "your dog" ? "they eat" : `${Who} eats`} now: change the amounts to match a real day, and see what's missing and what fixes it.`} short="balance the bowl">{who === "your dog" ? "Balance the bowl" : `Balance ${Who}'s bowl`}</Sub>
-                <BalanceBowl bowl={bowl} need={dailyCalories(kg)} who={Who} kg={kg} preset={preset} />
+                <BalanceBowl bowl={bowl} need={caloriesFor(kg, months)} who={Who} kg={kg} preset={preset} />
 
                 {/* 2. Then one thing at a time: they pick what to see next. */}
                 <Sub note="Pick one. You can come back for the rest." short="what next">{`What next for ${Who}?`}</Sub>
@@ -1623,7 +1623,7 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad, onBowl 
                   <Tips compact tips={PERFECT_BOWL_RULES} />
                 </NoLead.Provider>
                 {chart === "yes" ? (
-                  <DietChart kg={kg} months={months} need={dailyCalories(kg)} who={Who} onLoad={onLoad} onExperts={() => document.getElementById("experts")?.scrollIntoView({ behavior: "smooth", block: "start" })} />
+                  <DietChart kg={kg} months={months} need={caloriesFor(kg, months)} who={Who} onLoad={onLoad} onExperts={() => document.getElementById("experts")?.scrollIntoView({ behavior: "smooth", block: "start" })} />
                 ) : (
                   <div className="fn-cta">
                     <p>
@@ -1728,7 +1728,7 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad, onBowl 
             {pick === "rules" && (
               <>
                 <p className="fn-lead">
-                  {who === "your dog" ? "A grown dog" : Who} at {kg} kg needs roughly {dailyCalories(kg)} calories a day, more if very active.
+                  {months < 12 ? `${who === "your dog" ? "A growing puppy" : Who} at ${kg} kg needs roughly ${caloriesFor(kg, months)} calories a day while growing.` : `${who === "your dog" ? "A grown dog" : Who} at ${kg} kg needs roughly ${dailyCalories(kg)} calories a day, more if very active.`}
                 </p>
                 <KitchenRules kg={kg} months={months} />
               </>

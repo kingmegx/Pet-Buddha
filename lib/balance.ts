@@ -339,7 +339,11 @@ export function startingBowl(bowl: Bowl | null, need: number): Line[] {
 // food (0.65%); eggshell powder is almost all calcium carbonate, about
 // 5.5 g a teaspoon. Grams are solved from the food values above so the
 // bowl lands on the dog's calories. Indian foods in place of US ones are ours.
-export function dietChart(kg: number, need: number) {
+// Puppies get a little more meat and organs, a little less veg, and twice
+// the calcium: about 3.2 g per 1,000 calories, inside AAFCO's growth range
+// (at least 3.0 g, at most 4.5 g for big breeds, where too much harms bone).
+// A grown dog's bowl gives about 1.7 g (the minimum is 1.25 g).
+export function dietChart(kg: number, need: number, puppy = false) {
   const kcal = (id: string) => {
     const f = food(id);
     return (f.protein * KCAL.protein + f.fat * KCAL.fat + (f.starchy ? f.carbs * KCAL.carbs : 0)) / 100;
@@ -347,7 +351,7 @@ export function dietChart(kg: number, need: number) {
   // 1 tsp of ground seeds (about 3 g) per 10 kg, at least half a teaspoon.
   const seedTsp = Math.max(0.5, Math.round(kg / 10 * 2) / 2);
   const seedG = seedTsp * food("seeds").grams;
-  const share = { thigh: 0.55, liver: 0.1, organs: 0.1, veg: 0.25 };
+  const share = puppy ? { thigh: 0.6, liver: 0.1, organs: 0.15, veg: 0.15 } : { thigh: 0.55, liver: 0.1, organs: 0.1, veg: 0.25 };
   const perGram = (Object.keys(share) as (keyof typeof share)[]).reduce((t, id) => t + share[id] * kcal(id), 0);
   const rest = Math.max(0, need - seedG * kcal("seeds")) / perGram;
   const g5 = (x: number) => Math.max(5, Math.round(x / 5) * 5);
@@ -357,7 +361,7 @@ export function dietChart(kg: number, need: number) {
   const veg = g5(rest * share.veg);
   const total = meat + liver + organs + veg;
   // Eggshell powder in quarter teaspoons.
-  const shellTsp = Math.max(0.25, Math.round(((total * 0.0065) / 5.5) * 4) / 4);
+  const shellTsp = Math.max(0.25, Math.round(((total * (puppy ? 0.013 : 0.0065)) / 5.5) * 4) / 4);
   // Oily fish a few times a week: one sardine per 9 kg (as in SKIN_FOOD).
   const sardines = Math.max(1, Math.round(kg / 9));
   return { meat, liver, organs, veg, total, seedTsp, seedG, shellTsp, shellG: Math.round(shellTsp * 5.5 * 10) / 10, sardines };

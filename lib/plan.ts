@@ -773,6 +773,14 @@ export const GARLIC_CONTEXT =
 // (resting need; active dogs need more).
 export const dailyCalories = (kg: number) => Math.round((kg * 30 + 70) / 10) * 10;
 
+// A growing puppy needs far more for their size: about three times their
+// resting energy (70 × kg^0.75) under 4 months, and twice until a year,
+// the usual vet rule of thumb.
+export const puppyCalories = (kg: number, months: number) => Math.round((70 * Math.pow(kg, 0.75) * (months < 4 ? 3 : 2)) / 10) * 10;
+
+// What to feed in a day: puppy or grown dog.
+export const caloriesFor = (kg: number, months: number) => (months < 12 ? puppyCalories(kg, months) : dailyCalories(kg));
+
 // Starch in dry food, from the label: 100 minus the rest. Ash is 6% if not listed.
 export function starchPercent(v: { protein: number; fat: number; fibre: number; moisture: number; ash?: number }) {
   return Math.max(0, Math.round(100 - (v.protein + v.fat + v.fibre + v.moisture + (v.ash ?? 6))));

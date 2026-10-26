@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { dailyCalories } from "@/lib/plan";
+import { dailyCalories, puppyCalories } from "@/lib/plan";
 import { DietChart } from "./DietChart";
 import type { Preset } from "./BalanceBowl";
 
@@ -179,6 +179,10 @@ export function BodyCheck({ kg, months, who, onLoad, onExperts }: { kg: number; 
   const now = dailyCalories(kg);
   const aim = dailyCalories(target);
   const weekly = Math.round(kg * 0.01 * 10) / 10;
+  // Puppies never diet down to a target: they're fed a little under a
+  // growing puppy's need and grow into a leaner shape.
+  const puppy = months < 12;
+  const pupAim = Math.round((puppyCalories(kg, months) * 0.9) / 10) * 10;
 
   const pick = (v: number) => {
     const next = [...answers.slice(0, step), v];
@@ -236,7 +240,9 @@ export function BodyCheck({ kg, months, who, onLoad, onExperts }: { kg: number; 
         <span>
           <strong>{b.label}</strong>
           <small>
-            {score > 5
+            {score > 5 && puppy
+              ? `A little more padding than ideal. Puppies shouldn't diet: feed ${who} a little less and let them grow into a leaner shape.`
+              : score > 5
               ? `About ${Math.round((score - 5) * 10)}% over ${who}'s ideal. A good target is around ${target} kg.`
               : score <= 3
                 ? `${who} could do with a little more. Talk to your vet, then feed a little more of a complete, fresh bowl.`
@@ -251,14 +257,22 @@ export function BodyCheck({ kg, months, who, onLoad, onExperts }: { kg: number; 
       {score > 5 && (
         <>
           <ol className="tc tc-compact">
-            {[
+            {(puppy
+              ? [
+                  ["Feed a little less, not a diet", `About ${pupAim} calories a day: a tenth under what a growing puppy of ${kg} kg needs.`],
+                  ["Weigh the food", "Use a kitchen scale. Cups and handfuls creep up without anyone noticing."],
+                  ["Treats count", "Keep treats under a tenth of the day. Use bits of their meal as rewards in training."],
+                  ["Play, don't run them hard", "Short games and sniffy walks. Long runs and lots of stairs are hard on growing joints."],
+                  ["Check every two weeks", `Weigh ${who} and redo this check every two weeks: a puppy's shape changes fast. Ask your vet if it isn't improving.`],
+                ]
+              : [
               ["Feed for the weight you want", `About ${aim} calories a day: what ${who} needs at ${target} kg, about ${now - aim} fewer than now.`],
               ["Weigh the food", "Use a kitchen scale for a week. Cups and handfuls creep up without anyone noticing."],
               ["Swap starch for veg", "Cut back the rice, roti or kibble and fill the gap with green beans, pumpkin or zucchini. Same full bowl, far fewer calories."],
               ["Treats count", "Keep treats under a tenth of the day. Use bits of their meal, or crunchy veg, as rewards."],
               ["Add a sniffy walk", "Ten extra minutes of slow, sniffy walking a day helps more than one tiring run."],
               ["Slow and steady", `Aim to lose about ${weekly} kg a week (1% of their weight). Weigh them weekly, and ask your vet to confirm the target.`],
-            ].map(([t, d], i) => (
+            ]).map(([t, d], i) => (
               <li key={t}>
                 <span className="tc-num">{String(i + 1).padStart(2, "0")}</span>
                 <strong>{t}</strong>
@@ -267,11 +281,11 @@ export function BodyCheck({ kg, months, who, onLoad, onExperts }: { kg: number; 
             ))}
           </ol>
           {chart ? (
-            <DietChart kg={target} months={months} need={aim} who={who} onLoad={onLoad} onExperts={onExperts} />
+            <DietChart kg={puppy ? kg : target} months={months} need={puppy ? pupAim : aim} who={who} onLoad={onLoad} onExperts={onExperts} />
           ) : (
             <div className="fn-cta">
               <p>
-                <strong>Want this as a plan?</strong> We&apos;ll size a diet chart for {who} at their target of {target} kg, in grams, with Indian food.
+                <strong>Want this as a plan?</strong> {puppy ? <>We&apos;ll size a growing puppy&apos;s diet chart for {who} at {kg} kg, a little under their need, in grams, with Indian food.</> : <>We&apos;ll size a diet chart for {who} at their target of {target} kg, in grams, with Indian food.</>}
               </p>
               <button className="pill" onClick={() => setChart(true)}>
                 Make {who}&apos;s diet chart <span className="arrow" aria-hidden />

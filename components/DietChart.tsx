@@ -4,7 +4,7 @@ import { dietChart } from "@/lib/balance";
 import { COOKING, FRESH_MEAT_SHOP, FRESH_READY, garlicCloves } from "@/lib/plan";
 import type { Preset } from "./BalanceBowl";
 
-// A day's bowl for a healthy adult dog, by the gram, in the shape of The
+// A day's bowl for a healthy dog or a growing puppy, by the gram, in the shape of The
 // Forever Dog's complete homemade recipes, made with Indian food. It teaches
 // what a bowl should look like; Balance the bowl then shows the gaps it
 // still has (zinc, vitamin D and so on) and what closes them.
@@ -25,23 +25,25 @@ function tsp(n: number) {
 export function DietChart({ kg, months, need, who, onLoad, onExperts }: { kg: number; months: number; need: number; who: string; onLoad: (p: Omit<Preset, "key">) => void; onExperts: () => void }) {
   // Puppies under 8 months eat three meals; after that, two meals with a snack in between.
   const meals = months < 8 ? 3 : 2;
-  const c = dietChart(kg, need);
-  const per = (g: number) => Math.round(g / meals / 5) * 5;
-  const garlic = garlicCloves(kg);
   const puppy = months < 12;
+  const c = dietChart(kg, need, puppy);
+  const per = (g: number) => Math.round(g / meals / 5) * 5;
+  // The book's garlic amounts are for grown dogs; puppies go without.
+  const garlic = puppy ? null : garlicCloves(kg);
 
+  // Puppies get a chart too: a careful start beats guessing. It grows with
+  // them, so it says to weigh weekly and make a fresh one every two weeks.
   const disclaimer = (
     <div className="dc-note">
-      <strong>{puppy ? "For grown dogs only." : "For healthy adult dogs."}</strong>{" "}
+      <strong>{puppy ? "For a growing puppy." : "For healthy adult dogs."}</strong>{" "}
       {puppy
-        ? `Puppies need a recipe made for growth, with more calcium and minerals than this. Ask one of the nutritionists below for one made for ${who}.`
+        ? `A careful starting point while ${who} grows, not a prescription. Weigh them every week and make a new chart every two weeks, as the amounts grow with them. Don't add calcium beyond what's here, especially for big breeds. If you can, have a nutritionist check it.`
         : `This is a general guide to what a bowl should look like, not a prescription. If ${who} has a medical condition, is pregnant, nursing or on medication, ask one of the nutritionists below for a diet made for them.`}{" "}
       <button className="dc-link" onClick={onExperts}>
         <span className="link-words">See the nutritionists</span> <span aria-hidden>↓</span>
       </button>
     </div>
   );
-  if (puppy) return <div className="dc">{disclaimer}</div>;
 
   const rows: { part: string; grams?: number; amount?: string; what: string; pick?: string[]; note?: string }[] = [
     { part: "Meat", grams: c.meat, what: "Chicken thigh, mutton, buff or fish. Rotate between them.", note: "Chicken breast is leaner: add a teaspoon of ghee or coconut oil with it." },
@@ -60,7 +62,7 @@ export function DietChart({ kg, months, need, who, onLoad, onExperts }: { kg: nu
         <div className="dc-total">
           <strong>{c.total} g</strong>
           <span>
-            of fresh food a day for {who} at {kg} kg, about {need} calories. All cooked weights: weigh after cooking.
+            of fresh food a day for {who} at {kg} kg{puppy ? ", growing" : ""}, about {need} calories. All cooked weights: weigh after cooking.
           </span>
         </div>
         <span className="dc-meals-note">{meals === 3 ? "Split into 3 meals a day" : "Split into 2 meals a day, with a snack in between"}</span>
