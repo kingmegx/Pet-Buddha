@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
 import { ACTIVITIES, CALM, FOOD_CHIP, foodsFromBowl, FRESH_BOWLS, doseFor, type Dose, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
-import { BODY_TIPS, BOWL_NOTE, COOKING, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, caloriesFor, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, tabName, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
+import { BODY_TIPS, BOWL_NOTE, COOKING, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, caloriesFor, dailyCalories, expert, garlicCloves, garlicFor, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, tabName, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
@@ -747,7 +747,7 @@ function Compare() {
               </span>
             </span>
             {[a.body, a.mind, a.calm].map((n, i) => (
-              <span key={i} className="s-dots" role="cell" aria-label={`${heads[i]}: ${n} of 3`}>
+              <span key={i} className="s-dots" role="cell" aria-label={`${heads[i]}: ${n} of 3`} data-label={heads[i]}>
                 {[1, 2, 3].map((d) => (
                   <i key={d} className={d <= n ? "on" : ""} />
                 ))}
@@ -1429,7 +1429,7 @@ export function Results({
                 </button>
               </div>
               <p className="toys-lead">
-                {garlicCloves(kg) ? `Not in measured amounts. At ${kg} kg, ${Who} can have up to ${garlicCloves(kg)} of fresh garlic a day, chopped into food.` : `Under 4.5 kg, leave garlic out. Onion is never safe at any size.`}
+                {garlicFor(kg, months) ? `Not in measured amounts. At ${kg} kg, ${Who} can have up to ${garlicFor(kg, months)!.amount} of fresh garlic, ${garlicFor(kg, months)!.often}, chopped into food.` : `Under 4.5 kg, leave garlic out. Onion is never safe at any size.`}
               </p>
               <Tips compact tips={GARLIC_WHY} />
               <p className="s-feature-label">The research, in plain words</p>
@@ -1548,8 +1548,8 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad, onBowl 
         tips={[
           ...GARLIC_WHY,
           {
-            t: garlicCloves(kg) ? `For ${Who}: ${garlicCloves(kg)} a day` : "Very small dogs: skip it",
-            d: garlicCloves(kg) ? `At ${kg} kg, up to ${garlicCloves(kg)} of fresh garlic a day, chopped into the food. Stop if they seem unwell.` : "Under 4.5 kg, leave garlic out. Onion is never safe at any size.",
+            t: garlicFor(kg, months) ? `For ${Who}: ${garlicFor(kg, months)!.amount}, ${garlicFor(kg, months)!.often}` : "Very small dogs: skip it",
+            d: garlicFor(kg, months) ? `At ${kg} kg${months < 12 ? ", growing" : ""}, up to ${garlicFor(kg, months)!.amount} of fresh garlic, ${garlicFor(kg, months)!.often}, chopped into the food. Stop if they seem unwell.` : "Under 4.5 kg, leave garlic out. Onion is never safe at any size.",
             src: "The Forever Dog",
           },
         ]}

@@ -33,6 +33,9 @@ export default function Privacy() {
       <h2>Where it&apos;s kept</h2>
       <p>On Supabase, in their Mumbai region. Only you can read or change your saved dogs; the database checks that on every request.</p>
 
+      <h2>Counting visits</h2>
+      <p>We count page visits with Vercel Web Analytics, to see how many people the site helps. It uses no cookies and keeps nothing that identifies you.</p>
+
       <h2>What we never do</h2>
       <ul>
         <li>No ads, and no selling or sharing your details with anyone.</li>

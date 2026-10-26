@@ -1,7 +1,7 @@
 "use client";
 
 import { dietChart } from "@/lib/balance";
-import { COOKING, FRESH_MEAT_SHOP, FRESH_READY, garlicCloves } from "@/lib/plan";
+import { COOKING, FRESH_MEAT_SHOP, FRESH_READY, garlicFor } from "@/lib/plan";
 import type { Preset } from "./BalanceBowl";
 
 // A day's bowl for a healthy dog or a growing puppy, by the gram, in the shape of The
@@ -28,8 +28,7 @@ export function DietChart({ kg, months, need, who, onLoad, onExperts }: { kg: nu
   const puppy = months < 12;
   const c = dietChart(kg, need, puppy);
   const per = (g: number) => Math.round(g / meals / 5) * 5;
-  // The book's garlic amounts are for grown dogs; puppies go without.
-  const garlic = puppy ? null : garlicCloves(kg);
+  const garlic = garlicFor(kg, months);
 
   // Puppies get a chart too: a careful start beats guessing. It grows with
   // them, so it says to weigh weekly and make a fresh one every two weeks.
@@ -109,7 +108,7 @@ export function DietChart({ kg, months, need, who, onLoad, onExperts }: { kg: nu
           <span className="dc-part">A pinch of</span>
           <p>
             {HERBS.join(", ")}, and turmeric paste (turmeric, a crushed peppercorn and coconut oil). One crushed clove a day.
-            {garlic ? ` Up to ${garlic} of fresh garlic a day.` : ""}
+            {garlic ? ` Up to ${garlic.amount} of fresh garlic, ${garlic.often}.` : ""}
           </p>
         </div>
         <div>

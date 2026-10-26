@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Epilogue, Lora } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 // The type of truus.co: DM Sans for text, Epilogue for headings and the
@@ -19,7 +20,11 @@ export const viewport: Viewport = { themeColor: "#f0ebe6" };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${body.className} ${brand.variable} ${accent.variable}`}>{children}</body>
+      <body className={`${body.className} ${brand.variable} ${accent.variable}`}>
+        {children}
+        {/* Visit counts from Vercel: no cookies, no personal data. */}
+        <Analytics />
+      </body>
     </html>
   );
 }

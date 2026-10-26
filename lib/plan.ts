@@ -743,6 +743,16 @@ export function garlicCloves(kg: number) {
   return "2½ cloves";
 }
 
+// How much garlic, and how often. Grown dogs: the book's amount every day.
+// Puppies: up to a clove, two or three days a week (half under 9 kg, none
+// under 4.5 kg, as for grown dogs).
+export function garlicFor(kg: number, months: number): { amount: string; often: string } | null {
+  const amount = garlicCloves(kg);
+  if (!amount) return null;
+  if (months < 12) return { amount: kg < 9 ? "half a clove" : "1 clove", often: "2 or 3 days a week" };
+  return { amount, often: "a day" };
+}
+
 // The research behind the garlic advice. Summaries are ours, from each
 // paper's abstract on PubMed (read 17 Oct 2026).
 export const GARLIC_RESEARCH = [

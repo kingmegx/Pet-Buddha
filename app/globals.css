@@ -14614,3 +14614,46 @@ body:has(.stage),
     font-size: 12px;
   }
 }
+
+/* Phones: the activity table becomes one small card per activity, the
+   icon and name on top and each score on its own labelled line. Four
+   columns don't fit on a phone, and the dots ran into the names. */
+@media (max-width: 760px) {
+  .sugg .s-row-head {
+    display: none;
+  }
+
+  .sugg .s-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 16px;
+  }
+
+  .sugg .s-act {
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .sugg .s-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .sugg .s-icon svg {
+    width: 38px;
+    height: 38px;
+  }
+
+  .sugg .s-dots {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sugg .s-dots::before {
+    content: attr(data-label);
+    flex: 1;
+    font-size: 14px;
+    color: #5c5650;
+  }
+}
