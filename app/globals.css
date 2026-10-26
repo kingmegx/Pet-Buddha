@@ -14359,3 +14359,26 @@ body:has(.stage),
     font-size: 16px;
   }
 }
+
+/* Phones: the name tag sits under the title and its line (which wrap to
+   two lines each), and the input sits under the tag, at any phone height. */
+@media (max-width: 760px) {
+  .nametag {
+    top: calc(9% + 212px);
+    width: 150px;
+  }
+
+  .screen-name .controls {
+    top: max(57%, calc(9% + 345px));
+  }
+}
+
+/* Phones: the two windows sit 28px from the top and are 150px tall, so the
+   name always starts below them, even on a short screen. */
+@media (max-width: 900px) {
+  .l-first .l-hero {
+    padding-top: 196px;
+    align-content: start;
+    align-items: start;
+  }
+}
