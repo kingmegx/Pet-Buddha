@@ -530,8 +530,8 @@ export const TOPPERS: { group: string; items: string[] }[] = [
   { group: "Spice box", items: ["Turmeric (haldi)", "Cumin (jeera)", "Cinnamon (dalchini)", "Fresh coriander", "Ginger", "Parsley", "A pinch of ground clove", "Fresh garlic, measured"] },
 ];
 
-// Ready-cooked fresh food, for kibble feeders and vegetarian homes who
-// won't cook. From Heads Up For Tails' own pages, read 26 Oct 2026.
+// Ready-cooked fresh food, for kibble feeders, and for vegetarian homes
+// that won't cook meat (they only ever see the meat recipes). From Heads Up For Tails' own pages, read 26 Oct 2026.
 const SARAS = "https://headsupfortails.com";
 export const FRESH_READY = {
   name: "Sara's Wholesome",
@@ -539,8 +539,8 @@ export const FRESH_READY = {
   all: `${SARAS}/collections/saras-wholesome-fresh-dog-food`,
   trial: `${SARAS}/products/saras-wholesome-100gm-trial-pack`,
   chicken: `${SARAS}/products/huft-saras-wholesome-food-classic-chicken-and-brown-rice-dog-food`,
-  paneer: `${SARAS}/products/saras-wholesome-paneer-veggies-dog-food`,
-  vegBiryani: `${SARAS}/products/saras-wholesome-vegetable-biryani-wet-dog-food-vegetarian-weekly-pack`,
+  chickenBiryani: `${SARAS}/products/saras-chicken-biryani-wholesome-food-for-dog`,
+  muttonBiryani: `${SARAS}/products/sara-mutton-biryani-wholesome-food-for-dog`,
 };
 
 // Fresh meat cut for dogs, delivered (Canine Craving), for anyone switching.

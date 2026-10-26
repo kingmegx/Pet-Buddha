@@ -182,14 +182,15 @@ export function FreshMeatCard() {
 }
 
 // Fresh food, ready-cooked: for kibble feeders who won't cook, and for
-// vegetarian homes, who see the paneer and vegetable recipes first.
+// vegetarian homes, who get meat into the bowl without cooking it. Only
+// meat recipes here: a vegetarian bowl is what they're moving on from.
 export function ReadyFreshCard({ veg = false }: { veg?: boolean }) {
   const r = FRESH_READY;
   return (
     <div className="dc-shop">
       {veg ? (
         <p>
-          <strong>Short on time?</strong> {r.name} from Heads Up For Tails is fresh dog food, cooked and ready to serve. It has vegetarian recipes too, Paneer &amp; Veggies and Vegetable Biryani, from {r.from}.
+          <strong>Not cooking meat at home?</strong> {r.name} from Heads Up For Tails is fresh meat dog food, cooked and ready to serve, so there&apos;s no meat to handle in your kitchen. Chicken &amp; Brown Rice is {r.from}.
         </p>
       ) : (
         <p>
@@ -199,11 +200,14 @@ export function ReadyFreshCard({ veg = false }: { veg?: boolean }) {
       <p className="s-links">
         {veg ? (
           <>
-            <a href={r.paneer} target="_blank" rel="noreferrer">
-              Paneer &amp; Veggies <span aria-hidden>→</span>
+            <a href={r.chicken} target="_blank" rel="noreferrer">
+              Chicken &amp; Brown Rice <span aria-hidden>→</span>
             </a>
-            <a href={r.vegBiryani} target="_blank" rel="noreferrer">
-              Vegetable Biryani <span aria-hidden>→</span>
+            <a href={r.chickenBiryani} target="_blank" rel="noreferrer">
+              Chicken Biryani <span aria-hidden>→</span>
+            </a>
+            <a href={r.muttonBiryani} target="_blank" rel="noreferrer">
+              Mutton Biryani <span aria-hidden>→</span>
             </a>
           </>
         ) : (
@@ -216,9 +220,11 @@ export function ReadyFreshCard({ veg = false }: { veg?: boolean }) {
             </a>
           </>
         )}
-        <a href={r.all} target="_blank" rel="noreferrer">
-          All recipes <span aria-hidden>→</span>
-        </a>
+        {!veg && (
+          <a href={r.all} target="_blank" rel="noreferrer">
+            All recipes <span aria-hidden>→</span>
+          </a>
+        )}
       </p>
     </div>
   );
