@@ -5,8 +5,8 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
-import { ACTIVITIES, BOWLS, CALM, FRESH_BOWLS, doseFor, type Dose, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
-import { BODY_TIPS, BOWL_NOTE, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, tabName, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
+import { ACTIVITIES, BOWLS, CALM, foodsLabel, FRESH_BOWLS, doseFor, type Dose, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
+import { BODY_TIPS, BOWL_NOTE, COOKING, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, tabName, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import { BallIcon, ChewIcon, SniffIcon, WalkIcon } from "./Icons";
@@ -16,7 +16,7 @@ import { ToiletRoad } from "./ToiletRoad";
 import { BowlCompare } from "./BowlCompare";
 import { PerfectBowl } from "./PerfectBowl";
 import { BalanceBowl, type Preset } from "./BalanceBowl";
-import { DietChart, FreshMeatCard } from "./DietChart";
+import { DietChart, FreshMeatCard, ReadyFreshCard } from "./DietChart";
 import { BodyCheck } from "./BodyCheck";
 
 // The dog's name set in the italic accent face, like "why *pet buddha*".
@@ -926,6 +926,7 @@ export function Results({
   sex,
   needs,
   bowl,
+  foods = [],
   email = null,
   onProfile,
   onRestart,
@@ -938,6 +939,7 @@ export function Results({
   sex: Sex | null;
   needs: ProblemId[];
   bowl: Bowl | null;
+  foods?: Bowl[];
   email?: string | null;
   onProfile: () => void;
   onRestart: () => void;
@@ -953,7 +955,7 @@ export function Results({
   const lead = groups[0];
   const breedName = pet.face === "mixed" && pet.name.startsWith("Mixed") ? "Mixed breed" : pet.name;
   const meta = [`${formatAge(months)} old`, `${kg} kg${weightSure ? "" : " (a guess)"}`, sex === "boy" ? "Boy" : sex === "girl" ? "Girl" : null].filter(Boolean).join(" · ");
-  const bowlName = BOWLS.find((b) => b.id === bowl)?.label;
+  const bowlName = (foods.length ? foodsLabel(foods) : BOWLS.find((b) => b.id === bowl)?.label) ?? null;
   const chosen = PROBLEMS.filter((p) => needs.includes(p.id));
   const neuter = chosen.some((p) => NEUTER_FOR.includes(p.id)) ? neuterNote(sex, months) : null;
 
@@ -962,6 +964,9 @@ export function Results({
   const [toys, setToys] = useState(false);
   // The diet chart's bowl, loaded into Balance the bowl.
   const [preset, setPreset] = useState<Preset | null>(null);
+  // Up to "Balance the bowl" at the top of the Food tab.
+  const toBowl = () =>
+    window.setTimeout(() => document.querySelector(".bb")?.closest(".s-panel")?.querySelectorAll(".s-subhead").forEach((h) => h.textContent?.startsWith("Balance") && h.scrollIntoView({ behavior: "smooth", block: "start" })), 50);
   const [elim, setElim] = useState(false);
   const [garlicOpen, setGarlicOpen] = useState(false);
   // Escape closes the toy shelf and the food-allergy guide.
@@ -1281,8 +1286,9 @@ export function Results({
                   products={products}
                   onLoad={(p) => {
                     setPreset({ key: Date.now(), ...p });
-                    window.setTimeout(() => document.querySelector(".bb")?.closest(".s-panel")?.querySelectorAll(".s-subhead").forEach((h) => h.textContent?.startsWith("Balance") && h.scrollIntoView({ behavior: "smooth", block: "start" })), 50);
+                    toBowl();
                   }}
+                  onBowl={toBowl}
                 />
 
                 <p className="s-note">
@@ -1496,7 +1502,7 @@ export function Results({
 // one they pick opens. Progressive: the diet chart is made when they ask.
 type NextId = "perfect" | "body" | "start" | "why" | "help" | "rules" | "faq";
 
-function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bowl: Bowl | null; needs: ProblemId[]; kg: number; months: number; who: string; Who: string; products: Product[]; onLoad: (p: Omit<Preset, "key">) => void }) {
+function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad, onBowl }: { bowl: Bowl | null; needs: ProblemId[]; kg: number; months: number; who: string; Who: string; products: Product[]; onLoad: (p: Omit<Preset, "key">) => void; onBowl: () => void }) {
   const [pick, setPick] = useState<NextId | null>(null);
   const [chart, setChart] = useState<"no" | "making" | "yes">("no");
   const fresh = !!bowl && FRESH_BOWLS.includes(bowl);
@@ -1561,7 +1567,18 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bow
       <p className="s-toilet-note">{GARLIC_CONTEXT}</p>
     </FeatureFold>
   );
+  // Before any recipe: check the bowl they already make, so what we suggest
+  // fits it.
   const links = (
+    <>
+    <div className="fn-nudge">
+      <p>
+        <strong>Check {who === "your dog" ? "the" : `${Who}'s`} bowl first.</strong> Put in what goes in it on a normal day, and we&apos;ll show what&apos;s missing and exactly what to add, in grams.
+      </p>
+      <button className="pill" onClick={onBowl}>
+        {who === "your dog" ? "Balance the bowl" : `Balance ${Who}'s bowl`} <span className="arrow arrow-up" aria-hidden />
+      </button>
+    </div>
     <p className="s-links">
       {HOMEMADE_LINKS.map((l) => (
         <a key={l.url} href={l.url} target="_blank" rel="noreferrer">
@@ -1569,6 +1586,7 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bow
         </a>
       ))}
     </p>
+    </>
   );
 
   return (
@@ -1629,8 +1647,16 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bow
                 <>
                   {bowl && <p className="fn-lead">{BOWL_NOTE[bowl]}</p>}
                   <Tips compact tips={HOMEMADE_TIPS} />
-                  {bowl === "veg" && <FreshMeatCard />}
+                  {bowl === "veg" && (
+                    <>
+                      <ReadyFreshCard veg />
+                      <FreshMeatCard />
+                    </>
+                  )}
                   {links}
+                  <Fold title="How to cook it" line="Pressure cooker, broth, bones and spices, step by step.">
+                    <Tips compact tips={COOKING} />
+                  </Fold>
                   <Fold title="Fresh toppers to add" line="Easy fresh extras from your own kitchen, and how much of each.">
                     <ToppersGrid />
                     <Tips compact tips={TOPPER_AMOUNTS} />
@@ -1641,6 +1667,7 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bow
                 <>
                   <p className="fn-lead">Keep their usual food. Add fresh bites, up to a tenth of the day&apos;s food.</p>
                   <Tips compact tips={TOPPER_TIPS} />
+                  <ReadyFreshCard />
                   <FreshMeatCard />
                   {/* For the packaged part: a better kibble while they move towards fresh. */}
                   {RECOMMENDED_KIBBLES.length > 0 && (
@@ -1665,8 +1692,8 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bow
                   <Fold title="When you're ready for more" line="A quarter, half, or all fresh: what each step looks like.">
                     <Ladder start={bowl ? LADDER_START[bowl] : LADDER[0].id} />
                   </Fold>
-                  <Fold title="Making it at home" line="What makes a home-made bowl complete, not just fresh.">
-                    <Tips compact tips={HOMEMADE_TIPS} />
+                  <Fold title="Making it at home" line="How to cook it, step by step, in an Indian kitchen.">
+                    <Tips compact tips={COOKING} />
                     {links}
                   </Fold>
                 </>

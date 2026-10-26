@@ -1,7 +1,8 @@
 // Balance the bowl: a rough check of a day's food against what a dog needs.
 //
-// Values are typical figures per 100 g of food as it's served (cooked where
-// it's cooked), rounded from standard food tables (USDA FoodData Central and
+// Values are typical figures per 100 g of food as it's served, and every
+// meat, organ and fish is a cooked weight: owners weigh after cooking (the
+// site tells them so). Rounded from standard food tables (USDA FoodData Central and
 // Indian food composition tables). They're a guide, not a lab analysis:
 // real recipes, cuts and brands vary.
 //
@@ -92,7 +93,7 @@ export const FOODS: Food[] = [
 
   { id: "sardine", count: true, name: "Sardine", group: "Fish", unit: "sardine", grams: 25, protein: 25, fat: 11.5, carbs: 0, has: ["omega3", "calcium", "vitd", "taurine"] },
   { id: "bangda", name: "Mackerel (bangda)", group: "Fish", unit: "100 g", grams: 100, protein: 24, fat: 18, carbs: 0, has: ["omega3", "vitd", "taurine"] },
-  { id: "whitefish", name: "White fish (rohu, basa)", group: "Fish", unit: "100 g", grams: 100, protein: 20, fat: 2, carbs: 0, has: ["taurine"] },
+  { id: "whitefish", name: "White fish (rohu, basa)", group: "Fish", unit: "100 g", grams: 100, protein: 23, fat: 2.5, carbs: 0, has: ["taurine"] },
   { id: "prawns", name: "Prawns", group: "Fish", unit: "100 g", grams: 100, protein: 24, fat: 1, carbs: 0.2, has: ["taurine", "zinc"] },
 
   { id: "curd", name: "Curd, plain", group: "Dairy", unit: "tbsp", grams: 15, protein: 3.5, fat: 3.3, carbs: 4.7, has: ["calcium"] },

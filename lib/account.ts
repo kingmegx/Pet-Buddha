@@ -24,6 +24,8 @@ export type SavedDog = {
   sex: Sex | null;
   needs: ProblemId[];
   bowl: Bowl | null;
+  // Everything they ticked; older saves only have `bowl`.
+  foods?: Bowl[];
 };
 
 // Set just before leaving for Google or the email link, so that coming back

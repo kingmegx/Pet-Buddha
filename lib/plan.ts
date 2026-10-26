@@ -530,13 +530,18 @@ export const TOPPERS: { group: string; items: string[] }[] = [
   { group: "Spice box", items: ["Turmeric (haldi)", "Cumin (jeera)", "Cinnamon (dalchini)", "Fresh coriander", "Ginger", "Parsley", "A pinch of ground clove", "Fresh garlic, measured"] },
 ];
 
-// How to cook a dog's bowl, Indian kitchen style.
-export const COOKING: Tip[] = [
-  { t: "Boil it gently", d: "Simmer the meat in plain water until just cooked through. Keep the water: it's broth for the bowl." },
-  { t: "Pressure cooker? One whistle", d: "Short on time, a pressure cooker is fine. One whistle is enough; more makes the meat tough." },
-  { t: "No masala", d: "No salt, onion, chilli, garam masala or ready pastes. Only dog-safe spices: a pinch of haldi, jeera or dalchini." },
-  { t: "Veg, lightly", d: "Steam or boil the veg lightly, or chop it raw and fine, then mix it in." },
-];
+// Ready-cooked fresh food, for kibble feeders and vegetarian homes who
+// won't cook. From Heads Up For Tails' own pages, read 26 Oct 2026.
+const SARAS = "https://headsupfortails.com";
+export const FRESH_READY = {
+  name: "Sara's Wholesome",
+  from: "₹99 for 100 g",
+  all: `${SARAS}/collections/saras-wholesome-fresh-dog-food`,
+  trial: `${SARAS}/products/saras-wholesome-100gm-trial-pack`,
+  chicken: `${SARAS}/products/huft-saras-wholesome-food-classic-chicken-and-brown-rice-dog-food`,
+  paneer: `${SARAS}/products/saras-wholesome-paneer-veggies-dog-food`,
+  vegBiryani: `${SARAS}/products/saras-wholesome-vegetable-biryani-wet-dog-food-vegetarian-weekly-pack`,
+};
 
 // Fresh meat cut for dogs, delivered (Canine Craving), for anyone switching.
 export const FRESH_MEAT_SHOP = {
@@ -607,19 +612,26 @@ export const BOWL_NOTE: Record<Bowl, string> = {
   raw: "Raw meat and veg is a great base. On its own it usually runs short on a few things, like calcium, omega-3 and vitamin D. Put in what you feed above, and we'll show what to add.",
 };
 
-// Making it at home: the rules for a complete recipe.
+// Making the bowl complete: for a dog already on fresh food.
 export const HOMEMADE_TIPS: Tip[] = [
   { t: "Add what's missing", d: "Meat, rice and veg alone run short on a few things. Add an egg (vitamin D, choline), sardines twice a week (omega-3), a little liver or mutton (zinc), and eggshell powder for calcium: about half a teaspoon per 500 g of meat." },
-  { t: "Then use a complete recipe", d: "For everything else, follow a recipe made for dogs by a canine nutritionist, or add a vitamin premix made for home-cooked dog food." },
-  { t: "No ingredient swaps", d: "Once you have a recipe, swapping one thing for another slowly unbalances it. A human multivitamin won't fix it." },
-  { t: "How to spot a good recipe", d: "It states which standard it meets, lists ingredients by weight, gives calories and a nutrient breakdown." },
-  { t: "Freeze, then thaw cold", d: "Freeze raw meat first, then thaw it in the fridge, not on the counter.", src: "@georginaskitchen.india" },
-  { t: "Start with chews and organs", d: "While you plan a full diet, start small amounts of organs and raw chews like chicken feet or necks. A little nausea at first is normal.", src: "@georginaskitchen.india" },
-  { t: "Poach, don't fry", d: "Gently poach meat in water until just cooked through. Browning creates harmful compounds. Raw is fine too, handled cleanly." },
+  { t: "Then check it in the bowl above", d: "Put in a normal day's bowl, weighed after cooking. We'll show what's still short, like zinc or vitamin E, and what to add, in grams." },
+  { t: "Keep it steady", d: "Once the bowl balances, keep the same foods and amounts. Swapping one thing for another slowly unbalances it, and a human multivitamin won't fix it." },
+];
+
+// Cooking it at home, step by step. Shown under "Making it at home" and in
+// the diet chart. Every amount on the site is a cooked weight.
+export const COOKING: Tip[] = [
+  { t: "Get a kitchen scale", d: "It's the one tool you need. Weigh the meat after it's cooked: every amount on Pet Buddha, in the diet chart and the bowl checker, is a cooked weight." },
+  { t: "Pressure cook the meat", d: "Put the chicken in the cooker with at least as much water as meat (1:1, or a little more). One whistle is enough; more makes it tough. Or simmer it gently in a pan until just cooked through." },
+  { t: "Keep the broth", d: "Don't throw the water away. It holds goodness from the meat, and a few spoons over the bowl makes any meal more welcome." },
+  { t: "Bones out, every time", d: "Cooked bones turn brittle and splinter, and can cut their mouth or gut. Pick out every bone and throw them away." },
+  { t: "No salt, chilli or masala", d: "Nothing from our spice box but a pinch of haldi, jeera or dalchini. No salt, chilli, onion, garam masala or ready pastes." },
+  { t: "Plain is perfect for them", d: "Dogs have about a fifth of the taste buds we do, and they eat with their nose. Plain meat and its broth already smell wonderful to them, so there's no need to make it \"tasty\"." },
+  { t: "Veg, lightly", d: "Steam or boil the veg lightly, or chop it raw and fine, then mix it in." },
 ];
 
 export const HOMEMADE_LINKS = [
-  { label: "Complete recipes at foreverdog.com", url: "https://foreverdog.com" },
   { label: "Find a fresh food consultant", url: "https://freshfoodconsultants.org" },
 ];
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AGE_STOPS, MIXED, POPULAR, WEIGHT_RANGE, formatAge, searchBreeds, type Breed } from "@/lib/flow";
-import { BOWLS, PROBLEMS, type Bowl, type ProblemId, type Sex } from "@/lib/content";
+import { FOOD_CHOICES, PROBLEMS, type Bowl, type ProblemId, type Sex } from "@/lib/content";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
 import Slider from "./Slider";
@@ -25,8 +25,8 @@ export function Profile({
   setSex,
   needs,
   setNeeds,
-  bowl,
-  setBowl,
+  foods,
+  toggleFood,
   onDone,
 }: {
   name: string;
@@ -43,8 +43,8 @@ export function Profile({
   setSex: (s: Sex) => void;
   needs: ProblemId[];
   setNeeds: (fn: (now: ProblemId[]) => ProblemId[]) => void;
-  bowl: Bowl | null;
-  setBowl: (b: Bowl) => void;
+  foods: Bowl[];
+  toggleFood: (b: Bowl) => void;
   onDone: () => void;
 }) {
   const [typed, setTyped] = useState("");
@@ -164,8 +164,8 @@ export function Profile({
         <div className="profile-row">
           <span>Eats</span>
           <div className="chips chips-left">
-            {BOWLS.map((b) => (
-              <button key={b.id} className="chip" aria-pressed={bowl === b.id} onClick={() => setBowl(b.id)}>
+            {FOOD_CHOICES.map((b) => (
+              <button key={b.id} className="chip" aria-pressed={foods.includes(b.id)} onClick={() => toggleFood(b.id)}>
                 {b.label}
               </button>
             ))}

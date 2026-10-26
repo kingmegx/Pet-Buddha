@@ -1,7 +1,7 @@
 "use client";
 
 import { dietChart } from "@/lib/balance";
-import { COOKING, FRESH_MEAT_SHOP, garlicCloves } from "@/lib/plan";
+import { COOKING, FRESH_MEAT_SHOP, FRESH_READY, garlicCloves } from "@/lib/plan";
 import type { Preset } from "./BalanceBowl";
 
 // A day's bowl for a healthy adult dog, by the gram, in the shape of The
@@ -60,7 +60,7 @@ export function DietChart({ kg, months, need, who, onLoad, onExperts }: { kg: nu
         <div className="dc-total">
           <strong>{c.total} g</strong>
           <span>
-            of fresh food a day for {who} at {kg} kg, about {need} calories
+            of fresh food a day for {who} at {kg} kg, about {need} calories. All cooked weights: weigh after cooking.
           </span>
         </div>
         <span className="dc-meals-note">{meals === 3 ? "Split into 3 meals a day" : "Split into 2 meals a day, with a snack in between"}</span>
@@ -175,6 +175,49 @@ export function FreshMeatCard() {
         </a>
         <a href={FRESH_MEAT_SHOP.meals} target="_blank" rel="noreferrer">
           Ready fresh meals <span aria-hidden>→</span>
+        </a>
+      </p>
+    </div>
+  );
+}
+
+// Fresh food, ready-cooked: for kibble feeders who won't cook, and for
+// vegetarian homes, who see the paneer and vegetable recipes first.
+export function ReadyFreshCard({ veg = false }: { veg?: boolean }) {
+  const r = FRESH_READY;
+  return (
+    <div className="dc-shop">
+      {veg ? (
+        <p>
+          <strong>Short on time?</strong> {r.name} from Heads Up For Tails is fresh dog food, cooked and ready to serve. It has vegetarian recipes too, Paneer &amp; Veggies and Vegetable Biryani, from {r.from}.
+        </p>
+      ) : (
+        <p>
+          <strong>Want fresh without cooking?</strong> {r.name} from Heads Up For Tails is fresh dog food, cooked and ready to serve, from {r.from}. Start with the trial pack and mix a little into their usual food.
+        </p>
+      )}
+      <p className="s-links">
+        {veg ? (
+          <>
+            <a href={r.paneer} target="_blank" rel="noreferrer">
+              Paneer &amp; Veggies <span aria-hidden>→</span>
+            </a>
+            <a href={r.vegBiryani} target="_blank" rel="noreferrer">
+              Vegetable Biryani <span aria-hidden>→</span>
+            </a>
+          </>
+        ) : (
+          <>
+            <a href={r.trial} target="_blank" rel="noreferrer">
+              Trial pack of 3 <span aria-hidden>→</span>
+            </a>
+            <a href={r.chicken} target="_blank" rel="noreferrer">
+              Chicken &amp; Brown Rice <span aria-hidden>→</span>
+            </a>
+          </>
+        )}
+        <a href={r.all} target="_blank" rel="noreferrer">
+          All recipes <span aria-hidden>→</span>
         </a>
       </p>
     </div>

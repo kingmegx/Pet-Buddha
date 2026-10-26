@@ -14268,3 +14268,65 @@ body:has(.stage),
   font-size: 13px;
   color: rgba(17, 17, 17, 0.5);
 }
+
+/* Food question: four foods, more than one can be ticked; two even rows. */
+.chips.chips-foods {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(560px, 100%);
+  margin-inline: auto;
+}
+
+.chips-foods .chip {
+  justify-content: center;
+  width: 100%;
+}
+
+@media (max-width: 520px) {
+  .chips-foods .chip.chip-big {
+    padding-inline: 12px;
+    font-size: 15px;
+  }
+}
+
+/* "Check the bowl first": sends fresh feeders up to the bowl checker. */
+.fn-nudge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
+  margin-top: 20px;
+  padding: 18px 20px;
+  border: 1.5px solid #ece6df;
+  border-radius: 14px;
+}
+
+.fn-nudge p {
+  flex: 1 1 300px;
+  margin: 0 !important;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #3b3530 !important;
+}
+
+.arrow-up {
+  rotate: -90deg;
+}
+
+/* "All weights are cooked weights", under the bowl's label. */
+.bb .bb-label:has(+ .bb-cooked) {
+  margin-bottom: 4px !important;
+}
+
+.bb .bb-cooked {
+  margin: 0 0 16px !important;
+  font-size: 13px !important;
+  line-height: 1.45;
+  color: rgba(17, 17, 17, 0.6) !important;
+}
+
+/* Two shop cards in a row (ready-cooked, then fresh meat): a small gap. */
+.dc-shop + .dc-shop {
+  margin-top: 12px;
+}

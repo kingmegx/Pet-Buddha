@@ -187,6 +187,7 @@ export function BalanceBowl({ bowl, need, who, kg, preset }: { bowl: Bowl | null
       {/* What's in the bowl */}
       <div className="bb-in">
         <p className="bb-label">In {who === "your dog" ? "the" : `${who}'s`} bowl, over a day</p>
+        <p className="bb-cooked">All weights are cooked weights. Weigh meat after cooking.</p>
         <ul className="bb-lines">
           <AnimatePresence initial={false}>
             {lines.map((l) => {

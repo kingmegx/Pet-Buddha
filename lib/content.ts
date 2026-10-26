@@ -62,6 +62,33 @@ export const BOWLS: { id: Bowl; label: string }[] = [
   { id: "mix", label: "A mix" },
 ];
 
+// What the owner can tick on the food question; more than one is fine.
+// "A mix" isn't offered: ticking packaged and a fresh food is the mix.
+export const FOOD_CHOICES = BOWLS.filter((b) => b.id !== "mix");
+
+// The one bowl the advice is written for, from what they ticked. Packaged
+// with anything fresh is a mix; fresh foods together lean to meat, then raw.
+export function bowlFor(foods: Bowl[]): Bowl | null {
+  if (foods.length === 0) return null;
+  if (foods.length === 1) return foods[0];
+  if (foods.includes("kibble")) return "mix";
+  if (foods.includes("meat")) return "meat";
+  if (foods.includes("raw")) return "raw";
+  return foods[0];
+}
+
+// "packaged (kibble) and fresh, meat-based", for the dog's card.
+export function foodsLabel(foods: Bowl[]) {
+  const names = FOOD_CHOICES.filter((b) => foods.includes(b.id)).map((b) => b.label.toLowerCase());
+  return names.length < 2 ? names[0] ?? null : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
+
+// Saved before foods could be ticked together: one bowl, maybe "mix".
+export function foodsFromBowl(bowl: Bowl | null): Bowl[] {
+  if (!bowl) return [];
+  return bowl === "mix" ? ["kibble", "meat"] : [bowl];
+}
+
 // Bowls that are already fresh: the advice is about making them complete.
 export const FRESH_BOWLS: Bowl[] = ["veg", "meat", "raw"];
 

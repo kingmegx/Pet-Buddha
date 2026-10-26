@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { AGE_STOPS, BREEDS, MIXED, POPULAR, WEIGHT_RANGE, ageBand, formatAge, monthsSince, searchBreeds, type Breed } from "@/lib/flow";
-import { BOWLS, PROBLEMS, commonProblems, type Bowl, type ProblemId, type Sex } from "@/lib/content";
+import { FOOD_CHOICES, PROBLEMS, bowlFor, commonProblems, foodsFromBowl, type Bowl, type ProblemId, type Sex } from "@/lib/content";
 import { Face } from "./Faces";
 import { CatBust, ProfileBust } from "./Busts";
 import { NicheArt } from "./NicheArt";
@@ -94,8 +94,11 @@ export default function Onboarding() {
   const [needs, setNeeds] = useState<ProblemId[]>([]);
   // Once the owner has ticked or unticked anything, their list is left alone.
   const [needsTouched, setNeedsTouched] = useState(false);
-  // What is in the bowl now, from the food step.
-  const [bowl, setBowl] = useState<Bowl | null>(null);
+  // What is in the bowl now, from the food step: one or more foods, and
+  // the bowl the advice is written for.
+  const [foods, setFoods] = useState<Bowl[]>([]);
+  const bowl = bowlFor(foods);
+  const toggleFood = (f: Bowl) => setFoods((now) => (now.includes(f) ? now.filter((x) => x !== f) : [...now, f]));
   const [cheer, setCheer] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [packMood, setPackMood] = useState<PackMood>("idle");
@@ -141,7 +144,7 @@ export default function Onboarding() {
     setSex(d.sex);
     setNeeds(d.needs);
     setNeedsTouched(true);
-    setBowl(d.bowl);
+    setFoods(d.foods ?? foodsFromBowl(d.bowl));
     setTrail([]);
     setStep("done");
   };
@@ -240,7 +243,7 @@ export default function Onboarding() {
     setDob("");
     setNeeds([]);
     setNeedsTouched(false);
-    setBowl(null);
+    setFoods([]);
   };
 
   // The curating screen is a short pause before the results.
@@ -253,7 +256,7 @@ export default function Onboarding() {
   // Later flows will read this instead of asking again.
   useEffect(() => {
     if ((step !== "done" && step !== "profile") || !pet) return;
-    const profile = { name: name.trim() || null, breed: pet.name, ageMonths: months, dateOfBirth: dobMonths !== null ? dob : null, weightKg: kg, weightSure, sex, needs, bowl };
+    const profile = { name: name.trim() || null, breed: pet.name, ageMonths: months, dateOfBirth: dobMonths !== null ? dob : null, weightKg: kg, weightSure, sex, needs, bowl, foods };
     try {
       localStorage.setItem("petbuddha.profile", JSON.stringify(profile));
     } catch {}
@@ -261,7 +264,7 @@ export default function Onboarding() {
     if (!email) return;
     const t = window.setTimeout(() => saveDog(profile), 800);
     return () => window.clearTimeout(t);
-  }, [step, pet, name, months, dobMonths, dob, kg, weightSure, sex, needs, bowl, email]);
+  }, [step, pet, name, months, dobMonths, dob, kg, weightSure, sex, needs, bowl, foods, email]);
 
   // Eyebrow, title and the line under the title, per step.
   const titles: Record<Step, [string, string, string]> = {
@@ -273,7 +276,7 @@ export default function Onboarding() {
     age: ["Step 5 of 8", `How old is ${who}?`, "Age changes what's safe to chew and what they need."],
     sex: ["Step 6 of 8", `Is ${who} a boy or a girl?`, "A few behaviours differ between the two."],
     needs: ["Step 7 of 8", "What would you like help with?", `Pick all that apply. We've pre-selected what's common at ${formatAge(months)}.`],
-    food: ["Step 8 of 8", `What does ${who} eat now?`, "Then tick anything you've noticed about their body."],
+    food: ["Step 8 of 8", `What does ${who} eat now?`, "Tick everything that goes in the bowl, then anything you've noticed about their body."],
     curating: ["One moment", `Putting it together for ${who}`, ""],
     done: ["", "", ""],
     profile: ["", "", ""],
@@ -704,17 +707,15 @@ export default function Onboarding() {
 
           {step === "food" && (
             <div className="controls">
-              <div className="chips" role="radiogroup" aria-label="What they eat">
-                {BOWLS.map((b) => (
+              <div className="chips chips-foods" role="group" aria-label="What they eat">
+                {FOOD_CHOICES.map((b) => (
                   <button
                     key={b.id}
                     className="chip chip-big"
-                    role="radio"
-                    aria-checked={bowl === b.id}
-                    aria-pressed={bowl === b.id}
+                    aria-pressed={foods.includes(b.id)}
                     onClick={() => {
-                      setBowl(b.id);
-                      celebrate();
+                      if (!foods.includes(b.id)) celebrate();
+                      toggleFood(b.id);
                     }}
                   >
                     {b.label}
@@ -777,13 +778,13 @@ export default function Onboarding() {
                 setNeedsTouched(true);
                 setNeeds(fn);
               }}
-              bowl={bowl}
-              setBowl={setBowl}
+              foods={foods}
+              toggleFood={toggleFood}
               onDone={() => setStep("done")}
             />
           )}
 
-          {step === "done" && pet && <Results pet={pet} name={cap(name)} months={months} kg={kg} weightSure={weightSure} sex={sex} needs={needs} bowl={bowl} email={email} onProfile={() => setStep("profile")} onRestart={restart} />}
+          {step === "done" && pet && <Results pet={pet} name={cap(name)} months={months} kg={kg} weightSure={weightSure} sex={sex} needs={needs} bowl={bowl} foods={foods} email={email} onProfile={() => setStep("profile")} onRestart={restart} />}
         </motion.section>
       </AnimatePresence>
 
