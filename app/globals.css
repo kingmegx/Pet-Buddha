@@ -14382,3 +14382,127 @@ body:has(.stage),
     align-items: start;
   }
 }
+
+/* =====================================================================
+   Phones: the questions stack top to bottom and the page scrolls.
+   On a laptop each question is a fixed frame with parts placed by
+   percentage; on a phone that made them collide (wrapped titles, short
+   screens) and hid anything below the fold. Here: title, then the
+   picture, then the controls, in normal flow.
+   ===================================================================== */
+@media (max-width: 760px) {
+  html:has(.stage.is-q),
+  body:has(.stage.is-q) {
+    height: auto;
+    overflow: auto;
+  }
+
+  .stage.is-q {
+    position: relative;
+    inset: auto;
+    min-height: 100dvh;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 40px;
+  }
+
+  .stage.is-q .progress {
+    position: fixed;
+  }
+
+  .stage.is-q .back {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+  }
+
+  .stage.is-q .title {
+    position: relative;
+    top: auto;
+    padding: 64px 20px 0;
+  }
+
+  .stage.is-q .title h1 {
+    font-size: 30px;
+    line-height: 1.1;
+  }
+
+  .stage.is-q .title .sub {
+    max-width: 34ch;
+    margin: 12px auto 0;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* The corner stickers crowd a phone screen. */
+  .stage.is-q .step-stickers {
+    display: none;
+  }
+
+  .stage.is-q .hero {
+    position: relative;
+    top: auto !important;
+    left: auto;
+    translate: none;
+    width: 150px;
+    margin: 20px auto 0;
+  }
+
+  .stage.is-q .screen {
+    position: relative;
+    inset: auto;
+    flex: 1 0 auto;
+  }
+
+  .stage.is-q .screen .controls {
+    position: relative;
+    top: auto !important;
+    bottom: auto;
+    margin-top: 24px;
+  }
+
+  .stage.is-q .nametag {
+    position: relative;
+    top: auto;
+    left: auto;
+    translate: none;
+    width: 150px;
+    margin: 20px auto 0;
+  }
+
+  .stage.is-q .breed-pick {
+    position: relative;
+    inset: auto;
+    padding-top: 20px;
+  }
+
+  /* Breed faces: names start right under each face, so they line up. */
+  .stage.is-q .tile {
+    justify-content: flex-start;
+  }
+
+  .stage.is-q .tile .face {
+    width: 84px;
+  }
+
+  .stage.is-q .breed-name {
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .stage.is-q .sides {
+    position: relative;
+    inset: auto;
+    height: max(440px, calc(100dvh - 220px));
+    margin-top: 12px;
+  }
+}
+
+/* The landing and the plan scroll inside their own panels: make sure a
+   swipe always scrolls them on phones, and doesn't bounce the page. */
+.paper.landing,
+.results {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}

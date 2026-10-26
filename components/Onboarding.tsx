@@ -128,6 +128,19 @@ export default function Onboarding() {
     } catch {}
   }, []);
 
+  // Development only: ?step=breed (or any step) opens that question with a
+  // sample dog, for checking layouts quickly. Ignored on the live site.
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+    const want = new URLSearchParams(window.location.search).get("step") as Step | null;
+    if (!want) return;
+    setName("Quro");
+    setBreed(POPULAR[0]);
+    setTrail(["landing"]);
+    setStep(want);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Signed in: who to, and their saved dog. Back from Google or the email
   // link, the plan they were looking at is saved first; otherwise the saved
   // one opens, so they land straight on it.
@@ -308,7 +321,8 @@ export default function Onboarding() {
 
   return (
     <main
-      className="stage"
+      // Questions get their own phone layout: stacked, and scrolling.
+      className={`stage ${step !== "landing" && step !== "done" && step !== "profile" && step !== "curating" ? "is-q" : ""}`}
       onPointerMove={(e) => {
         // Eyes follow the hand. Updated at most once per frame.
         const stage = e.currentTarget;
