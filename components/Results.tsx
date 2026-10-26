@@ -1,5 +1,6 @@
 "use client";
 
+import { SaveCard, SavePlan } from "./SavePlan";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
@@ -925,6 +926,7 @@ export function Results({
   sex,
   needs,
   bowl,
+  email = null,
   onProfile,
   onRestart,
 }: {
@@ -936,6 +938,7 @@ export function Results({
   sex: Sex | null;
   needs: ProblemId[];
   bowl: Bowl | null;
+  email?: string | null;
   onProfile: () => void;
   onRestart: () => void;
 }) {
@@ -1021,9 +1024,12 @@ export function Results({
     <div className="results sugg">
       <div className="results-bar">
         <Logo />
-        <button className="linklike" onClick={onProfile}>
-          {name || "Profile"} <i className="chev" aria-hidden />
-        </button>
+        <span className="results-bar-end">
+          <SavePlan email={email} who={name || "your dog"} />
+          <button className="linklike" onClick={onProfile}>
+            {name || "Profile"} <i className="chev" aria-hidden />
+          </button>
+        </span>
       </div>
 
       {/* 1. The aha */}
@@ -1310,6 +1316,7 @@ export function Results({
           <Squiggle className="is-short" />
         </div>
         <div className="s-help">
+          <SaveCard email={email} who={name || "your dog"} />
           <div className="s-help-card">
             <h3>Something else going on?</h3>
             <p>Add it to {name ? `${name}'s` : "the"} profile, or change anything we got wrong. The plan updates.</p>

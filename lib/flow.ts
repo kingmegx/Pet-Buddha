@@ -71,8 +71,8 @@ export function searchBreeds(typed: string, limit = 5) {
 
 export const WEIGHT_RANGE: [number, number] = [1, 70];
 
-// Age slider stops, in months.
-export const AGE_STOPS = [2, 3, 4, 5, 6, 8, 10, 12, 18, 24, 36, 48, 60, 72, 84, 96, 120, 144, 180];
+// Age slider stops, in months: finer for puppies, then every year from 2 to 18.
+export const AGE_STOPS = [2, 3, 4, 5, 6, 8, 10, 12, 18, ...Array.from({ length: 17 }, (_, i) => (i + 2) * 12)];
 
 export function formatAge(months: number) {
   if (months < 1) return "under 1 month";

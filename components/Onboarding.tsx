@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { AGE_STOPS, MIXED, POPULAR, WEIGHT_RANGE, ageBand, formatAge, monthsSince, searchBreeds, type Breed } from "@/lib/flow";
+import { AGE_STOPS, BREEDS, MIXED, POPULAR, WEIGHT_RANGE, ageBand, formatAge, monthsSince, searchBreeds, type Breed } from "@/lib/flow";
 import { BOWLS, PROBLEMS, commonProblems, type Bowl, type ProblemId, type Sex } from "@/lib/content";
 import { Face } from "./Faces";
 import { CatBust, ProfileBust } from "./Busts";
@@ -18,6 +18,7 @@ import { Profile } from "./Profile";
 import Slider from "./Slider";
 import { DobInput } from "./DobInput";
 import HandCursor from "./HandCursor";
+import { accounts, loadDog, localDog, saveDog, takeSaveOnReturn, type SavedDog } from "@/lib/account";
 
 type Step = "landing" | "species" | "name" | "breed" | "weight" | "age" | "sex" | "needs" | "food" | "curating" | "done" | "profile";
 
@@ -124,6 +125,49 @@ export default function Onboarding() {
     } catch {}
   }, []);
 
+  // Signed in: who to, and their saved dog. Back from Google or the email
+  // link, the plan they were looking at is saved first; otherwise the saved
+  // one opens, so they land straight on it.
+  const [email, setEmail] = useState<string | null>(null);
+  const restore = (d: SavedDog) => {
+    const b = BREEDS.find((x) => x.name === d.breed) ?? (d.breed === MIXED.name ? MIXED : null);
+    if (!b) return;
+    setName(cap(d.name ?? ""));
+    setBreed(b);
+    setDob(d.dateOfBirth ?? "");
+    setAge(sliderPosition(d.ageMonths));
+    setWeight((d.weightKg - minKg) / (maxKg - minKg));
+    setWeightSure(d.weightSure);
+    setSex(d.sex);
+    setNeeds(d.needs);
+    setNeedsTouched(true);
+    setBowl(d.bowl);
+    setTrail([]);
+    setStep("done");
+  };
+  useEffect(() => {
+    if (!accounts) return;
+    let first = true;
+    const { data } = accounts.auth.onAuthStateChange((_event, session) => {
+      setEmail(session?.user.email ?? null);
+      if (!session || !first) return;
+      first = false;
+      // Off the auth callback, so Supabase isn't asked while it's still busy.
+      window.setTimeout(async () => {
+        const local = localDog();
+        if (takeSaveOnReturn() && local) {
+          await saveDog(local);
+          restore(local);
+        } else {
+          const saved = await loadDog();
+          if (saved) restore(saved);
+        }
+      }, 0);
+    });
+    return () => data.subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // On the landing, the bottoms of the two arched windows line up with the
   // "8 short questions" line under the button.
   useEffect(() => {
@@ -213,7 +257,11 @@ export default function Onboarding() {
     try {
       localStorage.setItem("petbuddha.profile", JSON.stringify(profile));
     } catch {}
-  }, [step, pet, name, months, dobMonths, dob, kg, weightSure, sex, needs, bowl]);
+    // Signed in: keep the account copy up to date too, once the edits settle.
+    if (!email) return;
+    const t = window.setTimeout(() => saveDog(profile), 800);
+    return () => window.clearTimeout(t);
+  }, [step, pet, name, months, dobMonths, dob, kg, weightSure, sex, needs, bowl, email]);
 
   // Eyebrow, title and the line under the title, per step.
   const titles: Record<Step, [string, string, string]> = {
@@ -735,7 +783,7 @@ export default function Onboarding() {
             />
           )}
 
-          {step === "done" && pet && <Results pet={pet} name={cap(name)} months={months} kg={kg} weightSure={weightSure} sex={sex} needs={needs} bowl={bowl} onProfile={() => setStep("profile")} onRestart={restart} />}
+          {step === "done" && pet && <Results pet={pet} name={cap(name)} months={months} kg={kg} weightSure={weightSure} sex={sex} needs={needs} bowl={bowl} email={email} onProfile={() => setStep("profile")} onRestart={restart} />}
         </motion.section>
       </AnimatePresence>
 
