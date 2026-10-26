@@ -77,11 +77,8 @@ export function bowlFor(foods: Bowl[]): Bowl | null {
   return foods[0];
 }
 
-// "packaged (kibble) and fresh, meat-based", for the dog's card.
-export function foodsLabel(foods: Bowl[]) {
-  const names = FOOD_CHOICES.filter((b) => foods.includes(b.id)).map((b) => b.label.toLowerCase());
-  return names.length < 2 ? names[0] ?? null : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
-}
+// One short chip per food on the dog's card, so none wraps.
+export const FOOD_CHIP: Record<Bowl, string> = { kibble: "Eats kibble", veg: "Eats fresh veg", meat: "Eats fresh meat", raw: "Eats raw", mix: "Eats a mix" };
 
 // Saved before foods could be ticked together: one bowl, maybe "mix".
 export function foodsFromBowl(bowl: Bowl | null): Bowl[] {

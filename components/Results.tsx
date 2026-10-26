@@ -5,7 +5,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Breed } from "@/lib/flow";
 import { formatAge } from "@/lib/flow";
-import { ACTIVITIES, BOWLS, CALM, foodsLabel, FRESH_BOWLS, doseFor, type Dose, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
+import { ACTIVITIES, CALM, FOOD_CHIP, foodsFromBowl, FRESH_BOWLS, doseFor, type Dose, CHECKED, HOUSE_RULES, KINDS, NEUTER_FOR, PROBLEMS, STORES, TOILET, neuterNote, pickProducts, type Bowl, type KindId, type ProblemId, type Product, type Sex } from "@/lib/content";
 import { BODY_TIPS, BOWL_NOTE, COOKING, EXPERTS, FOOD_CREDIT, FOOD_TIPS, GARLIC_CONTEXT, GARLIC_RESEARCH, HOMEMADE_LINKS, HOMEMADE_TIPS, INDIAN_KITCHEN, LADDER, LADDER_START, BIG_DOG_TIPS, PUPPY_NOTE, SENIOR_TIPS, SKIP_INGREDIENTS, SWITCH_TIPS, TOPPERS, TOPPER_AMOUNTS, TOPPER_TIPS, WALK_TIPS, WHEN_TIPS, dailyCalories, expert, garlicCloves, groupsFor, starchGrade, starchPercent, headlineFor, tipsFor, weekPlan, PERFECT_BOWL_RULES, VEG_TIPS, GARLIC_WHY, DAL_RICE_CURD, FOOD_FAQ, RECOMMENDED_KIBBLES, SKIN_FOOD, tabName, type Expert, type Group, type GroupId, type Tip } from "@/lib/plan";
 import { Face } from "./Faces";
 import { Logo } from "./Logo";
@@ -955,7 +955,7 @@ export function Results({
   const lead = groups[0];
   const breedName = pet.face === "mixed" && pet.name.startsWith("Mixed") ? "Mixed breed" : pet.name;
   const meta = [`${formatAge(months)} old`, `${kg} kg${weightSure ? "" : " (a guess)"}`, sex === "boy" ? "Boy" : sex === "girl" ? "Girl" : null].filter(Boolean).join(" · ");
-  const bowlName = (foods.length ? foodsLabel(foods) : BOWLS.find((b) => b.id === bowl)?.label) ?? null;
+  const eats = (foods.length ? foods : foodsFromBowl(bowl)).map((f) => FOOD_CHIP[f]);
   const chosen = PROBLEMS.filter((p) => needs.includes(p.id));
   const neuter = chosen.some((p) => NEUTER_FOR.includes(p.id)) ? neuterNote(sex, months) : null;
 
@@ -1068,13 +1068,15 @@ export function Results({
           <strong>{name || breedName}</strong>
           <span>{name ? breedName : null}</span>
           <span>{meta}</span>
-          {told.length > 0 && (
+          {(told.length > 0 || eats.length > 0) && (
             <ul className="s-id-tags">
               {chosen.slice(0, 4).map((p) => (
                 <li key={p.id}>{p.label}</li>
               ))}
               {chosen.length > 4 && <li>+{chosen.length - 4} more</li>}
-              {bowlName && <li>Eats: {bowlName.toLowerCase()}</li>}
+              {eats.map((e) => (
+                <li key={e}>{e}</li>
+              ))}
             </ul>
           )}
         </div>
@@ -1521,9 +1523,9 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad, onBowl 
   const helpLabel = body.map((p) => PROBLEMS.find((x) => x.id === p)!.label.toLowerCase()).join(" and ");
 
   const choices: { id: NextId; label: string; line: string; kind: StickerKind; tone: string; on: boolean }[] = [
-    { id: "perfect", label: `${Who}'s perfect bowl`, line: "What to aim for, and a diet chart by the gram.", kind: "bowl", tone: "#e6f5c9", on: true },
-    { id: "body", label: `Is ${Who} a healthy weight?`, line: "A 2-minute body check, and a plan if needed.", kind: "paw", tone: "#c9d3ff", on: true },
-    { id: "start", label: fresh ? "Make the bowl complete" : "Start adding fresh food", line: fresh ? "What to add so nothing's missing." : "One small first step, then more.", kind: "leaf", tone: "#fbe0d2", on: true },
+    { id: "perfect", label: `${Who}'s perfect bowl`, line: "What to aim for, and a diet chart.", kind: "bowl", tone: "#e6f5c9", on: true },
+    { id: "body", label: `Is ${Who} a healthy weight?`, line: "A 2-minute check, and a plan if needed.", kind: "paw", tone: "#c9d3ff", on: true },
+    { id: "start", label: fresh ? "Make the bowl complete" : "Start adding fresh food", line: fresh ? "What to add so nothing's missing." : "One small step, then more.", kind: "leaf", tone: "#fbe0d2", on: true },
     { id: "why", label: "Why fresh food?", line: "Their bowl next to a fresh one.", kind: "sparkle", tone: "#fde3b0", on: packaged },
     { id: "help", label: `Help with ${helpLabel}`, line: "Tips and toppers for what you told us.", kind: "heart", tone: "#ddd3f7", on: body.length > 0 },
     { id: "rules", label: "Kitchen rules", line: "Safe foods, unsafe foods, how much.", kind: "sparkle", tone: "#e6f5c9", on: true },

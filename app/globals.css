@@ -13693,17 +13693,18 @@ body:has(.stage),
   color: #b2431c;
 }
 
-/* Seven "What next" tiles: 4 on top, 3 below, both rows full. */
+/* Seven "What next" tiles: 3 on top, then 2 and 2 (wider). Four across
+   squeezed the titles to two words a line. */
 .fn-choices.n-7 {
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .fn-choices.n-7 .fn-choice {
-  grid-column: span 3;
+  grid-column: span 2;
 }
 
-.fn-choices.n-7 .fn-choice:nth-child(n + 5) {
-  grid-column: span 4;
+.fn-choices.n-7 .fn-choice:nth-child(n + 4) {
+  grid-column: span 3;
 }
 
 @media (max-width: 760px) {
@@ -14329,4 +14330,32 @@ body:has(.stage),
 /* Two shop cards in a row (ready-cooked, then fresh meat): a small gap. */
 .dc-shop + .dc-shop {
   margin-top: 12px;
+}
+
+/* Chips on the dog's card stay on one line each. */
+.s-id-tags li {
+  white-space: nowrap;
+}
+
+/* A narrow "What next?" tile: the sticker and plus share the top row and
+   the words get the full width below, so titles don't break every two
+   words. Wide tiles keep everything on one row. */
+.fn-choice {
+  container-type: inline-size;
+  flex-wrap: wrap;
+}
+
+@container (max-width: 340px) {
+  .fn-choice .fn-words {
+    order: 3;
+    flex: 1 1 100%;
+  }
+
+  .fn-choice .fn-plus {
+    margin-left: auto;
+  }
+
+  .fn-choice .fn-words strong {
+    font-size: 16px;
+  }
 }
