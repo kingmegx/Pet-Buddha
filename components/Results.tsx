@@ -1353,6 +1353,9 @@ export function Results({
         <button className="linklike" onClick={onRestart}>
           Start over
         </button>
+        <a className="linklike" href="/privacy">
+          Privacy
+        </a>
       </footer>
     </div>
     </SeenTips.Provider>

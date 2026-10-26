@@ -140,7 +140,7 @@ function SaveSheet({ open, onClose, who }: { open: boolean; onClose: () => void;
                 </form>
                 {error && <p className="acct-error">{error}</p>}
 
-                <p className="acct-small">We only keep the answers about your dog. No ads, no spam.</p>
+                <p className="acct-small">We only keep the answers about your dog. No ads, no spam. <a href="/privacy" target="_blank" rel="noreferrer">Privacy</a></p>
               </>
             )}
           </motion.div>
