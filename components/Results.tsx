@@ -15,7 +15,8 @@ import { ToiletRoad } from "./ToiletRoad";
 import { BowlCompare } from "./BowlCompare";
 import { PerfectBowl } from "./PerfectBowl";
 import { BalanceBowl, type Preset } from "./BalanceBowl";
-import { DietChart } from "./DietChart";
+import { DietChart, FreshMeatCard } from "./DietChart";
+import { BodyCheck } from "./BodyCheck";
 
 // The dog's name set in the italic accent face, like "why *pet buddha*".
 function Accent({ text, word }: { text: string; word?: string }) {
@@ -1483,20 +1484,20 @@ export function Results({
 
 // The Food tab after Balance the bowl: a short row of choices, and only the
 // one they pick opens. Progressive: the diet chart is made when they ask.
-type NextId = "perfect" | "start" | "why" | "help" | "rules" | "faq";
+type NextId = "perfect" | "body" | "start" | "why" | "help" | "rules" | "faq";
 
 function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bowl: Bowl | null; needs: ProblemId[]; kg: number; months: number; who: string; Who: string; products: Product[]; onLoad: (p: Omit<Preset, "key">) => void }) {
   const [pick, setPick] = useState<NextId | null>(null);
   const [chart, setChart] = useState<"no" | "making" | "yes">("no");
   const fresh = !!bowl && FRESH_BOWLS.includes(bowl);
   const packaged = !bowl || bowl === "kibble" || bowl === "mix";
-  const body = (["tummy", "picky", "weight", "joints"] as ProblemId[]).filter((p) => needs.includes(p));
+  // Weight is answered by the body condition check, so it has its own tile.
+  const body = (["tummy", "picky", "joints"] as ProblemId[]).filter((p) => needs.includes(p));
   const kinds = (
     [
       ["joints", needs.includes("joints")],
       ["gut", needs.includes("tummy")],
       ["picky", needs.includes("picky")],
-      ["slim", needs.includes("weight")],
     ] as [KindId, boolean][]
   )
     .filter(([, on]) => on)
@@ -1505,10 +1506,11 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bow
 
   const choices: { id: NextId; label: string; line: string; kind: StickerKind; tone: string; on: boolean }[] = [
     { id: "perfect", label: `${Who}'s perfect bowl`, line: "What to aim for, and a diet chart by the gram.", kind: "bowl", tone: "#e6f5c9", on: true },
+    { id: "body", label: `Is ${Who} a healthy weight?`, line: "A 2-minute body check, and a plan if needed.", kind: "paw", tone: "#c9d3ff", on: true },
     { id: "start", label: fresh ? "Make the bowl complete" : "Start adding fresh food", line: fresh ? "What to add so nothing's missing." : "One small first step, then more.", kind: "leaf", tone: "#fbe0d2", on: true },
     { id: "why", label: "Why fresh food?", line: "Their bowl next to a fresh one.", kind: "sparkle", tone: "#fde3b0", on: packaged },
     { id: "help", label: `Help with ${helpLabel}`, line: "Tips and toppers for what you told us.", kind: "heart", tone: "#ddd3f7", on: body.length > 0 },
-    { id: "rules", label: "Kitchen rules", line: "Safe foods, unsafe foods, how much.", kind: "paw", tone: "#c9d3ff", on: true },
+    { id: "rules", label: "Kitchen rules", line: "Safe foods, unsafe foods, how much.", kind: "sparkle", tone: "#e6f5c9", on: true },
     { id: "faq", label: "Questions people ask", line: "Curd rice, rice for tummies, and more.", kind: "nose", tone: "#fbe0d2", on: true },
   ];
   const shown = choices.filter((c) => c.on);
@@ -1617,6 +1619,7 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bow
                 <>
                   {bowl && <p className="fn-lead">{BOWL_NOTE[bowl]}</p>}
                   <Tips compact tips={HOMEMADE_TIPS} />
+                  {bowl === "veg" && <FreshMeatCard />}
                   {links}
                   <Fold title="Fresh toppers to add" line="Easy fresh extras from your own kitchen, and how much of each.">
                     <ToppersGrid />
@@ -1628,6 +1631,7 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bow
                 <>
                   <p className="fn-lead">Keep their usual food. Add fresh bites, up to a tenth of the day&apos;s food.</p>
                   <Tips compact tips={TOPPER_TIPS} />
+                  <FreshMeatCard />
                   {/* For the packaged part: a better kibble while they move towards fresh. */}
                   {RECOMMENDED_KIBBLES.length > 0 && (
                     <div className="fn-kibble">
@@ -1659,6 +1663,13 @@ function FoodNext({ bowl, needs, kg, months, who, Who, products, onLoad }: { bow
               ))}
 
             {pick === "why" && <BowlCompare bowl={bowl} needs={needs} who={Who} />}
+
+            {pick === "body" && (
+              <>
+                <BodyCheck kg={kg} months={months} who={Who} onLoad={onLoad} onExperts={() => document.getElementById("experts")?.scrollIntoView({ behavior: "smooth", block: "start" })} />
+                {needs.includes("weight") && <KindShelf id="slim" products={products} who={who} needs={needs} />}
+              </>
+            )}
 
             {pick === "help" && (
               <>

@@ -524,11 +524,26 @@ export const TOPPER_TIPS: Tip[] = [
 
 // What to put on top. Grouped so the list can be scanned.
 export const TOPPERS: { group: string; items: string[] }[] = [
-  { group: "Vegetables", items: ["Carrot", "Cucumber", "Broccoli", "Cauliflower (gobhi)", "Spinach (palak)", "Green beans", "Peas", "Okra (bhindi)", "Pumpkin", "Button mushrooms, cooked", "Celery", "Bell pepper"] },
+  { group: "Vegetables", items: ["Broccoli", "Pumpkin", "Green beans", "Carrot", "Celery", "Red bell pepper", "Zucchini", "Spinach (a little)", "Sweet potato (a little)", "Beetroot (a little)"] },
   { group: "Fruit", items: ["Raw green banana (kaccha kela)", "Papaya", "Pomegranate seeds", "Apple, no seeds", "Strawberries, no stems", "Blueberries", "Pineapple", "Coconut, unsweetened", "Kiwi"] },
   { group: "Protein", items: ["Egg, any way", "Sardines (mathi), in water", "Liver, heart and other organs", "Plain cooked chicken, fish, mutton"] },
   { group: "Spice box", items: ["Turmeric (haldi)", "Cumin (jeera)", "Cinnamon (dalchini)", "Fresh coriander", "Ginger", "Parsley", "A pinch of ground clove", "Fresh garlic, measured"] },
 ];
+
+// How to cook a dog's bowl, Indian kitchen style.
+export const COOKING: Tip[] = [
+  { t: "Boil it gently", d: "Simmer the meat in plain water until just cooked through. Keep the water: it's broth for the bowl." },
+  { t: "Pressure cooker? One whistle", d: "Short on time, a pressure cooker is fine. One whistle is enough; more makes the meat tough." },
+  { t: "No masala", d: "No salt, onion, chilli, garam masala or ready pastes. Only dog-safe spices: a pinch of haldi, jeera or dalchini." },
+  { t: "Veg, lightly", d: "Steam or boil the veg lightly, or chop it raw and fine, then mix it in." },
+];
+
+// Fresh meat cut for dogs, delivered (Canine Craving), for anyone switching.
+export const FRESH_MEAT_SHOP = {
+  name: "Canine Craving",
+  meat: "https://www.caninecraving.com/collections/dog-fresh-meat-seafood",
+  meals: "https://www.caninecraving.com/collections/fresh-meal",
+};
 
 export const TOPPER_AMOUNTS: Tip[] = [
   { t: "Organs: a paw a day", d: "Liver and other organs are rich. About the size of your dog's paw is plenty for a day." },
@@ -696,10 +711,12 @@ export const BODY_TIPS: Partial<Record<ProblemId, Tip[]>> = {
     { t: "Start before it hurts", d: "Big and long-backed breeds are prone to joint trouble later. Joint support can start once they're fully grown.", src: "Doggiliciouus" },
   ],
   weight: [
-    { t: "A lighter dog, more good years", d: "Even a little extra weight puts strain on the joints and the body. Bringing it down gently is one of the kindest things you can do for them.", src: "@whatsinmydogbowl" },
-    { t: "Swap, don't add", d: "Take 10% of their food away and give fresh toppers in its place." },
-    { t: "1% a week", d: "Aim to lose about 1% of body weight a week. Weigh them weekly." },
-    { t: "A shorter window", d: "Feed within 10 hours for two weeks, then 8 hours. Ask your vet to set the target weight." },
+    { t: "Check their body shape first", d: "Weight alone doesn't tell you much. A two-minute body condition check shows whether they're carrying extra, and how much to aim to lose." },
+    { t: "Feed for the weight you want", d: "Work out the calories for their target weight, not the weight they are now, and feed that." },
+    { t: "Weigh the food", d: "Use a kitchen scale for a week. Cups and handfuls creep up without anyone noticing." },
+    { t: "Swap starch for veg", d: "Cut back the rice, roti or kibble and fill the gap with green beans, pumpkin or zucchini. Same full bowl, far fewer calories." },
+    { t: "Treats count", d: "Keep treats under a tenth of the day. Use bits of their meal, or crunchy veg, as rewards." },
+    { t: "Slow and steady", d: "Aim to lose about 1% of their body weight a week. Weigh them every week, same time, same scale. Ask your vet to confirm the target.", src: "@whatsinmydogbowl" },
   ],
 };
 

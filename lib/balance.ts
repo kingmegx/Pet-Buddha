@@ -138,6 +138,7 @@ export const BRANDS: Brand[] = [
   { id: "hearty-chicken", name: "Hearty Chicken & Duck (adult)", protein: 36.2, fat: 10.7, fibre: 4.5, moisture: 11, ash: 7.8 },
   { id: "hearty-lamb", name: "Hearty Lamb & Blueberry (adult)", protein: 36.9, fat: 11.4, fibre: 4.5, moisture: 11, ash: 6.1 },
   { id: "hearty-gf", name: "Hearty Grain-Free Turkey, Fish & Chicken", protein: 30.9, fat: 18.2, fibre: 2, moisture: 9, ash: 2.8 },
+  { id: "hearty-puppy", name: "Hearty Puppy, Chicken & Fish", protein: 30.7, fat: 17.9, fibre: 1.73, moisture: 5.14 }, // ash isn't on the pack
   { id: "orijen", name: "Orijen Original", protein: 38, fat: 18, fibre: 4, moisture: 12, ash: 10 }, // ash isn't on the label; set so starch matches its stated 18%
   { id: "acana-small", name: "Acana Small Breed Adult", protein: 31, fat: 17, fibre: 5, moisture: 12, ash: 7 },
   { id: "acana-large", name: "Acana Large Breed Adult", protein: 31, fat: 15, fibre: 6, moisture: 12, ash: 7 },

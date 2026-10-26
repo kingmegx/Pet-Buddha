@@ -1,7 +1,7 @@
 "use client";
 
 import { dietChart } from "@/lib/balance";
-import { garlicCloves } from "@/lib/plan";
+import { COOKING, FRESH_MEAT_SHOP, garlicCloves } from "@/lib/plan";
 import type { Preset } from "./BalanceBowl";
 
 // A day's bowl for a healthy adult dog, by the gram, in the shape of The
@@ -120,6 +120,21 @@ export function DietChart({ kg, months, need, who, onLoad, onExperts }: { kg: nu
         </div>
       </div>
 
+      {/* How to cook it, and where to get fresh meat cut for dogs. */}
+      <div className="dc-cook">
+        <span className="dc-part">How to cook it</span>
+        <ol className="tc tc-compact">
+          {COOKING.map((c, i) => (
+            <li key={c.t}>
+              <span className="tc-num">{String(i + 1).padStart(2, "0")}</span>
+              <strong>{c.t}</strong>
+              <p>{c.d}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <FreshMeatCard />
+
       <div className="dc-gaps">
         <p>
           <strong>Even a good home bowl misses a few things</strong>, like zinc, vitamin D and E, and iodine. The book&apos;s recipes add them as supplements. Load this bowl into the checker above to see what&apos;s missing and what fixes it.
@@ -143,6 +158,25 @@ export function DietChart({ kg, months, need, who, onLoad, onExperts }: { kg: nu
         </button>
       </div>
       <p className="dc-src">Built on the complete homemade recipes in The Forever Dog by Rodney Habib and Dr. Karen Becker, with Indian foods.</p>
+    </div>
+  );
+}
+
+// Fresh meat, delivered: for anyone moving to a fresh, meat-based bowl.
+export function FreshMeatCard() {
+  return (
+    <div className="dc-shop">
+      <p>
+        <strong>No butcher you trust?</strong> {FRESH_MEAT_SHOP.name} delivers farm-fresh meat and organs cut for dogs (chicken, mutton, buffalo, duck and more), and ready-cooked fresh meals. Check they deliver to your city.
+      </p>
+      <p className="s-links">
+        <a href={FRESH_MEAT_SHOP.meat} target="_blank" rel="noreferrer">
+          Fresh meat and organs <span aria-hidden>→</span>
+        </a>
+        <a href={FRESH_MEAT_SHOP.meals} target="_blank" rel="noreferrer">
+          Ready fresh meals <span aria-hidden>→</span>
+        </a>
+      </p>
     </div>
   );
 }
