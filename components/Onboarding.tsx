@@ -8,7 +8,7 @@ import { Face } from "./Faces";
 import { CatBust, ProfileBust } from "./Busts";
 import { NicheArt } from "./NicheArt";
 import { HeroDoodles, LandingMore, Squiggle } from "./LandingMore";
-import { BLOB, Sticker, type StickerKind } from "./Stickers";
+import { BLOB } from "./Stickers";
 import { NameTag } from "./NameTag";
 import { Pack, aimPack, type PackMood } from "./Pack";
 import { CatBox, type BoxBrand, type CatCoat } from "./CatBox";
@@ -62,18 +62,6 @@ function Rise({ text, accent }: { text: string; accent?: string }) {
   );
 }
 
-// A line-art sticker and a text sticker on each question, in the corners,
-// like the ones scattered around the landing's sections.
-const STEP_STICKERS: Partial<Record<Step, { kind: StickerKind; tone: string; ink: string; text: string; ts: string }>> = {
-  species: { kind: "heart", tone: "#fbe0d2", ink: "#7c2d4a", text: "hi there", ts: "ts-lime" },
-  name: { kind: "sparkle", tone: "#fde3b0", ink: "#6b3a12", text: "good name!", ts: "ts-lilac" },
-  breed: { kind: "nose", tone: "#e6f5c9", ink: "#1f5c43", text: "no two noses alike", ts: "ts-coral" },
-  weight: { kind: "bone", tone: "#c9d3ff", ink: "#3a3f8f", text: "no scales needed", ts: "ts-sun" },
-  age: { kind: "ball", tone: "#fde3b0", ink: "#6b3a12", text: "puppy or wise one?", ts: "ts-lime" },
-  sex: { kind: "paw", tone: "#ecd3f5", ink: "#7c2d4a", text: "noted", ts: "ts-coral" },
-  needs: { kind: "leaf", tone: "#e6f5c9", ink: "#1f5c43", text: "we've got you", ts: "ts-lilac" },
-  food: { kind: "bowl", tone: "#fbe0d2", ink: "#7c2d4a", text: "bowl talk", ts: "ts-sun" },
-};
 const HERO_TONES = ["#c9d3ff", "#e6f5c9", "#fbe0d2", "#ecd3f5", "#fde3b0"];
 const TAG_TONES = ["ts-lime", "ts-coral", "ts-lilac", "ts-sun"];
 
@@ -282,14 +270,14 @@ export default function Onboarding() {
   // Eyebrow, title and the line under the title, per step.
   const titles: Record<Step, [string, string, string]> = {
     landing: ["", "", ""],
-    species: ["Step 1 of 8", "Who are we helping today?", ""],
-    name: ["Step 2 of 8", "What's your dog's name?", "We'll use it to personalise the plan. It stays on this device."],
-    breed: ["Step 3 of 8", `What breed is ${who}?`, "Search, or pick the closest face. Not sure? Choose \"Mixed\" and the plan still works."],
-    weight: ["Step 4 of 8", `How much does ${who} weigh?`, "A rough guess is fine. It helps us size chews and portions safely."],
-    age: ["Step 5 of 8", `How old is ${who}?`, "Age changes what's safe to chew and what they need."],
-    sex: ["Step 6 of 8", `Is ${who} a boy or a girl?`, "A few behaviours differ between the two."],
-    needs: ["Step 7 of 8", "What would you like help with?", `Pick all that apply. We've pre-selected what's common at ${formatAge(months)}.`],
-    food: ["Step 8 of 8", `What does ${who} eat now?`, "Tick everything that goes in the bowl, then anything you've noticed about their body."],
+    species: ["Question 1 of 8", "Who are we helping today?", ""],
+    name: ["Question 2 of 8", "What's your dog's name?", "We'll use it to personalise the plan. It stays on this device."],
+    breed: ["Question 3 of 8", `What breed is ${who}?`, "Search, or pick the closest face. Not sure? Choose \"Mixed\" and the plan still works."],
+    weight: ["Question 4 of 8", `How much does ${who} weigh?`, "A rough guess is fine. It helps us size chews and portions safely."],
+    age: ["Question 5 of 8", `How old is ${who}?`, "Age changes what's safe to chew and what they need."],
+    sex: ["Question 6 of 8", `Is ${who} a boy or a girl?`, "A few behaviours differ between the two."],
+    needs: ["Question 7 of 8", "What would you like help with?", `Pick all that apply. We've pre-selected what's common at ${formatAge(months)}.`],
+    food: ["Question 8 of 8", `What does ${who} eat now?`, "Tick everything that goes in the bowl, then anything you've noticed about their body."],
     curating: ["One moment", `Putting it together for ${who}`, ""],
     done: ["", "", ""],
     profile: ["", "", ""],
@@ -369,18 +357,6 @@ export default function Onboarding() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence mode="wait">
-        {STEP_STICKERS[step] && (
-          <motion.div key={step} className="step-stickers" aria-hidden initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }}>
-            <motion.span className="step-line" initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: -8 }} transition={{ type: "spring", stiffness: 260, damping: 14, delay: 0.25 }}>
-              <Sticker kind={STEP_STICKERS[step]!.kind} tone={STEP_STICKERS[step]!.tone} ink={STEP_STICKERS[step]!.ink} />
-            </motion.span>
-            <motion.span className={`step-text text-sticker ${STEP_STICKERS[step]!.ts}`} initial={{ scale: 0, rotate: 12 }} animate={{ scale: 1, rotate: 5 }} transition={{ type: "spring", stiffness: 260, damping: 14, delay: 0.35 }}>
-              {STEP_STICKERS[step]!.text}
-            </motion.span>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <AnimatePresence>
         {heroOn && pet && (

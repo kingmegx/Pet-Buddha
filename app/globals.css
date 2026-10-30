@@ -14657,3 +14657,10 @@ body:has(.stage),
     color: #5c5650;
   }
 }
+
+/* The questions sit on chalk white. */
+html:has(.stage.is-q),
+body:has(.stage.is-q),
+.stage.is-q {
+  background: #fbffff;
+}
